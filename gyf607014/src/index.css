@@ -1,0 +1,77 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700;900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #37464A;
+  background-color: #FBF7F4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #FBF7F4;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-teal-500 px-4 py-2 text-sm font-medium text-white shadow-card transition-all duration-150 hover:bg-teal-600 hover:-translate-y-px hover:shadow-cardHover active:translate-y-0 active:shadow-card disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-teal-500/20 bg-white px-4 py-2 text-sm font-medium text-teal-600 shadow-card transition-all duration-150 hover:bg-teal-50 hover:-translate-y-px hover:shadow-cardHover active:translate-y-0;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate2-500 transition-colors duration-150 hover:bg-teal-50 hover:text-teal-600;
+  }
+  .btn-warning {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2 text-sm font-medium text-white shadow-card transition-all duration-150 hover:bg-amber-600 hover:-translate-y-px hover:shadow-cardHover active:translate-y-0;
+  }
+  .card {
+    @apply rounded-xl bg-white shadow-card border border-teal-500/5;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-cardHover hover:-translate-y-0.5;
+  }
+  .input-field {
+    @apply w-full rounded-md border border-teal-500/15 bg-white px-3 py-2 text-sm text-slate2-700 shadow-sm transition-all duration-150 placeholder:text-slate2-400 focus:border-teal-500/50 focus:outline-none focus:ring-2 focus:ring-teal-500/15;
+  }
+  .input-field-warning {
+    @apply w-full rounded-md border border-amber-400/60 bg-amber-50/30 px-3 py-2 text-sm text-slate2-700 shadow-sm transition-all duration-150 placeholder:text-slate2-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/15;
+  }
+  .label {
+    @apply block text-xs font-medium text-slate2-500 mb-1.5 tracking-wide;
+  }
+  .status-pill {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .chip {
+    @apply inline-flex items-center rounded-md bg-cream-200 px-2 py-0.5 text-xs text-slate2-600;
+  }
+  .section-title {
+    @apply font-serif text-lg font-semibold text-teal-700 tracking-tight;
+  }
+  .divider {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-teal-500/10 to-transparent;
+  }
+}
+
+@layer utilities {
+  .animate-delay-100 { animation-delay: 100ms; }
+  .animate-delay-200 { animation-delay: 200ms; }
+  .animate-delay-300 { animation-delay: 300ms; }
+  .animate-delay-400 { animation-delay: 400ms; }
+  .animate-delay-500 { animation-delay: 500ms; }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background-color: rgba(15,76,92,0.15); border-radius: 3px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .text-balance { text-wrap: balance; }
+}
