@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>婴幼儿费用核销回访册 · 儿保随访版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f0f4f8;color:#333}
+.header{background:linear-gradient(135deg,#1e88e5,#1565c0);color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.header h1{font-size:20px;font-weight:600}
+.header .user{display:flex;gap:12px;align-items:center;font-size:14px}
+.header .role{background:rgba(255,255,255,.2);padding:4px 10px;border-radius:12px;font-size:12px}
+.btn{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:14px;transition:all .2s;font-weight:500}
+.btn-primary{background:#1e88e5;color:#fff}
+.btn-primary:hover{background:#1565c0}
+.btn-success{background:#43a047;color:#fff}
+.btn-success:hover{background:#2e7d32}
+.btn-warn{background:#fb8c00;color:#fff}
+.btn-danger{background:#e53935;color:#fff}
+.btn-danger:hover{background:#c62828}
+.btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5)}
+.btn-small{padding:4px 10px;font-size:12px}
+.container{max-width:1400px;margin:20px auto;padding:0 20px}
+.tabs{display:flex;gap:4px;border-bottom:2px solid #e0e0e0;margin-bottom:20px}
+.tab{padding:12px 24px;cursor:pointer;border-radius:6px 6px 0 0;font-size:14px;color:#666;transition:all .2s}
+.tab.active{background:#fff;color:#1e88e5;border-bottom:2px solid #1e88e5;font-weight:600;margin-bottom:-2px}
+.tab:hover:not(.active){background:#e3f2fd;color:#1565c0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.stat-card .label{font-size:13px;color:#888;margin-bottom:8px}
+.stat-card .value{font-size:28px;font-weight:700;color:#1e88e5}
+.stat-card.warn .value{color:#fb8c00}
+.stat-card.danger .value{color:#e53935}
+.stat-card.success .value{color:#43a047}
+.card{background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:20px}
+.card h2{font-size:16px;margin-bottom:16px;color:#333;display:flex;align-items:center;gap:8px}
+.card h2::before{content:'';width:4px;height:18px;background:#1e88e5;border-radius:2px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f5f7fa;padding:12px;text-align:left;font-weight:600;color:#555;border-bottom:2px solid #e0e0e0;white-space:nowrap}
+td{padding:12px;border-bottom:1px solid #f0f0f0;color:#444}
+tr:hover{background:#fafbfc}
+.badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;display:inline-block}
+.badge-success{background:#e8f5e9;color:#2e7d32}
+.badge-pending{background:#fff3e0;color:#ef6c00}
+.badge-partial{background:#fce4ec;color:#c2185b}
+.badge-failed{background:#ffebee;color:#c62828}
+.badge-cancelled{background:#eceff1;color:#546e7a}
+.badge-manual{background:#e1f5fe;color:#0277bd}
+.badge-sample{background:#f3e5f5;color:#6a1b9a}
+.badge-warn{background:#fff9c4;color:#f57f17}
+.empty{text-align:center;padding:60px 20px;color:#999;font-size:14px}
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999}
+.modal-mask.show{display:flex}
+.modal{background:#fff;border-radius:12px;padding:24px;min-width:520px;max-width:90vw;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h3{font-size:18px;margin-bottom:20px;color:#333}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:13px;color:#555;margin-bottom:6px;font-weight:500}
+.form-row input,.form-row select,.form-row textarea{width:100%;padding:8px 12px;border:1px solid #d0d0d0;border-radius:6px;font-size:14px;outline:none;transition:border .2s}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:#1e88e5}
+.form-row textarea{resize:vertical;min-height:60px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.checkbox-row{display:flex;align-items:center;gap:8px;padding:8px 0}
+.checkbox-row input{width:auto}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #eee}
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1e88e5,#0d47a1)}
+.login-box{background:#fff;padding:40px;border-radius:16px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-box h2{text-align:center;color:#1e88e5;margin-bottom:8px}
+.login-box .sub{text-align:center;color:#888;font-size:13px;margin-bottom:28px}
+.steps{background:#f5f7fa;padding:16px;border-radius:8px;margin-bottom:20px}
+.steps h4{font-size:14px;margin-bottom:12px;color:#555}
+.step-item{display:flex;gap:10px;padding:8px 0;font-size:13px;color:#444}
+.step-num{width:22px;height:22px;background:#1e88e5;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.step-item.optional .step-num{background:#90a4ae}
+.step-content b{color:#333}
+.tip{background:#e3f2fd;padding:12px 16px;border-radius:6px;border-left:4px solid #1e88e5;font-size:13px;color:#1565c0;margin-bottom:16px}
+.tip-warn{background:#fff3e0;border-color:#fb8c00;color:#e65100}
+.tip-danger{background:#ffebee;border-color:#e53935;color:#b71c1c}
+.history-list{max-height:280px;overflow:auto}
+.history-item{padding:12px;background:#f8f9fa;border-radius:6px;margin-bottom:8px;font-size:12px}
+.history-item .h-meta{color:#888;margin-bottom:6px;display:flex;justify-content:space-between}
+.history-item .h-field{color:#1e88e5;font-weight:600}
+.history-item .h-diff{color:#555;margin-top:4px}
+.history-item .h-diff .old{color:#e53935;text-decoration:line-through}
+.history-item .h-diff .new{color:#2e7d32;font-weight:600}
+.audit-tag{background:#ffebee;color:#c62828;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;margin-left:6px}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search-input{padding:8px 12px;border:1px solid #d0d0d0;border-radius:6px;font-size:14px;width:240px}
+.hidden{display:none!important}
+.manual-highlight{background:#fffde7}
+.cross-class-tag{background:#fce4ec;color:#c2185b;padding:2px 6px;border-radius:4px;font-size:11px}
+</style>
+</head>
+<body>
+
+<div id="login-page" class="login-page hidden">
+  <div class="login-box">
+    <h2>婴幼儿费用核销回访册</h2>
+    <div class="sub">儿保随访版</div>
+    <div class="form-row">
+      <label>用户名</label>
+      <input id="login-user" placeholder="nurse01 或 super01">
+    </div>
+    <div class="form-row">
+      <label>密码</label>
+      <input id="login-pwd" type="password" placeholder="123456" value="123456">
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;margin-top:8px" onclick="doLogin()">登 录</button>
+    <div style="margin-top:20px;font-size:12px;color:#888;text-align:center">
+      护士账号: nurse01 / 123456 &nbsp;|&nbsp; 主管账号: super01 / 123456
+    </div>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <div class="header">
+    <h1>🏥 婴幼儿费用核销回访册 · 儿保随访版</h1>
+    <div class="user">
+      <span id="user-realname"></span>
+      <span id="user-role" class="role"></span>
+      <button class="btn btn-ghost btn-small" onclick="logout()">退出</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-tab="records">核销记录</div>
+      <div class="tab" data-tab="babies">宝宝档案</div>
+      <div class="tab supervisor-only hidden" data-tab="audit">审计中心</div>
+    </div>
+
+    <div id="tab-records">
+      <div id="balance-alert"></div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h2 style="margin-bottom:0">核销记录列表</h2>
+          <div class="flex">
+            <select id="filter-status" class="search-input" onchange="loadRecords()">
+              <option value="">全部状态</option>
+              <option value="success">核销成功</option>
+              <option value="partial_success">部分成功</option>
+              <option value="pending">待处理</option>
+              <option value="cancelled">已取消</option>
+            </select>
+            <button class="btn btn-primary" onclick="openCreateModal()">➕ 新建核销</button>
+            <button class="btn btn-warn" onclick="importSamples()">📥 导入样例</button>
+          </div>
+        </div>
+        <div id="workflow-tips" class="steps">
+          <h4>📋 新人操作步骤指引 <button class="btn btn-small" style="float:right" onclick="loadSteps()">刷新</button></h4>
+          <div id="steps-list"></div>
+        </div>
+        <div id="records-table"></div>
+      </div>
+    </div>
+
+    <div id="tab-babies" class="hidden">
+      <div class="card">
+        <h2>宝宝档案（含账户余额）</h2>
+        <div id="babies-table"></div>
+      </div>
+    </div>
+
+    <div id="tab-audit" class="hidden">
+      <div class="card">
+        <h2>审计日志 <span style="font-size:12px;color:#888;font-weight:normal">（仅主管可见）</span></h2>
+        <div id="audit-logs"></div>
+      </div>
+      <div class="card">
+        <h2>负余额预警 <span style="font-size:12px;color:#888;font-weight:normal">（月底重点关注）</span></h2>
+        <div id="negative-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="create-modal">
+  <div class="modal">
+    <h3>新建核销记录</h3>
+    <div class="tip">按以下步骤操作,新人也能准确完成核销。</div>
+    <div class="steps" style="background:#fff;border:1px solid #eee">
+      <div id="create-steps"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>选择宝宝 *</label>
+        <select id="f-baby"></select>
+      </div>
+      <div class="form-row">
+        <label>服务日期 *</label>
+        <input id="f-date" type="date">
+      </div>
+      <div class="form-row">
+        <label>服务类型 *</label>
+        <select id="f-type">
+          <option>常规儿保</option>
+          <option>疫苗接种</option>
+          <option>体检复查</option>
+          <option>营养咨询</option>
+          <option>手工补录</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>费用金额 *</label>
+        <input id="f-amount" type="number" step="0.01" placeholder="单位:元">
+      </div>
+      <div class="form-row">
+        <label>班次</label>
+        <select id="f-shift">
+          <option>上午班</option>
+          <option>下午班</option>
+          <option>全天</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>班级</label>
+        <input id="f-class" placeholder="自动带出,可改">
+      </div>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="f-cross" onchange="document.getElementById('f-note').disabled=!this.checked">
+      <label for="f-cross" style="margin:0;cursor:pointer">宝宝跨班(部分服务完成),勾选后填写说明</label>
+    </div>
+    <div class="form-row">
+      <label>部分成功说明 <span style="color:#888">(跨班时填写)</span></label>
+      <textarea id="f-note" placeholder="例:上午在太阳班完成疫苗,下午转月亮班未完成体检" disabled></textarea>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="f-manual">
+      <label for="f-manual" style="margin:0;cursor:pointer">标记为手工补录(用于补录历史数据)</label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('create-modal')">取消</button>
+      <button class="btn btn-primary" onclick="submitCreate()">提交核销</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="detail-modal">
+  <div class="modal">
+    <h3>核销记录详情</h3>
+    <div id="detail-content"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('detail-modal')">关闭</button>
+      <button class="btn btn-warn" id="btn-edit" onclick="openEdit()">修改</button>
+      <button class="btn btn-success supervisor-only hidden" id="btn-review" onclick="doReview()">主管复核</button>
+      <button class="btn btn-danger" onclick="doCancel()">取消核销</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="edit-modal">
+  <div class="modal">
+    <h3>修改核销记录</h3>
+    <div class="tip tip-warn">修改后会在历史记录中保留旧值、操作人和修改时间,主管可审计。</div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>服务日期</label>
+        <input id="e-date" type="date">
+      </div>
+      <div class="form-row">
+        <label>服务类型</label>
+        <select id="e-type">
+          <option>常规儿保</option>
+          <option>疫苗接种</option>
+          <option>体检复查</option>
+          <option>营养咨询</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>费用金额</label>
+        <input id="e-amount" type="number" step="0.01">
+      </div>
+      <div class="form-row">
+        <label>状态</label>
+        <select id="e-status">
+          <option value="success">核销成功</option>
+          <option value="partial_success">部分成功</option>
+          <option value="pending">待处理</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>班次</label>
+        <select id="e-shift">
+          <option>上午班</option>
+          <option>下午班</option>
+          <option>全天</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>班级</label>
+        <input id="e-class">
+      </div>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="e-cross">
+      <label for="e-cross" style="margin:0">跨班</label>
+    </div>
+    <div class="form-row">
+      <label>部分成功说明</label>
+      <textarea id="e-note"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('edit-modal')">取消</button>
+      <button class="btn btn-primary" onclick="submitEdit()">保存修改</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentUser = null;
+let currentRecord = null;
+
+function $(id){return document.getElementById(id)}
+function show(id){$(id).classList.remove('hidden')}
+function hide(id){$(id).classList.add('hidden')}
+function statusBadge(s,source){
+  const map={success:'核销成功 badge-success',pending:'待处理 badge-pending',
+    partial_success:'部分成功 badge-partial',failed:'失败 badge-failed',
+    cancelled:'已取消 badge-cancelled'};
+  let html='<span class="badge '+map[s].split(' ').slice(1).join(' ')+'">'+map[s].split(' ')[0]+'</span>';
+  if(source==='manual') html+=' <span class="badge badge-manual">手工补录</span>';
+  if(source==='sample') html+=' <span class="badge badge-sample">样例</span>';
+  return html;
+}
+
+async function api(url,opt={}){
+  const r=await fetch(url,Object.assign({headers:{'Content-Type':'application/json'}},opt,
+    opt.body?{body:JSON.stringify(opt.body)}:{}));
+  if(!r.ok){try{const e=await r.json();alert(e.error||'请求失败');}catch(_){alert('请求失败');}return null;}
+  return r.json();
+}
+
+async function doLogin(){
+  const u=$('login-user').value.trim();const p=$('login-pwd').value;
+  if(!u||!p){alert('请输入用户名密码');return}
+  const r=await api('/api/login',{method:'POST',body:{username:u,password:p}});
+  if(r&&r.ok){currentUser=r.user;initApp();}
+}
+
+async function logout(){
+  await api('/api/logout',{method:'POST'});
+  currentUser=null;location.reload();
+}
+
+function initApp(){
+  hide('login-page');show('app');
+  $('user-realname').textContent=currentUser.realName;
+  $('user-role').textContent=currentUser.role==='supervisor'?'主管账号':'普通护士';
+  if(currentUser.role==='supervisor'){
+    document.querySelectorAll('.supervisor-only').forEach(el=>el.classList.remove('hidden'));
+  }
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.onclick=()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      ['records','babies','audit'].forEach(k=>hide('tab-'+k));
+      show('tab-'+t.dataset.tab);
+      if(t.dataset.tab==='records'){loadRecords();loadStats();loadSteps();}
+      if(t.dataset.tab==='babies')loadBabies();
+      if(t.dataset.tab==='audit'&&currentUser.role==='supervisor')loadAudit();
+    };
+  });
+  loadStats();loadRecords();loadSteps();
+  $('f-date').value=new Date().toISOString().slice(0,10);
+}
+
+async function loadStats(){
+  const r=await api('/api/stats');if(!r)return;
+  $('stats').innerHTML=`
+    <div class="stat-card"><div class="label">核销记录总数</div><div class="value">${r.total}</div></div>
+    <div class="stat-card success"><div class="label">核销成功</div><div class="value">${r.success}</div></div>
+    <div class="stat-card warn"><div class="label">部分成功(跨班)</div><div class="value">${r.partial}</div></div>
+    <div class="stat-card"><div class="label">待处理</div><div class="value">${r.pending}</div></div>
+    <div class="stat-card ${r.negativeCount>0?'danger':''}"><div class="label">负余额预警</div><div class="value">${r.negativeCount}</div></div>
+  `;
+  if(r.negativeCount>0){
+    $('balance-alert').innerHTML=`<div class="tip tip-danger">⚠️ 发现 ${r.negativeCount} 个宝宝账户余额为负,请主管及时处理!(历史记录可查)</div>`;
+  }
+}
+
+async function loadSteps(){
+  const r=await api('/api/workflow/steps');if(!r)return;
+  const html=r.steps.map(s=>`
+    <div class="step-item ${s.required?'':'optional'}">
+      <div class="step-num">${s.step}</div>
+      <div class="step-content"><b>${s.title}</b>${s.required?'':' <span style="color:#90a4ae">(可选)</span>'}<br><span style="color:#666">${s.desc}</span></div>
+    </div>`).join('');
+  $('steps-list').innerHTML=html;
+  $('create-steps').innerHTML=html;
+}
+
+async function loadRecords(){
+  const st=$('filter-status').value;
+  const r=await api('/api/records'+(st?'?status='+st:''));if(!r)return;
+  if(r.records.length===0){$('records-table').innerHTML='<div class="empty">暂无记录,点击右上角"新建核销"或"导入样例"开始</div>';return;}
+  const cols=currentUser.role==='supervisor'
+    ?['核销单号','宝宝','班级','服务日期','服务类型','金额','状态','班次','操作人','复核','创建时间','操作']
+    :['核销单号','宝宝','班级','服务日期','服务类型','金额','状态','班次','操作人','复核时间','创建时间','操作'];
+  $('records-table').innerHTML=`<table><thead><tr>${cols.map(c=>'<th>'+c+'</th>').join('')}</tr></thead><tbody>
+    ${r.records.map(x=>`<tr class="${x.source==='manual'?'manual-highlight':''}">
+      <td><b>${x.record_no}</b></td>
+      <td>${x.baby_no} ${x.baby_name}${x.is_cross_class?' <span class="cross-class-tag">跨班</span>':''}</td>
+      <td>${x.class_name||''}</td>
+      <td>${x.service_date}</td>
+      <td>${x.service_type}</td>
+      <td><b style="color:#e65100">¥${x.amount.toFixed(2)}</b></td>
+      <td>${statusBadge(x.status,x.source)}</td>
+      <td>${x.shift||''}</td>
+      <td>${x.operator_name}</td>
+      <td>${currentUser.role==='supervisor'?(x.reviewer_name?x.reviewer_name+'<br><span style="color:#888;font-size:11px">'+(x.review_time||'')+'</span>':'<span style="color:#888">未复核</span>'):(x.review_time||'未复核')}</td>
+      <td style="font-size:12px;color:#888">${x.created_at}</td>
+      <td><button class="btn btn-small btn-primary" onclick="viewDetail(${x.id})">详情</button></td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+async function loadBabies(){
+  const r=await api('/api/babies');if(!r)return;
+  $('babies-table').innerHTML=`<table><thead><tr>
+    <th>编号</th><th>姓名</th><th>性别</th><th>生日</th><th>班级</th><th>监护人</th><th>联系电话</th><th>账户余额</th>
+  </tr></thead><tbody>
+  ${r.babies.map(b=>`<tr>
+    <td>${b.baby_no}</td><td>${b.name}</td><td>${b.gender||''}</td><td>${b.birth_date||''}</td>
+    <td>${b.class_name||''}</td><td>${b.guardian||''}</td><td>${b.phone||''}</td>
+    <td style="${b.balance<0?'color:#e53935;font-weight:700':'color:#2e7d32;font-weight:600'}">¥${b.balance.toFixed(2)}</td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+async function loadAudit(){
+  const r=await api('/api/audit');if(!r)return;
+  $('audit-logs').innerHTML=r.logs.length?`<table><thead><tr>
+    <th>时间</th><th>用户</th><th>操作</th><th>详情</th><th>是否越权</th>
+  </tr></thead><tbody>
+  ${r.logs.map(l=>`<tr>
+    <td style="font-size:12px;color:#888">${l.created_at}</td>
+    <td>${l.username||'-'}${l.user_id?'(#'+l.user_id+')':''}</td>
+    <td><b>${l.action}</b></td>
+    <td style="font-size:12px">${l.detail||'-'}${l.target_type?`<br><span style="color:#888">${l.target_type} #${l.target_id}</span>`:''}</td>
+    <td>${l.is_unauthorized?'<span class="audit-tag">越权</span>':'<span class="badge badge-success">正常</span>'}</td>
+  </tr>`).join('')}</tbody></table>`:'<div class="empty">暂无审计记录</div>';
+
+  $('negative-list').innerHTML=r.negatives.length?`<table><thead><tr>
+    <th>预警时间</th><th>宝宝</th><th>余额</th><th>月份</th>
+  </tr></thead><tbody>
+  ${r.negatives.map(n=>`<tr>
+    <td>${n.created_at}</td><td>${n.baby_no} ${n.name}</td>
+    <td style="color:#e53935;font-weight:700">¥${n.balance.toFixed(2)}</td>
+    <td>${n.month_key}</td>
+  </tr>`).join('')}</tbody></table>`:'<div class="empty">暂无负余额预警</div>';
+}
+
+async function openCreateModal(){
+  const r=await api('/api/babies');if(!r)return;
+  $('f-baby').innerHTML=r.babies.map(b=>`<option value="${b.id}" data-class="${b.class_name||''}">${b.baby_no} ${b.name} (余额¥${b.balance.toFixed(2)})</option>`).join('');
+  $('f-baby').onchange=()=>{
+    const opt=$('f-baby').options[$('f-baby').selectedIndex];
+    $('f-class').value=opt.dataset.class||'';
+  };
+  $('f-class').value=r.babies[0]?.class_name||'';
+  $('f-cross').checked=false;
+  $('f-note').disabled=true;$('f-note').value='';
+  $('f-manual').checked=false;
+  $('f-amount').value='';
+  show('create-modal');
+}
+
+async function submitCreate(){
+  const body={
+    baby_id:+$('f-baby').value,
+    service_date:$('f-date').value,
+    service_type:$('f-type').value,
+    amount:parseFloat($('f-amount').value),
+    shift:$('f-shift').value,
+    class_name:$('f-class').value,
+    is_cross_class:$('f-cross').checked,
+    partial_note:$('f-note').value,
+    source:$('f-manual').checked?'manual':'normal'
+  };
+  if(!body.baby_id||!body.service_date||!body.service_type||!body.amount){alert('请填写必填项');return;}
+  if(body.is_cross_class&&!body.partial_note){alert('跨班时必须填写部分成功说明');return;}
+  const r=await api('/api/records',{method:'POST',body});
+  if(r&&r.ok){
+    alert('核销成功!单号:'+r.record_no+'\n状态:'+r.status);
+    closeModal('create-modal');
+    loadRecords();loadStats();
+  }
+}
+
+async function viewDetail(id){
+  const r=await api('/api/records/'+id);if(!r)return;
+  currentRecord=r.record;
+  const x=r.record;
+  let hist='';
+  if(r.history&&r.history.length){
+    hist=r.history.map(h=>{
+      const label={status:'状态',amount:'金额',service_date:'服务日期',service_type:'服务类型',
+        class_name:'班级',shift:'班次',is_cross_class:'跨班标记',partial_note:'部分说明',
+        reviewer_id:'复核人',review_time:'复核时间'}[h.field_name]||h.field_name;
+      return `<div class="history-item">
+        <div class="h-meta"><span><b>${h.operator_name}</b> 操作</span><span style="color:#888">${h.changed_at}</span></div>
+        <div><span class="h-field">${label}</span></div>
+        <div class="h-diff">
+          ${h.old_value!==null&&h.old_value!==undefined?'<span class="old">旧值:'+h.old_value+'</span> → ':''}
+          <span class="new">新值:${h.new_value||'(空)'}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }else{hist='<div class="history-item" style="color:#999;text-align:center">暂无修改历史</div>';}
+
+  $('detail-content').innerHTML=`
+    <div class="tip">${x.source==='manual'?'📝 手工补录记录':'📄 正常核销记录'}${x.is_cross_class?' — 宝宝跨班,部分成功':''}</div>
+    <div class="form-grid">
+      <div class="form-row"><label>核销单号</label><input value="${x.record_no}" disabled></div>
+      <div class="form-row"><label>状态</label><input value="${x.status}" disabled></div>
+      <div class="form-row"><label>宝宝</label><input value="${x.baby_no} ${x.baby_name}" disabled></div>
+      <div class="form-row"><label>班级</label><input value="${x.class_name||''}" disabled></div>
+      <div class="form-row"><label>服务日期</label><input value="${x.service_date}" disabled></div>
+      <div class="form-row"><label>服务类型</label><input value="${x.service_type}" disabled></div>
+      <div class="form-row"><label>金额</label><input value="¥${x.amount.toFixed(2)}" disabled></div>
+      <div class="form-row"><label>班次</label><input value="${x.shift||''}" disabled></div>
+      <div class="form-row"><label>操作人</label><input value="${x.operator_name}" disabled></div>
+      <div class="form-row"><label>复核时间</label><input value="${x.review_time||'未复核'}" disabled></div>
+    </div>
+    ${x.partial_note?`<div class="form-row"><label>部分成功说明</label><textarea disabled>${x.partial_note}</textarea></div>`:''}
+    <h4 style="margin:20px 0 10px">📜 修改历史 (含操作人、时间、新旧值对比)</h4>
+    <div class="history-list">${hist}</div>
+  `;
+  if(currentUser.role==='supervisor'&&!x.reviewer_id){show('btn-review');}else{hide('btn-review');}
+  show('detail-modal');
+}
+
+function openEdit(){
+  if(!currentRecord)return;const x=currentRecord;
+  $('e-date').value=x.service_date;$('e-type').value=x.service_type;
+  $('e-amount').value=x.amount;$('e-status').value=x.status;
+  $('e-shift').value=x.shift||'上午班';$('e-class').value=x.class_name||'';
+  $('e-cross').checked=!!x.is_cross_class;$('e-note').value=x.partial_note||'';
+  closeModal('detail-modal');show('edit-modal');
+}
+
+async function submitEdit(){
+  if(!currentRecord)return;
+  const body={
+    service_date:$('e-date').value,service_type:$('e-type').value,
+    amount:parseFloat($('e-amount').value),status:$('e-status').value,
+    shift:$('e-shift').value,class_name:$('e-class').value,
+    is_cross_class:$('e-cross').checked,partial_note:$('e-note').value
+  };
+  const r=await api('/api/records/'+currentRecord.id,{method:'PUT',body});
+  if(r&&r.ok){
+    alert('修改已保存!请刷新详情页查看历史记录对比。');
+    closeModal('edit-modal');loadRecords();loadStats();
+    viewDetail(currentRecord.id);
+  }
+}
+
+async function doReview(){
+  if(!currentRecord)return;
+  const r=await api('/api/records/'+currentRecord.id+'/review',{method:'POST'});
+  if(r&&r.ok){alert('复核完成');closeModal('detail-modal');loadRecords();}
+}
+
+async function doCancel(){
+  if(!currentRecord)return;
+  if(!confirm('确定取消此核销记录?金额将退回账户。'))return;
+  const r=await api('/api/records/'+currentRecord.id+'/cancel',{method:'POST'});
+  if(r&&r.ok){alert('已取消');closeModal('detail-modal');loadRecords();loadStats();}
+}
+
+async function importSamples(){
+  if(!confirm('将导入样例核销数据(含1条手工补录,便于对比补录前后差异)。\n重复导入会将旧样例置为无效,不会产生重复有效结果。是否继续?'))return;
+  const r=await api('/api/import-samples',{method:'POST'});
+  if(r&&r.ok){
+    alert('导入成功!\n批次号:'+r.batchNo+'\n共导入'+r.count+'条(含1条手工补录,高亮黄色)');
+    loadRecords();loadStats();loadBabies();
+  }
+}
+
+function closeModal(id){$(id).classList.remove('show');hide(id)}
+document.querySelectorAll('.modal-mask').forEach(m=>{
+  m.onclick=e=>{if(e.target===m)closeModal(m.id);};
+});
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  const r=await api('/api/me');
+  if(r&&r.user){currentUser=r.user;initApp();}
+  else show('login-page');
+  $('login-pwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  $('login-user').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+});
+</script>
+</body>
+</html>

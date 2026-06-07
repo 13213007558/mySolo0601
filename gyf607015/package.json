@@ -1,0 +1,18 @@
+{
+  "name": "erbao-fee-verification",
+  "version": "1.0.0",
+  "description": "婴幼儿费用核销回访册儿保随访版",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "bcryptjs": "^2.4.3"
+  }
+}
