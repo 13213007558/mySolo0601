@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>审计中心</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <h1>🏥 审计中心</h1>
+  <nav>
+    <a href="/">授权列表</a>
+    <a href="/audit.html" class="active">审计中心</a>
+    <a href="/playbook.html">操作手册</a>
+  </nav>
+</header>
+<main>
+  <section class="toolbar">
+    <div class="filters">
+      <label>
+        <input type="checkbox" id="onlyMissing"> 仅显示处理人缺失(需主管复查)
+      </label>
+    </div>
+    <div class="actions">
+      <button id="btnRefresh">刷新</button>
+    </div>
+  </section>
+  <section>
+    <table id="auditTable">
+      <thead>
+        <tr>
+          <th>时间</th>
+          <th>授权ID</th>
+          <th>操作</th>
+          <th>字段</th>
+          <th>旧值 → 新值</th>
+          <th>处理人</th>
+          <th>详情</th>
+        </tr>
+      </thead>
+      <tbody id="auditBody"></tbody>
+    </table>
+  </section>
+</main>
+<script src="/app.js"></script>
+<script>initAuditPage();</script>
+</body>
+</html>

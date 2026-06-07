@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>操作手册 - 失败路径与人工更正路径</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <h1>📘 操作手册 - 失败路径与人工更正路径</h1>
+  <nav>
+    <a href="/">授权列表</a>
+    <a href="/audit.html">审计中心</a>
+    <a href="/playbook.html" class="active">操作手册</a>
+  </nav>
+</header>
+<main>
+  <section class="playbook">
+    <div class="playbook-card warn">
+      <h2>❌ 失败路径：保健老师如何复盘</h2>
+      <ol>
+        <li><b>场景</b>：电话授权 + 临时阿姨混合场景，操作人信息未正确记录</li>
+        <li>打开 <a href="/audit.html" target="_blank">审计中心</a>，勾选 <b>"仅显示处理人缺失"</b></li>
+        <li>找到 operator_display 为 <b>"未知处理人"</b> 或 <b>"未注册"</b> 的行</li>
+        <li>点击对应 <b>授权ID</b> 进入详情页</li>
+        <li>查看 <b>审计日志</b> 标签：对比 <code>old_value</code> → <code>new_value</code>，结合 detail 字段判断是谁改了什么</li>
+        <li>导出 Markdown / CSV，确认 <b>页面摘要</b> 与报告中的 <b>状态、类型、照片说明、整改内容</b> 完全一致</li>
+      </ol>
+      <div class="demo-box">
+        <button id="btnDemoFailure" class="primary">模拟：以不存在的操作人追加整改（触发失败路径）</button>
+        <div id="demoFailureResult"></div>
+      </div>
+    </div>
+
+    <div class="playbook-card success">
+      <h2>✅ 人工更正路径：主管复查后的修正步骤</h2>
+      <ol>
+        <li><b>场景</b>：已关闭的记录需要追加材料，但部分材料格式错误或整改内容过长</li>
+        <li>进入详情页，点击 <b>"追加材料"</b> 上传照片或补充整改内容</li>
+        <li>系统返回 <b>207 部分成功</b>：查看 results 中 success / failed 分组</li>
+        <li>失败项：
+          <ul>
+            <li>照片格式问题 → 转换为 jpg/png 后重新上传</li>
+            <li>整改内容超过500字 → 精简后再次提交</li>
+          </ul>
+        </li>
+        <li>成功项：照片下方可编辑 <b>照片说明</b>；整改记录可修改 <b>处理人/状态/内容</b></li>
+        <li>完成后再次导出 Markdown，确认"追加-更正-导出"三阶段信息一致</li>
+      </ol>
+      <div class="demo-box">
+        <button id="btnDemoPartial" class="primary">模拟：向已关闭记录追加混合材料（部分成功）</button>
+        <div id="demoPartialResult"></div>
+      </div>
+    </div>
+
+    <div class="playbook-card info">
+      <h2>🔄 服务重启后检查清单（护理主管）</h2>
+      <p>重启服务后，重新打开任意详情页，逐项确认：</p>
+      <ul>
+        <li>✅ 页面摘要与列表一致（宝宝名、房号、类型标签、状态）</li>
+        <li>✅ 每张照片的 <b>说明文字</b> 仍在</li>
+        <li>✅ <b>状态</b> 字段与关闭时一致（如"整改中"不应变回"待审核"）</li>
+        <li>✅ <b>整改记录</b> 的内容、处理人、状态均保留</li>
+        <li>✅ <b>审计日志</b> 不丢失，处理人缺失的行仍高亮显示便于复查</li>
+        <li>✅ 导出 CSV/Markdown 与详情页肉眼一致</li>
+      </ul>
+      <div class="demo-box">
+        <button id="btnConsistencyCheck" class="primary">一键一致性检查（摘要 vs 详情 vs 导出）</button>
+        <div id="consistencyResult"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="/app.js"></script>
+<script>initPlaybookPage();</script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>婴幼儿接送授权回访册 - 月子护理版</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <h1>🏥 蓝鲸早教 A 教室 · 婴幼儿接送授权回访册</h1>
+  <nav>
+    <a href="/" class="active">授权列表</a>
+    <a href="/audit.html">审计中心</a>
+    <a href="/playbook.html">操作手册(失败/更正路径)</a>
+  </nav>
+</header>
+
+<main>
+  <section class="toolbar">
+    <div class="filters">
+      <label>状态：
+        <select id="statusFilter">
+          <option value="">全部</option>
+          <option value="pending">待审核</option>
+          <option value="approved">已通过</option>
+          <option value="rejected">已驳回</option>
+          <option value="rectifying">整改中</option>
+          <option value="closed">已关闭</option>
+        </select>
+      </label>
+      <label>类型：
+        <select id="typeFilter">
+          <option value="">全部</option>
+          <option value="normal">正常</option>
+          <option value="phone">电话授权</option>
+          <option value="temp_auntie">临时阿姨</option>
+          <option value="mixed">混合(电话+临时阿姨)</option>
+        </select>
+      </label>
+      <input id="search" placeholder="搜索宝宝名/接送人/房号">
+    </div>
+    <div class="actions">
+      <button id="btnNew" class="primary">+ 新增授权</button>
+      <button id="btnExportCsv">导出 CSV</button>
+      <button id="btnExportMd">导出 Markdown</button>
+      <button id="btnPreview">预览导出内容</button>
+    </div>
+  </section>
+
+  <section class="summary-bar">
+    <div id="summaryTotal">共 0 条</div>
+    <div id="summaryBreakdown"></div>
+  </section>
+
+  <section class="list">
+    <table id="listTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>页面摘要</th>
+          <th>类型</th>
+          <th>状态</th>
+          <th>照片</th>
+          <th>整改</th>
+          <th>创建时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="listBody"></tbody>
+    </table>
+  </section>
+</main>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <h2 id="modalTitle">新增授权记录</h2>
+    <form id="authForm">
+      <div class="row"><label>宝宝姓名*<input name="baby_name" required></label></div>
+      <div class="row">
+        <label>出生日期<input name="baby_dob" type="date"></label>
+        <label>房号<input name="room_number"></label>
+        <label>母亲姓名<input name="mother_name"></label>
+      </div>
+      <div class="row">
+        <label>被授权接送人*<input name="authorized_person" required></label>
+        <label>联系电话<input name="phone"></label>
+        <label>与宝宝关系<input name="relationship"></label>
+      </div>
+      <div class="row"><label>身份证号<input name="id_card"></label></div>
+      <div class="row">
+        <label>授权类型
+          <select name="auth_type" id="authType">
+            <option value="normal">正常授权</option>
+            <option value="phone">电话授权</option>
+            <option value="temp_auntie">临时阿姨</option>
+            <option value="mixed">混合(电话+临时阿姨)</option>
+          </select>
+        </label>
+        <label>当前操作人
+          <select name="operator" id="operatorSel"></select>
+        </label>
+      </div>
+      <div class="row" id="phoneFields" style="display:none">
+        <label>电话授权人<input name="phone_auth_by"></label>
+        <label style="flex:2">电话授权备注<input name="phone_auth_note"></label>
+      </div>
+      <div class="row" id="auntieFields" style="display:none">
+        <label>临时阿姨姓名<input name="temp_auntie_name"></label>
+      </div>
+      <div class="row">
+        <label>状态
+          <select name="status">
+            <option value="pending">待审核</option>
+            <option value="approved">已通过</option>
+            <option value="rejected">已驳回</option>
+            <option value="rectifying">整改中</option>
+            <option value="closed">已关闭</option>
+          </select>
+        </label>
+      </div>
+      <div class="row modal-actions">
+        <button type="button" id="btnCancel">取消</button>
+        <button type="submit" class="primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="previewModal" class="modal hidden">
+  <div class="modal-content wide">
+    <h2>导出预览（确保与页面摘要、详情状态一致）</h2>
+    <div class="preview-tabs">
+      <button class="tab active" data-tab="summary">摘要行</button>
+      <button class="tab" data-tab="csv">CSV</button>
+      <button class="tab" data-tab="md">Markdown</button>
+    </div>
+    <div id="previewSummary" class="preview-pane active"></div>
+    <pre id="previewCsv" class="preview-pane"></pre>
+    <pre id="previewMd" class="preview-pane"></pre>
+    <div class="modal-actions"><button id="btnClosePreview">关闭</button></div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

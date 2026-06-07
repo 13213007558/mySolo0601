@@ -1,0 +1,16 @@
+{
+  "name": "infant-pickup-authorization",
+  "version": "1.0.0",
+  "description": "婴幼儿接送授权回访册 - 月子护理版",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.3.0",
+    "body-parser": "^1.20.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}
