@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Source Han Sans", "思源黑体", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.55;
+  font-weight: 400;
+  color: #2d2d2d;
+  background-color: #fff8f3;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: "LXGW WenKai", "霞鹜文楷", "Source Han Sans", serif;
+  letter-spacing: 0.02em;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d8d2cc;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c4bdb6;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl2 bg-gradient-to-r from-primary to-primary-dark px-5 py-2.5 text-white font-medium shadow-soft transition-all hover:shadow-card hover:-translate-y-0.5 active:translate-y-0;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl2 bg-secondary px-5 py-2.5 text-white font-medium shadow-soft transition-all hover:bg-secondary-dark;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl2 border border-muted bg-white px-4 py-2 text-secondary font-medium transition-all hover:bg-cream;
+  }
+  .card {
+    @apply rounded-xl2 bg-white shadow-soft p-5 transition-all hover:shadow-card;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium;
+  }
+  .input-base {
+    @apply w-full rounded-xl2 border border-muted bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/30;
+  }
+  .label-base {
+    @apply block text-sm font-medium text-secondary mb-1.5;
+  }
+}
