@@ -1,0 +1,5 @@
+{
+  "watch": ["api", "shared"],
+  "ext": "ts,json",
+  "exec": "tsx api/index.ts"
+}
