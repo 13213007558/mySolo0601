@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #1f2937;
+  background-color: #fffbf2;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(76, 175, 122, 0.08), transparent 60%),
+    radial-gradient(800px 500px at 100% 0%, rgba(255, 122, 89, 0.06), transparent 60%),
+    #fffbf2;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-milkgreen-400 text-white font-medium shadow-soft hover:bg-milkgreen-500 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-mistblue-500 font-medium border border-mistblue-200 hover:bg-cream-50 hover:border-mistblue-400 transition-all duration-200;
+  }
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-coral-400 text-white font-medium shadow-pop hover:bg-coral-500 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200;
+  }
+  .card {
+    @apply bg-white rounded-2xl shadow-card border border-cream-100;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border;
+  }
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-xl border border-cream-200 bg-cream-50 text-sm focus:border-milkgreen-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-milkgreen-400/20 transition;
+  }
+  .label-text {
+    @apply block text-sm font-medium text-mistblue-500 mb-1.5;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(107, 139, 168, 0.25);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 139, 168, 0.45);
+}
