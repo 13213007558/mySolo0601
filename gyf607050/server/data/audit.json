@@ -1,0 +1,42 @@
+[
+  {
+    "id": "914b8d1d-fc55-4b55-b68b-007dc3e61199",
+    "recordId": "9a0f4978-91fa-43a1-8363-bd29ed688268",
+    "action": "状态变更",
+    "operator": "厨房-刘师傅",
+    "detail": "状态从 待接单 变更为 已接单",
+    "timestamp": "2026-06-07T23:34:19.744Z"
+  },
+  {
+    "id": "b1bbf6dc-3922-49d3-8f98-2ab573aafd47",
+    "recordId": "9a0f4978-91fa-43a1-8363-bd29ed688268",
+    "action": "创建记录",
+    "operator": "张服务员",
+    "detail": "创建奶量记录：果果 120ml",
+    "timestamp": "2026-06-07T23:26:15.045Z"
+  },
+  {
+    "id": "e0187d6d-7f49-4184-bdd5-d90ae6c121f1",
+    "recordId": "7bf33590-d9a4-450e-bd15-7beaa1e643d2",
+    "action": "创建记录",
+    "operator": "王服务员",
+    "detail": "创建奶量记录：豆豆 210ml",
+    "timestamp": "2026-06-07T23:26:15.045Z"
+  },
+  {
+    "id": "c9ad0280-79a7-480d-93c2-06290427ffb3",
+    "recordId": "bcb44834-6ce2-4ff0-8eb2-ae701ccab5f8",
+    "action": "创建记录",
+    "operator": "李服务员",
+    "detail": "创建奶量记录：小红 150ml",
+    "timestamp": "2026-06-07T23:26:15.045Z"
+  },
+  {
+    "id": "577150fc-e176-4ebc-bfcf-4c01370c7552",
+    "recordId": "381b25ef-d9c7-490e-a202-ae03ad718f9a",
+    "action": "创建记录",
+    "operator": "张服务员",
+    "detail": "创建奶量记录：小明 180ml",
+    "timestamp": "2026-06-07T23:26:15.044Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "id": "4a9b9ca9-9709-4df2-bc44-40109ce93e43",
+    "rawData": {
+      "childName": "",
+      "amount": 0,
+      "createdBy": "测试员"
+    },
+    "reason": "缺少婴幼儿姓名",
+    "reportedBy": "测试员",
+    "reportedAt": "2026-06-07T23:34:44.995Z"
+  }
+]

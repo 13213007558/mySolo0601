@@ -1,0 +1,17 @@
+{
+  "name": "milk-tracking-server",
+  "version": "1.0.0",
+  "description": "婴幼儿奶量交接追踪台 - 后端服务",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.4",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.10",
+    "uuid": "^9.0.0"
+  }
+}
