@@ -1,0 +1,24 @@
+[
+  {
+    "id": "ANO001",
+    "recordId": "REC004",
+    "versionId": "VER005",
+    "versionNo": 1,
+    "field": "photoCount",
+    "type": "boundary_value",
+    "value": 100,
+    "reason": "照片数量100张处于边界值范围（0或≥100），请确认是否为真实数据",
+    "createdAt": "2026-06-06T18:59:02.481Z"
+  },
+  {
+    "id": "ANO002",
+    "recordId": "REC005",
+    "versionId": "VER007",
+    "versionNo": 2,
+    "field": "babyAgeDays",
+    "type": "unit_mixed",
+    "value": "8天",
+    "reason": "婴儿年龄包含非数字单位\"天\"，请统一使用\"天\"为单位，系统已自动提取数字部分",
+    "createdAt": "2026-06-07T18:59:02.482Z"
+  }
+]

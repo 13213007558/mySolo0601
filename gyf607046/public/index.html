@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>婴幼儿照片授权授权库 - 月子护理版</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-inner">
+      <h1>婴幼儿照片授权授权库</h1>
+      <span class="version-tag">月子护理版</span>
+    </div>
+    <div class="header-sub">护理主管专用 · 历史版本可追溯 · 异常数据可审计</div>
+  </header>
+
+  <nav class="nav">
+    <button class="nav-btn active" data-view="list">授权记录列表</button>
+    <button class="nav-btn" data-view="detail" id="navDetail" style="display:none;">记录详情</button>
+    <button class="nav-btn" data-view="new">新增授权记录</button>
+  </nav>
+
+  <main class="main">
+    <section id="viewList" class="view active">
+      <div class="stats-bar">
+        <div class="stat-card stat-total">
+          <div class="stat-label">记录总数</div>
+          <div class="stat-value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card stat-authorized">
+          <div class="stat-label">已授权</div>
+          <div class="stat-value" id="statAuthorized">0</div>
+        </div>
+        <div class="stat-card stat-revoked">
+          <div class="stat-label">已撤回</div>
+          <div class="stat-value" id="statRevoked">0</div>
+        </div>
+        <div class="stat-card stat-pending">
+          <div class="stat-label">待确认</div>
+          <div class="stat-value" id="statPending">0</div>
+        </div>
+      </div>
+
+      <div class="table-toolbar">
+        <input type="text" id="searchInput" placeholder="搜索婴儿姓名/监护人/房号..." class="search-input">
+        <span class="data-hint">💡 数据持久化存储于本地JSON，刷新页面或重启服务数据不丢失</span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>婴儿姓名</th>
+              <th>监护人</th>
+              <th>房号</th>
+              <th>婴儿年龄</th>
+              <th>照片数量</th>
+              <th>状态</th>
+              <th>版本</th>
+              <th>最近更新</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="viewDetail" class="view">
+      <div id="detailContent">
+      </div>
+    </section>
+
+    <section id="viewNew" class="view">
+      <div class="form-card">
+        <h2 id="formTitle">新增授权记录</h2>
+        <form id="authForm">
+          <input type="hidden" id="formRecordId">
+          <div class="form-row">
+            <div class="form-group">
+              <label>婴儿姓名 *</label>
+              <input type="text" id="babyName" required>
+            </div>
+            <div class="form-group">
+              <label>监护人姓名 *</label>
+              <input type="text" id="guardianName" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>房号</label>
+              <input type="text" id="roomNo" placeholder="如：301-A">
+            </div>
+            <div class="form-group">
+              <label>婴儿年龄（天）</label>
+              <input type="text" id="babyAgeDays" placeholder="纯数字，如：15">
+              <div class="form-hint">⚠️ 单位混用（如"15天"）会被检测并记录</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>照片数量（张）</label>
+              <input type="text" id="photoCount" placeholder="纯数字，如：20">
+              <div class="form-hint">⚠️ 边界值（0或≥100）会被检测并记录</div>
+            </div>
+            <div class="form-group">
+              <label>授权状态 *</label>
+              <select id="status" required>
+                <option value="pending">待确认</option>
+                <option value="authorized">已授权</option>
+                <option value="revoked">已撤回</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>照片说明</label>
+            <textarea id="photoDescription" rows="3" placeholder="详细描述照片内容、场景、拍摄时间等"></textarea>
+          </div>
+          <div class="form-group">
+            <label>整改记录</label>
+            <textarea id="rectification" rows="2" placeholder="如有撤回或整改情况请填写"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>操作人姓名</label>
+              <input type="text" id="operatorName" placeholder="护理人员姓名">
+            </div>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" id="isLateRecord">
+                <span>手工补录（晚到记录）</span>
+              </label>
+              <div class="form-hint">勾选后将标记为补录记录，旧版本不会被覆盖</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea id="remark" rows="2" placeholder="补录原因或其他说明"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="switchView('list')">返回列表</button>
+            <button type="submit" class="btn-primary" id="submitBtn">保存记录</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
