@@ -1,0 +1,151 @@
+{
+  "export_time": "2026-06-07T10:07:18.035Z",
+  "operator": "王主管",
+  "requested_record_ids": [
+    1,
+    2,
+    3,
+    9999,
+    8888
+  ],
+  "exported_record_count": 3,
+  "expected_record_count": 5,
+  "expected_total_pages": 11,
+  "actual_total_pages": 9,
+  "has_mismatch": true,
+  "mismatch_detail": {
+    "record_count_diff": 2,
+    "page_count_diff": 2
+  },
+  "items": [
+    {
+      "record": {
+        "id": 1,
+        "shift_type": "night",
+        "status": "archived",
+        "child_id": 1,
+        "shift_date": "2026-06-06",
+        "total_pages": 3,
+        "received_pages": 3,
+        "is_partial": 0,
+        "handler": "李老师（夜班）",
+        "updated_at": "2026-06-07 18:07:18",
+        "reviewer": "王主管",
+        "child_name": "安安",
+        "birth_date": "2024-03-15",
+        "guardian": "安妈妈"
+      },
+      "pages": [
+        {
+          "id": 1,
+          "record_id": 1,
+          "page_number": 1,
+          "content": "旧记录：20:00 喝奶150ml，20:30 入睡，呼吸平稳",
+          "is_valid": 1,
+          "invalid_reason": null
+        },
+        {
+          "id": 2,
+          "record_id": 1,
+          "page_number": 2,
+          "content": "旧记录：23:00 巡视，尿布已更换，体温36.5度",
+          "is_valid": 1,
+          "invalid_reason": null
+        },
+        {
+          "id": 3,
+          "record_id": 1,
+          "page_number": 3,
+          "content": "旧记录：05:30 起床，精神好，早餐意愿强",
+          "is_valid": 1,
+          "invalid_reason": null
+        }
+      ]
+    },
+    {
+      "record": {
+        "id": 2,
+        "shift_type": "night",
+        "status": "pending_review",
+        "child_id": 2,
+        "shift_date": "2026-06-07",
+        "total_pages": 3,
+        "received_pages": 4,
+        "is_partial": 0,
+        "handler": "李老师（夜班）",
+        "updated_at": "2026-06-07 18:07:18",
+        "child_name": "乐乐",
+        "birth_date": "2024-08-22",
+        "guardian": "乐爸爸"
+      },
+      "pages": [
+        {
+          "id": 4,
+          "record_id": 2,
+          "page_number": 1,
+          "content": "新补材料：21:00 入睡，环境温度26度，睡姿仰卧",
+          "is_valid": 1,
+          "invalid_reason": null
+        },
+        {
+          "id": 5,
+          "record_id": 2,
+          "page_number": 2,
+          "content": "新补材料：02:00 有翻身、哼唧，安抚后继续睡",
+          "is_valid": 1,
+          "invalid_reason": null
+        },
+        {
+          "id": 6,
+          "record_id": 2,
+          "page_number": 3,
+          "content": "新补材料：06:00 起床，体温正常",
+          "is_valid": 0,
+          "invalid_reason": "字迹模糊，需白班老师确认"
+        },
+        {
+          "id": 9,
+          "record_id": 2,
+          "page_number": 4,
+          "content": "补充：第3页确认内容为：06:00 起床，体温36.6度，精神好",
+          "is_valid": 1,
+          "invalid_reason": null
+        }
+      ]
+    },
+    {
+      "record": {
+        "id": 3,
+        "shift_type": "night",
+        "status": "draft",
+        "child_id": 3,
+        "shift_date": "2026-06-07",
+        "total_pages": 5,
+        "received_pages": 2,
+        "is_partial": 1,
+        "handler": "李老师（夜班）",
+        "child_name": "萌萌",
+        "birth_date": "2025-01-10",
+        "guardian": "萌奶奶"
+      },
+      "pages": [
+        {
+          "id": 7,
+          "record_id": 3,
+          "page_number": 1,
+          "content": "21:30 入睡，伴随哭闹5分钟后平静",
+          "is_valid": 1,
+          "invalid_reason": null
+        },
+        {
+          "id": 8,
+          "record_id": 3,
+          "page_number": 3,
+          "content": "03:15 巡视，无异常（第2、4、5页缺失，待补",
+          "is_valid": 1,
+          "invalid_reason": null
+        }
+      ]
+    }
+  ]
+}

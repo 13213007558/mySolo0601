@@ -1,0 +1,15 @@
+{
+  "name": "nightshift-handover",
+  "version": "1.0.0",
+  "description": "婴幼儿睡眠观察回访册夜班交接版",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node server/app.js",
+    "init-db": "node server/init-db.js",
+    "seed": "node scripts/seed-sample.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2"
+  }
+}

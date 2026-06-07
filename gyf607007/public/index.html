@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>婴幼儿睡眠观察回访册 - 夜班交接版</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f6fa; color: #2c3e50; }
+    .header { background: #2c3e50; color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 18px; font-weight: 500; }
+    .header .tabs { display: flex; gap: 8px; }
+    .header .tab { padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 14px; background: rgba(255,255,255,0.1); }
+    .header .tab.active { background: #3498db; }
+    .container { max-width: 1200px; margin: 20px auto; padding: 0 16px; }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .btn-primary { background: #3498db; color: white; }
+    .btn-primary:hover { background: #2980b9; }
+    .btn-success { background: #27ae60; color: white; }
+    .btn-success:hover { background: #229954; }
+    .btn-warning { background: #f39c12; color: white; }
+    .btn-warning:hover { background: #e67e22; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn-danger:hover { background: #c0392b; }
+    .btn-secondary { background: #95a5a6; color: white; }
+    .btn-secondary:hover { background: #7f8c8d; }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .filter { padding: 8px 12px; border: 1px solid #dcdde1; border-radius: 4px; font-size: 14px; }
+    .card { background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 12px; overflow: hidden; }
+    .card-header { padding: 14px 20px; background: #fafbfc; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; }
+    .card-body { padding: 16px 20px; }
+    .record-title { font-size: 16px; font-weight: 600; }
+    .record-meta { font-size: 13px; color: #7f8c8d; margin-top: 4px; }
+    .status { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .status-draft { background: #ecf0f1; color: #2c3e50; }
+    .status-pending_review { background: #fff3cd; color: #856404; }
+    .status-returned { background: #f8d7da; color: #721c24; }
+    .status-archived { background: #d4edda; color: #155724; }
+    .partial-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: #e74c3c; color: white; margin-left: 8px; }
+    .timeline { position: relative; padding-left: 28px; margin: 12px 0; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: #dcdde1; }
+    .timeline-item { position: relative; padding-bottom: 14px; }
+    .timeline-item::before { content: ''; position: absolute; left: -24px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #3498db; border: 2px solid white; box-shadow: 0 0 0 2px #3498db; }
+    .timeline-item.return_supplement::before { background: #e74c3c; box-shadow: 0 0 0 2px #e74c3c; }
+    .timeline-item.archived::before { background: #27ae60; box-shadow: 0 0 0 2px #27ae60; }
+    .timeline-item.submit_review::before { background: #f39c12; box-shadow: 0 0 0 2px #f39c12; }
+    .timeline-item.add_pages::before { background: #9b59b6; box-shadow: 0 0 0 2px #9b59b6; }
+    .timeline-time { font-size: 12px; color: #95a5a6; }
+    .timeline-content { font-size: 14px; margin-top: 2px; }
+    .timeline-content strong { color: #2c3e50; }
+    .pages-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .page-item { padding: 4px 10px; background: #ecf0f1; border-radius: 4px; font-size: 12px; }
+    .page-item.invalid { background: #f8d7da; color: #721c24; text-decoration: line-through; }
+    .audit-item { padding: 10px 14px; background: #fff8e1; border-left: 3px solid #f39c12; margin-bottom: 8px; border-radius: 0 4px 4px 0; }
+    .audit-item.type-export_mismatch, .audit-item.type-import_row_failed { background: #fdecea; border-left-color: #e74c3c; }
+    .audit-time { font-size: 11px; color: #95a5a6; }
+    .audit-detail { font-size: 13px; margin-top: 2px; }
+    .export-row { padding: 10px 14px; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; }
+    .export-row:last-child { border-bottom: none; }
+    .mismatch-tag { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: white; border-radius: 8px; width: 90%; max-width: 600px; max-height: 80vh; overflow: auto; }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { font-size: 16px; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 14px 20px; border-top: 1px solid #ecf0f1; display: flex; justify-content: flex-end; gap: 8px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; margin-bottom: 6px; color: #34495e; font-weight: 500; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #dcdde1; border-radius: 4px; font-size: 14px; font-family: inherit; }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #95a5a6; }
+    .page-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; }
+    .page-row input { flex: 1; }
+    .alert { padding: 10px 14px; border-radius: 4px; margin-bottom: 12px; font-size: 13px; }
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    .empty-state { text-align: center; padding: 40px 20px; color: #95a5a6; }
+    .check-wrap { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .check-wrap label { display: flex; align-items: center; gap: 4px; font-size: 13px; cursor: pointer; }
+    .operator-input { padding: 8px 12px; border: 1px solid #dcdde1; border-radius: 4px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🌙 婴幼儿睡眠观察回访册 · 夜班交接版</h1>
+    <div class="tabs">
+      <div class="tab active" data-tab="records">记录列表</div>
+      <div class="tab" data-tab="audits">审计日志</div>
+      <div class="tab" data-tab="exports">导出历史</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="view-records">
+      <div class="toolbar">
+        <select class="filter" id="statusFilter">
+          <option value="">全部状态</option>
+          <option value="draft">草稿</option>
+          <option value="pending_review">待复核</option>
+          <option value="returned">退回补充</option>
+          <option value="archived">已归档</option>
+        </select>
+        <input class="operator-input" id="currentOperator" placeholder="当前操作人" value="夜班老师">
+        <button class="btn btn-primary" onclick="openImportModal()">📥 批量录入</button>
+        <button class="btn btn-success" onclick="openAddRecordModal()">➕ 单条录入</button>
+        <button class="btn btn-warning" onclick="openExportModal()">📤 导出选中</button>
+        <button class="btn btn-secondary" onclick="loadRecords()">🔄 刷新</button>
+      </div>
+      <div id="recordsList"></div>
+    </div>
+
+    <div id="view-audits" style="display:none;">
+      <div class="toolbar">
+        <button class="btn btn-secondary" onclick="loadAudits()">🔄 刷新审计</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><strong>审计日志（主管复查用）</strong></div>
+        <div class="card-body" id="auditsList"></div>
+      </div>
+    </div>
+
+    <div id="view-exports" style="display:none;">
+      <div class="toolbar">
+        <button class="btn btn-secondary" onclick="loadExports()">🔄 刷新导出</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><strong>导出历史</strong></div>
+        <div class="card-body" id="exportsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="addRecordModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>单条录入材料</h3>
+        <button class="close-btn" onclick="closeModal('addRecordModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>婴幼儿姓名 *</label>
+          <input type="text" id="ar_name">
+        </div>
+        <div class="form-group">
+          <label>出生日期</label>
+          <input type="date" id="ar_birth">
+        </div>
+        <div class="form-group">
+          <label>监护人</label>
+          <input type="text" id="ar_guardian">
+        </div>
+        <div class="form-group">
+          <label>夜班日期 *</label>
+          <input type="date" id="ar_date">
+        </div>
+        <div class="form-group">
+          <label>材料总页数（如缺页填大于下面的页数）</label>
+          <input type="number" id="ar_total_pages" min="1" value="3">
+        </div>
+        <div class="form-group">
+          <label>材料页面（实际收到的页面）</label>
+          <div id="ar_pages"></div>
+          <button class="btn btn-sm btn-secondary" onclick="addPageRow('ar_pages')" style="margin-top:6px;">+ 添加页面</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('addRecordModal')">取消</button>
+        <button class="btn btn-primary" onclick="submitAddRecord()">提交录入</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="importModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>批量录入（粘贴 JSON）</h3>
+        <button class="close-btn" onclick="closeModal('importModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="importResult"></div>
+        <div class="form-group">
+          <label>JSON 数据（数组格式，包含 name, shift_date, pages 等字段）</label>
+          <textarea id="importJson" placeholder='[
+  {
+    "name": "小明",
+    "shift_date": "2026-06-06",
+    "total_pages": 3,
+    "pages": [
+      { "page_number": 1, "content": "21:30 入睡，呼吸平稳" },
+      { "page_number": 2, "content": "00:00 巡视，无异常" }
+    ]
+  }
+]'></textarea>
+        </div>
+        <div class="form-group">
+          <label>快捷：加载测试样例（旧记录+新补材料+坏行）</label>
+          <button class="btn btn-sm btn-warning" onclick="loadSampleIntoImport()">📋 加载测试样例</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('importModal')">取消</button>
+        <button class="btn btn-primary" onclick="submitImport()">执行导入</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="remarkModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="remarkTitle">操作备注</h3>
+        <button class="close-btn" onclick="closeModal('remarkModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>备注说明</label>
+          <textarea id="remarkText"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('remarkModal')">取消</button>
+        <button class="btn btn-primary" onclick="executeRemarkAction()">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="addPagesModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>补充材料页面</h3>
+        <button class="close-btn" onclick="closeModal('addPagesModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="ap_pages"></div>
+        <button class="btn btn-sm btn-secondary" onclick="addPageRow('ap_pages')" style="margin-top:6px;">+ 添加页面</button>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('addPagesModal')">取消</button>
+        <button class="btn btn-primary" onclick="submitAddPages()">确认补充</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal" style="max-width: 720px;">
+      <div class="modal-header">
+        <h3 id="detailTitle">记录详情</h3>
+        <button class="close-btn" onclick="closeModal('detailModal')">×</button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="exportModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>选择要导出的记录</h3>
+        <button class="close-btn" onclick="closeModal('exportModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">提示：如选到不存在的 ID 或材料缺页的记录，导出会自动留下审计日志供主管复查。</div>
+        <div id="exportCheckList" class="check-wrap" style="max-height:400px;overflow:auto;padding:10px;border:1px solid #ecf0f1;border-radius:4px;"></div>
+        <div class="form-group" style="margin-top:14px;">
+          <label>或手动输入 record_id（逗号分隔，可故意写错测试审计，例如: 1,2,9999）</label>
+          <input type="text" id="exportIdsText" placeholder="1,2,9999">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('exportModal')">取消</button>
+        <button class="btn btn-primary" onclick="doExport()">确认导出</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentDetailId = null;
+    let currentRemarkAction = null;
+    let currentAddPagesId = null;
+
+    const statusLabels = {
+      draft: '草稿',
+      pending_review: '待复核',
+      returned: '退回补充',
+      archived: '已归档'
+    };
+
+    const eventLabels = {
+      created: '录入材料',
+      submit_review: '提交复核',
+      return_supplement: '退回补充',
+      add_pages: '补充材料',
+      archived: '关闭归档'
+    };
+
+    document.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        document.getElementById('view-records').style.display = t.dataset.tab === 'records' ? '' : 'none';
+        document.getElementById('view-audits').style.display = t.dataset.tab === 'audits' ? '' : 'none';
+        document.getElementById('view-exports').style.display = t.dataset.tab === 'exports' ? '' : 'none';
+        if (t.dataset.tab === 'audits') loadAudits();
+        if (t.dataset.tab === 'exports') loadExports();
+      });
+    });
+
+    document.getElementById('statusFilter').addEventListener('change', loadRecords);
+
+    function getOperator() {
+      return document.getElementById('currentOperator').value || '系统';
+    }
+
+    async function api(url, options) {
+      const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options
+      });
+      return await res.json();
+    }
+
+    async function loadRecords() {
+      const status = document.getElementById('statusFilter').value;
+      const url = '/api/records' + (status ? '?status=' + status : '');
+      const res = await api(url);
+      const list = document.getElementById('recordsList');
+      if (!res.ok) { list.innerHTML = '<div class="alert alert-error">' + res.error + '</div>'; return; }
+      if (res.data.length === 0) {
+        list.innerHTML = '<div class="empty-state">暂无记录，点击「单条录入」或「批量录入」开始</div>';
+        return;
+      }
+      list.innerHTML = res.data.map(r => renderRecordCard(r)).join('');
+    }
+
+    function renderRecordCard(r) {
+      const canSubmit = r.status === 'draft' || r.status === 'returned';
+      const canReturn = r.status === 'pending_review';
+      const canArchive = r.status === 'pending_review';
+      const canAddPages = r.status !== 'archived';
+      return `
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <span class="record-title">${r.child_name}</span>
+              <span class="status status-${r.status}">${statusLabels[r.status]}</span>
+              ${r.is_partial ? '<span class="partial-badge">材料缺页 ' + r.received_pages + '/' + r.total_pages + '</span>' : '<span class="partial-badge" style="background:#27ae60;">' + r.received_pages + '/' + r.total_pages + ' 页完整</span>'}
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="btn btn-sm btn-secondary" onclick="showDetail(${r.id})">详情</button>
+              ${canAddPages ? '<button class="btn btn-sm btn-secondary" onclick="openAddPages(' + r.id + ')">补材料</button>' : ''}
+              ${canSubmit ? '<button class="btn btn-sm btn-warning" onclick="askRemark(' + r.id + ', \'submit\')">提交复核</button>' : ''}
+              ${canReturn ? '<button class="btn btn-sm btn-danger" onclick="askRemark(' + r.id + ', \'return\')">退回补充</button>' : ''}
+              ${canArchive ? '<button class="btn btn-sm btn-success" onclick="askRemark(' + r.id + ', \'archive\')">归档</button>' : ''}
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="record-meta">日期：${r.shift_date} · 创建：${r.created_at} · 更新：${r.updated_at}</div>
+            <div class="record-meta">处理人：${r.handler || '-'} · 复核人：${r.reviewer || '-'}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function showDetail(id) {
+      const res = await api('/api/records/' + id);
+      if (!res.ok) { alert(res.error); return; }
+      const r = res.data;
+      currentDetailId = id;
+      document.getElementById('detailTitle').textContent = r.child_name + ' · ' + r.shift_date;
+      document.getElementById('detailBody').innerHTML = `
+        <div style="margin-bottom:14px;">
+          <strong>状态：</strong><span class="status status-${r.status}">${statusLabels[r.status]}</span>
+          ${r.is_partial ? '<span class="partial-badge">缺页</span>' : ''}
+        </div>
+        <div style="margin-bottom:14px;font-size:13px;color:#555;">
+          页数：${r.received_pages} / ${r.total_pages} · 出生日期：${r.birth_date || '-'} · 监护人：${r.guardian || '-'}
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong>材料页面：</strong>
+          <div class="pages-list">
+            ${r.pages.map(p => '<span class="page-item ' + (p.is_valid ? '' : 'invalid') + '">第' + p.page_number + '页' + (p.is_valid ? '' : '·' + (p.invalid_reason || '无效')) + '</span>').join('')}
+          </div>
+        </div>
+        <div>
+          <strong>交接时间线：</strong>
+          <div class="timeline">
+            ${r.timeline.map(e => `
+              <div class="timeline-item ${e.event_type}">
+                <div class="timeline-time">${e.created_at} · ${e.operator}</div>
+                <div class="timeline-content"><strong>${eventLabels[e.event_type] || e.event_type}</strong>${e.remark ? '：' + e.remark : ''}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      openModal('detailModal');
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function openAddRecordModal() {
+      document.getElementById('ar_name').value = '';
+      document.getElementById('ar_birth').value = '';
+      document.getElementById('ar_guardian').value = '';
+      document.getElementById('ar_date').value = new Date().toISOString().slice(0,10);
+      document.getElementById('ar_total_pages').value = 3;
+      document.getElementById('ar_pages').innerHTML = '';
+      addPageRow('ar_pages');
+      addPageRow('ar_pages');
+      openModal('addRecordModal');
+    }
+
+    function addPageRow(containerId, pageNumber) {
+      const div = document.createElement('div');
+      div.className = 'page-row';
+      div.innerHTML = `
+        <input type="number" placeholder="页码" style="width:80px;" class="page-num" value="${pageNumber || ''}">
+        <input type="text" placeholder="页面内容" class="page-content">
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;">
+          <input type="checkbox" class="page-invalid"> 无效
+        </label>
+        <button class="btn btn-sm btn-danger" onclick="this.parentNode.remove()">×</button>
+      `;
+      document.getElementById(containerId).appendChild(div);
+    }
+
+    function collectPageRows(containerId) {
+      const rows = document.querySelectorAll('#' + containerId + ' .page-row');
+      const pages = [];
+      let autoNum = 1;
+      rows.forEach(r => {
+        const pn = r.querySelector('.page-num').value || autoNum;
+        const content = r.querySelector('.page-content').value;
+        const invalid = r.querySelector('.page-invalid').checked;
+        if (content) {
+          pages.push({
+            page_number: parseInt(pn) || autoNum,
+            content: content,
+            is_valid: !invalid,
+            invalid_reason: invalid ? '标记无效' : null
+          });
+        }
+        autoNum++;
+      });
+      return pages;
+    }
+
+    async function submitAddRecord() {
+      const name = document.getElementById('ar_name').value.trim();
+      const date = document.getElementById('ar_date').value;
+      const pages = collectPageRows('ar_pages');
+      if (!name || !date) { alert('请填写姓名和日期'); return; }
+      if (pages.length === 0) { alert('请至少填写一页内容'); return; }
+      const totalPages = parseInt(document.getElementById('ar_total_pages').value) || pages.length;
+      const res = await api('/api/records/import', {
+        method: 'POST',
+        body: JSON.stringify({
+          operator: getOperator(),
+          items: [{
+            name,
+            birth_date: document.getElementById('ar_birth').value || null,
+            guardian: document.getElementById('ar_guardian').value || null,
+            shift_date: date,
+            total_pages: totalPages,
+            pages
+          }]
+        })
+      });
+      if (res.ok) {
+        alert('录入完成：成功 ' + res.data.success.length + '，失败 ' + res.data.failed.length);
+        closeModal('addRecordModal');
+        loadRecords();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    function openImportModal() {
+      document.getElementById('importResult').innerHTML = '';
+      document.getElementById('importJson').value = '';
+      openModal('importModal');
+    }
+
+    function loadSampleIntoImport() {
+      const today = new Date().toISOString().slice(0,10);
+      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+      const sample = [
+        {
+          "name": "安安",
+          "birth_date": "2024-03-15",
+          "guardian": "安妈妈",
+          "shift_date": yesterday,
+          "total_pages": 3,
+          "pages": [
+            { "page_number": 1, "content": "旧记录：20:00 喝奶150ml，20:30 入睡" },
+            { "page_number": 2, "content": "旧记录：23:00 巡视，尿布已更换" },
+            { "page_number": 3, "content": "旧记录：05:30 起床，精神好" }
+          ]
+        },
+        {
+          "name": "乐乐",
+          "birth_date": "2024-08-22",
+          "guardian": "乐爸爸",
+          "shift_date": today,
+          "total_pages": 3,
+          "pages": [
+            { "page_number": 1, "content": "新补材料：21:00 入睡，环境温度26度" },
+            { "page_number": 2, "content": "新补材料：02:00 有翻身，安抚后继续睡" },
+            { "page_number": 3, "content": "新补材料：06:00 起床，体温正常", "is_valid": false, "invalid_reason": "内容模糊待确认" }
+          ]
+        },
+        {
+          "name": "宝宝缺页",
+          "shift_date": today,
+          "total_pages": 5,
+          "pages": [
+            { "page_number": 1, "content": "只到了第1页，其他4页未交接" },
+            { "page_number": 3, "content": "第3页单独到了，第2/4/5页缺失" }
+          ]
+        },
+        {
+          "name": "坏行-无日期",
+          "pages": [
+            { "page_number": 1, "content": "这行会因为缺少日期而导入失败" }
+          ]
+        },
+        {
+          "name": "",
+          "shift_date": today,
+          "pages": [
+            { "page_number": 1, "content": "这行会因为缺少姓名而导入失败" }
+          ]
+        }
+      ];
+      document.getElementById('importJson').value = JSON.stringify(sample, null, 2);
+    }
+
+    async function submitImport() {
+      let items;
+      try {
+        items = JSON.parse(document.getElementById('importJson').value);
+      } catch (e) {
+        document.getElementById('importResult').innerHTML = '<div class="alert alert-error">JSON 格式错误: ' + e.message + '</div>';
+        return;
+      }
+      if (!Array.isArray(items)) {
+        document.getElementById('importResult').innerHTML = '<div class="alert alert-error">必须是数组</div>';
+        return;
+      }
+      const res = await api('/api/records/import', {
+        method: 'POST',
+        body: JSON.stringify({ operator: getOperator(), items })
+      });
+      if (res.ok) {
+        const d = res.data;
+        let html = '<div class="alert alert-success">导入完成：共 ' + d.total + ' 行，成功 ' + d.success.length + '，失败 ' + d.failed.length + '</div>';
+        if (d.failed.length) {
+          html += '<div class="alert alert-error"><strong>失败行：</strong><br>';
+          d.failed.forEach(f => {
+            html += '· 第' + (f.index + 1) + '行 ' + (f.name || '(无名)') + '：' + f.error + '<br>';
+          });
+          html += '</div>';
+        }
+        document.getElementById('importResult').innerHTML = html;
+        loadRecords();
+      } else {
+        document.getElementById('importResult').innerHTML = '<div class="alert alert-error">' + res.error + '</div>';
+      }
+    }
+
+    function askRemark(id, action) {
+      currentRemarkAction = { id, action };
+      document.getElementById('remarkText').value = '';
+      const titles = { submit: '提交复核备注', return: '退回补充原因', archive: '归档备注' };
+      document.getElementById('remarkTitle').textContent = titles[action] || '操作';
+      openModal('remarkModal');
+    }
+
+    async function executeRemarkAction() {
+      const { id, action } = currentRemarkAction;
+      const remark = document.getElementById('remarkText').value;
+      let url, method = 'POST';
+      if (action === 'submit') url = '/api/records/' + id + '/submit';
+      else if (action === 'return') url = '/api/records/' + id + '/return';
+      else if (action === 'archive') url = '/api/records/' + id + '/archive';
+      const res = await api(url, { method, body: JSON.stringify({ operator: getOperator(), remark }) });
+      if (res.ok) {
+        closeModal('remarkModal');
+        loadRecords();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    function openAddPages(id) {
+      currentAddPagesId = id;
+      document.getElementById('ap_pages').innerHTML = '';
+      addPageRow('ap_pages');
+      openModal('addPagesModal');
+    }
+
+    async function submitAddPages() {
+      const pages = collectPageRows('ap_pages');
+      if (pages.length === 0) { alert('请填写要补充的页面'); return; }
+      const res = await api('/api/records/' + currentAddPagesId + '/pages', {
+        method: 'POST',
+        body: JSON.stringify({ operator: getOperator(), pages })
+      });
+      if (res.ok) {
+        alert('补充了 ' + res.data.added + ' 页，当前 ' + res.data.received_pages + '/' + res.data.total_pages);
+        closeModal('addPagesModal');
+        loadRecords();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    async function loadAudits() {
+      const res = await api('/api/audits');
+      const el = document.getElementById('auditsList');
+      if (!res.ok) { el.innerHTML = '<div class="alert alert-error">' + res.error + '</div>'; return; }
+      if (res.data.length === 0) { el.innerHTML = '<div class="empty-state">暂无审计记录</div>'; return; }
+      el.innerHTML = res.data.map(a => `
+        <div class="audit-item type-${a.audit_type}">
+          <div class="audit-time">${a.created_at} · 类型: ${a.audit_type}${a.operator ? ' · 操作人: ' + a.operator : ''}${a.record_id ? ' · 记录ID: ' + a.record_id : ''}</div>
+          <div class="audit-detail">${a.detail}</div>
+        </div>
+      `).join('');
+    }
+
+    async function loadExports() {
+      const res = await api('/api/exports');
+      const el = document.getElementById('exportsList');
+      if (!res.ok) { el.innerHTML = '<div class="alert alert-error">' + res.error + '</div>'; return; }
+      if (res.data.length === 0) { el.innerHTML = '<div class="empty-state">暂无导出记录</div>'; return; }
+      el.innerHTML = res.data.map(e => `
+        <div class="export-row">
+          <div>
+            <strong>${e.export_date}</strong> · 操作人: ${e.operator || '-'}
+            <br><small>记录: 期望 ${e.expected_count} / 实际 ${e.actual_count} · 页数: 期望 ${e.expected_pages} / 实际 ${e.actual_pages}</small>
+            ${e.has_mismatch ? '<span class="mismatch-tag">数量不一致·已留审计</span>' : ''}
+          </div>
+          <a class="btn btn-sm btn-primary" href="/api/exports/download/${e.file_path ? e.file_path.split('/').pop() : ''}" target="_blank">下载</a>
+        </div>
+      `).join('');
+    }
+
+    async function openExportModal() {
+      document.getElementById('exportIdsText').value = '';
+      const res = await api('/api/records');
+      const el = document.getElementById('exportCheckList');
+      if (!res.ok || res.data.length === 0) {
+        el.innerHTML = '<div style="color:#999;padding:10px;">暂无记录可选，可直接在下方手动输入 ID</div>';
+      } else {
+        el.innerHTML = res.data.map(r => `
+          <label><input type="checkbox" class="export-chk" value="${r.id}"> ${r.child_name} (ID:${r.id}, ${r.shift_date}, ${statusLabels[r.status]})</label>
+        `).join('');
+      }
+      openModal('exportModal');
+    }
+
+    async function doExport() {
+      let ids = [];
+      document.querySelectorAll('.export-chk:checked').forEach(c => ids.push(parseInt(c.value)));
+      const text = document.getElementById('exportIdsText').value.trim();
+      if (text) {
+        text.split(',').forEach(s => {
+          const n = parseInt(s.trim());
+          if (!isNaN(n)) ids.push(n);
+        });
+      }
+      ids = [...new Set(ids)];
+      if (ids.length === 0) { alert('请勾选或输入至少一个记录 ID'); return; }
+      const res = await api('/api/export', {
+        method: 'POST',
+        body: JSON.stringify({ operator: getOperator(), record_ids: ids })
+      });
+      if (res.ok) {
+        let msg = '导出完成：' + res.data.actual_record_count + '/' + res.data.expected_record_count + ' 条，页数 ' + res.data.actual_pages + '/' + res.data.expected_pages;
+        if (res.data.has_mismatch) msg += '\n⚠️ 存在数量不一致，已写入审计日志，请主管到「审计日志」查看。';
+        alert(msg);
+        closeModal('exportModal');
+        loadExports();
+        loadAudits();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    loadRecords();
+  </script>
+</body>
+</html>
