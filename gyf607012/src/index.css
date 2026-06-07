@@ -1,0 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #1f2937;
+  background-color: #fafaf7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fafaf7 0%, #f4f7f4 100%);
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl shadow-card border border-gray-100 transition-all duration-200;
+  }
+  .card-hoverable {
+    @apply card hover:shadow-cardHover hover:-translate-y-0.5 cursor-pointer;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-medical-700 text-white rounded-xl font-medium text-sm transition-all hover:bg-medical-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm transition-all hover:bg-gray-50 active:scale-[0.98];
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-status-abnormal text-white rounded-xl font-medium text-sm transition-all hover:bg-orange-600 active:scale-[0.98];
+  }
+  .tag {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .tag-normal {
+    @apply tag bg-green-50 text-status-normal border border-green-200;
+  }
+  .tag-abnormal {
+    @apply tag bg-orange-50 text-status-abnormal border border-orange-200;
+  }
+  .tag-revised {
+    @apply tag bg-indigo-50 text-status-revised border border-indigo-200;
+  }
+  .tag-manual {
+    @apply tag bg-amber-50 text-status-manual border border-amber-200;
+  }
+  .input {
+    @apply w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-medical-500 focus:ring-2 focus:ring-medical-500/15 transition-colors;
+  }
+  .textarea {
+    @apply input resize-none min-h-[80px];
+  }
+  .label {
+    @apply block text-sm font-medium text-gray-700 mb-1.5;
+  }
+  .section-title {
+    @apply font-serif text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2;
+  }
+}
