@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+  body {
+    background-color: #f8f5ec;
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(184, 173, 151, 0.12) 0, transparent 50%),
+      radial-gradient(circle at 90% 100%, rgba(139, 179, 128, 0.10) 0, transparent 50%);
+    min-height: 100vh;
+    color: #363127;
+  }
+}
+
+@layer components {
+  .paper-card {
+    @apply bg-paper-50 border border-ink-100 rounded-2xl shadow-paper;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+  .btn {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200;
+  }
+  .btn-primary {
+    @apply btn bg-sage-600 text-paper-50 hover:bg-sage-700 active:bg-sage-800 shadow-sm;
+  }
+  .btn-secondary {
+    @apply btn bg-paper-100 text-ink-700 border border-ink-200 hover:bg-paper-200;
+  }
+  .btn-ghost {
+    @apply btn text-ink-600 hover:bg-paper-100;
+  }
+  .btn-danger {
+    @apply btn bg-clay-500 text-paper-50 hover:bg-clay-600;
+  }
+  .input {
+    @apply w-full px-3.5 py-2.5 bg-paper-50 border border-ink-200 rounded-xl text-ink-700 placeholder:text-ink-300 focus:outline-none focus:border-sage-400 focus:ring-2 focus:ring-sage-200 transition-all duration-200;
+  }
+  .label {
+    @apply block text-xs font-medium text-ink-500 mb-1.5 uppercase tracking-wider;
+  }
+  .h-display {
+    @apply font-display font-bold text-ink-800 tracking-tight;
+  }
+  .divider-dot {
+    @apply w-1 h-1 rounded-full bg-ink-300 inline-block;
+  }
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d8d2c4;
+  border-radius: 3px;
+}
