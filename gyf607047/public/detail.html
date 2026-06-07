@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>睡眠观察记录详情</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="/">← 返回列表</a>
+
+    <header>
+      <h1>🌙 睡眠观察详情 <span id="obsTitle" style="font-size:14px;color:#747d8c;margin-left:10px;"></span></h1>
+      <div class="actions" id="headerActions"></div>
+    </header>
+
+    <div class="detail-actions" id="actionBar"></div>
+
+    <div class="detail-card">
+      <h2>基本信息</h2>
+      <div class="detail-grid" id="detailGrid"></div>
+    </div>
+
+    <div class="detail-card">
+      <h2>现场照片 <button class="btn btn-sm btn-primary" style="margin-left:10px;" onclick="openPhotoUpload()">➕ 上传照片</button></h2>
+      <div class="photo-grid" id="photoGrid"></div>
+    </div>
+
+    <div class="detail-card">
+      <h2>退回与整改记录</h2>
+      <div class="correction-list" id="correctionList"></div>
+    </div>
+
+    <div class="detail-card">
+      <h2>⏱ 完整操作时间线（审计日志）</h2>
+      <p style="font-size:13px;color:#747d8c;margin-bottom:14px;">所有操作永久留痕，服务重启后数据完整保留，护理主管可随时复查。</p>
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="photoModal">
+    <div class="modal">
+      <h2>上传照片</h2>
+      <div class="form-row">
+        <label>照片文件 *</label>
+        <input type="file" id="photoFile" accept="image/*">
+      </div>
+      <div class="form-row">
+        <label>照片说明</label>
+        <input type="text" id="photoDesc" placeholder="如：仰睡姿势正常、面部红润等">
+      </div>
+      <div class="form-row">
+        <label>操作人</label>
+        <input type="text" id="photoOp" placeholder="护理员/主管姓名">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('photoModal')">取消</button>
+        <button class="btn btn-primary" onclick="submitPhoto()">上传</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="submitModal">
+    <div class="modal">
+      <h2>提交复核</h2>
+      <div class="form-row">
+        <label>操作人</label>
+        <input type="text" id="submitOp" placeholder="护理员姓名">
+      </div>
+      <p style="font-size:13px;color:#747d8c;">提交后状态变为"复核中"，主管可审核后归档或退回补充。</p>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('submitModal')">取消</button>
+        <button class="btn btn-primary" onclick="doSubmit()">确认提交</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="rejectModal">
+    <div class="modal">
+      <h2>退回补充</h2>
+      <div class="form-row">
+        <label>退回原因 *</label>
+        <textarea id="rejectReason" placeholder="如：缺少结束时间、照片说明不清、未记录异常处理等"></textarea>
+      </div>
+      <div class="form-row">
+        <label>操作人 *</label>
+        <input type="text" id="rejectOp" placeholder="主管姓名">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('rejectModal')">取消</button>
+        <button class="btn btn-warning" onclick="doReject()">确认退回</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="correctModal">
+    <div class="modal">
+      <h2>整改补充</h2>
+      <div class="form-row">
+        <label>整改内容 *</label>
+        <textarea id="correctContent" placeholder="说明已补充的内容或整改措施"></textarea>
+      </div>
+      <div class="form-row">
+        <label>操作人 *</label>
+        <input type="text" id="correctOp" placeholder="护理员姓名">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('correctModal')">取消</button>
+        <button class="btn btn-success" onclick="doCorrect()">确认提交</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="archiveModal">
+    <div class="modal">
+      <h2>关闭归档</h2>
+      <div class="form-row">
+        <label>操作人</label>
+        <input type="text" id="archiveOp" placeholder="主管姓名">
+      </div>
+      <p style="font-size:13px;color:#747d8c;">归档后记录不可修改，但所有照片、审计日志和整改记录永久保留。</p>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('archiveModal')">取消</button>
+        <button class="btn btn-success" onclick="doArchive()">确认归档</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="editModal">
+    <div class="modal">
+      <h2>编辑记录</h2>
+      <div class="form-row">
+        <label>婴幼儿姓名 *</label>
+        <input type="text" id="e_baby_name">
+      </div>
+      <div class="form-row">
+        <label>房间号</label>
+        <input type="text" id="e_room_no">
+      </div>
+      <div class="form-row">
+        <label>护理员 *</label>
+        <input type="text" id="e_nurse_name">
+      </div>
+      <div class="form-row">
+        <label>睡眠开始 *</label>
+        <input type="datetime-local" id="e_sleep_start">
+      </div>
+      <div class="form-row">
+        <label>睡眠结束</label>
+        <input type="datetime-local" id="e_sleep_end">
+      </div>
+      <div class="form-row">
+        <label>睡眠质量</label>
+        <select id="e_sleep_quality">
+          <option value="">请选择</option>
+          <option value="优">优</option>
+          <option value="良">良</option>
+          <option value="中">中</option>
+          <option value="差">差</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>睡姿</label>
+        <select id="e_position">
+          <option value="">请选择</option>
+          <option value="仰睡">仰睡</option>
+          <option value="侧睡">侧睡</option>
+          <option value="趴睡">趴睡</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>备注</label>
+        <textarea id="e_notes"></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('editModal')">取消</button>
+        <button class="btn btn-primary" onclick="doEdit()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const OBS_ID = params.get('id');
+    if (!OBS_ID) { location.href = '/'; }
+    const STATUS_LABEL = { DRAFT: '录入材料', REVIEW: '复核中', ARCHIVED: '已归档' };
+    const STATUS_CLS = { DRAFT: 'badge-draft', REVIEW: 'badge-review', ARCHIVED: 'badge-archived' };
+    const ACTION_LABEL = {
+      CREATE: '创建',
+      UPDATE: '编辑',
+      UPLOAD_PHOTO: '上传照片',
+      SUBMIT: '提交复核',
+      REJECT: '退回补充',
+      CORRECT: '整改提交',
+      ARCHIVE: '关闭归档',
+      CRASH_TEST: '异常测试',
+    };
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function fmtTime(s) {
+      if (!s) return '-';
+      try { return new Date(s).toLocaleString('zh-CN', { hour12: false }); } catch { return s; }
+    }
+    function toLocalInput(s) {
+      if (!s) return '';
+      try {
+        const d = new Date(s);
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        return d.toISOString().slice(0, 16);
+      } catch { return ''; }
+    }
+
+    async function loadDetail() {
+      const res = await fetch(`/api/observations/${OBS_ID}`);
+      if (!res.ok) { alert('记录不存在'); location.href = '/'; return; }
+      const data = await res.json();
+      renderDetail(data);
+    }
+
+    function renderDetail(d) {
+      document.getElementById('obsTitle').textContent = `#${d.id} · ${d.baby_name}`;
+      document.title = `详情 #${d.id} ${d.baby_name}`;
+
+      const grid = document.getElementById('detailGrid');
+      grid.innerHTML = `
+        <div class="detail-item"><div class="label">记录ID</div><div class="value">#${d.id}</div></div>
+        <div class="detail-item"><div class="label">状态</div><div class="value"><span class="badge ${STATUS_CLS[d.status]}">${STATUS_LABEL[d.status]}</span></div></div>
+        <div class="detail-item"><div class="label">婴幼儿姓名</div><div class="value">${escapeHtml(d.baby_name)}</div></div>
+        <div class="detail-item"><div class="label">房间号</div><div class="value">${escapeHtml(d.room_no || '-')}</div></div>
+        <div class="detail-item"><div class="label">护理员</div><div class="value">${escapeHtml(d.nurse_name)}</div></div>
+        <div class="detail-item"><div class="label">睡眠开始</div><div class="value">${fmtTime(d.sleep_start)}</div></div>
+        <div class="detail-item"><div class="label">睡眠结束</div><div class="value">${fmtTime(d.sleep_end)}</div></div>
+        <div class="detail-item"><div class="label">睡眠质量</div><div class="value">${escapeHtml(d.sleep_quality || '-')}</div></div>
+        <div class="detail-item"><div class="label">睡姿</div><div class="value">${escapeHtml(d.position || '-')}</div></div>
+        <div class="detail-item" style="grid-column:1/-1;"><div class="label">备注</div><div class="value">${escapeHtml(d.notes || '（无）')}</div></div>
+        <div class="detail-item"><div class="label">创建时间</div><div class="value">${fmtTime(d.created_at)}</div></div>
+        <div class="detail-item"><div class="label">更新时间</div><div class="value">${fmtTime(d.updated_at)}</div></div>
+      `;
+
+      const actions = document.getElementById('actionBar');
+      const header = document.getElementById('headerActions');
+      let btns = '';
+      if (d.status === 'DRAFT') {
+        btns += '<button class="btn btn-primary" onclick="openModal(\'submitModal\')">📤 提交复核</button>';
+        btns += '<button class="btn btn-secondary" onclick="openEdit()">✏️ 编辑</button>';
+        btns += '<button class="btn btn-warning" onclick="openModal(\'photoModal\')">📷 上传照片</button>';
+        if (d.corrections && d.corrections.some(c => !c.corrected_at)) {
+          btns += '<button class="btn btn-success" onclick="openModal(\'correctModal\')">✅ 提交整改</button>';
+        }
+      } else if (d.status === 'REVIEW') {
+        btns += '<button class="btn btn-danger" onclick="openModal(\'rejectModal\')">⚠️ 退回补充</button>';
+        btns += '<button class="btn btn-success" onclick="openModal(\'archiveModal\')">📦 关闭归档</button>';
+        btns += '<button class="btn btn-warning" onclick="openModal(\'photoModal\')">📷 上传照片</button>';
+      } else if (d.status === 'ARCHIVED') {
+        btns += '<span class="badge badge-archived">已归档 · 不可修改</span>';
+      }
+      btns += `<button class="btn btn-secondary" onclick="window.location.href='/api/export/audit/${OBS_ID}'">📋 导出审计</button>`;
+      actions.innerHTML = btns;
+      header.innerHTML = btns.includes('已归档') ? '' : '';
+
+      const photoGrid = document.getElementById('photoGrid');
+      if (!d.photos || !d.photos.length) {
+        photoGrid.innerHTML = '<div class="empty" style="grid-column:1/-1;">暂无照片</div>';
+      } else {
+        photoGrid.innerHTML = d.photos.map(p => `
+          <div class="photo-item">
+            <img src="${p.file_path}" alt="${escapeHtml(p.description)}" onclick="window.open('${p.file_path}')" style="cursor:pointer;">
+            <div class="desc">
+              <div><strong>说明：</strong>${escapeHtml(p.description || '（未填写）')}</div>
+              <div style="margin-top:4px;color:#a4b0be;">${fmtTime(p.uploaded_at)}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const corrList = document.getElementById('correctionList');
+      if (!d.corrections || !d.corrections.length) {
+        corrList.innerHTML = '<div class="empty">无退回记录</div>';
+      } else {
+        corrList.innerHTML = d.corrections.map(c => `
+          <div class="correction-item ${c.corrected_at ? 'corrected' : ''}">
+            <div class="c-title">${c.corrected_at ? '✅ 已整改' : '⚠️ 待整改'} — ${escapeHtml(c.rejected_by)} 于 ${fmtTime(c.rejected_at)}</div>
+            <div class="c-reason"><strong>退回原因：</strong>${escapeHtml(c.reject_reason)}</div>
+            ${c.corrected_at ? `<div class="c-answer"><strong>整改内容（${escapeHtml(c.corrected_by)} ${fmtTime(c.corrected_at)}）：</strong>${escapeHtml(c.correction_content)}</div>` : ''}
+          </div>
+        `).join('');
+      }
+
+      const tl = document.getElementById('timeline');
+      if (!d.audit || !d.audit.length) {
+        tl.innerHTML = '<div class="empty">暂无审计记录</div>';
+      } else {
+        tl.innerHTML = d.audit.map(a => {
+          let extra = '';
+          if (a.action === 'UPLOAD_PHOTO' && a.snapshot_json) {
+            try {
+              const snap = JSON.parse(a.snapshot_json);
+              extra = `<div class="tl-remark" style="margin-top:8px;">📷 照片：${escapeHtml(snap.description || '（无说明）')}<br><img src="${snap.file_path}" style="max-width:200px;margin-top:6px;border-radius:4px;"></div>`;
+            } catch {}
+          }
+          return `
+            <div class="timeline-item act-${a.action}">
+              <div class="tl-time">${fmtTime(a.created_at)}</div>
+              <div class="tl-title"><span class="tl-action">${ACTION_LABEL[a.action] || a.action}</span>${escapeHtml(a.operator)}</div>
+              <div class="tl-meta">${a.from_status ? `${STATUS_LABEL[a.from_status] || a.from_status} → ${STATUS_LABEL[a.to_status] || a.to_status}` : ''}</div>
+              ${a.remark ? `<div class="tl-remark">${escapeHtml(a.remark)}</div>` : ''}
+              ${extra}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    function openPhotoUpload() {
+      document.getElementById('photoFile').value = '';
+      document.getElementById('photoDesc').value = '';
+      document.getElementById('photoOp').value = '';
+      openModal('photoModal');
+    }
+
+    async function submitPhoto() {
+      const file = document.getElementById('photoFile').files[0];
+      if (!file) { alert('请选择照片'); return; }
+      const fd = new FormData();
+      fd.append('photo', file);
+      fd.append('description', document.getElementById('photoDesc').value.trim());
+      fd.append('operator', document.getElementById('photoOp').value.trim() || '护理员');
+      const res = await fetch(`/api/observations/${OBS_ID}/photos`, { method: 'POST', body: fd });
+      if (res.ok) { closeModal('photoModal'); loadDetail(); }
+      else { const e = await res.json(); alert('上传失败：' + (e.error || '')); }
+    }
+
+    async function doSubmit() {
+      const res = await fetch(`/api/observations/${OBS_ID}/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: document.getElementById('submitOp').value.trim() || '护理员' }),
+      });
+      if (res.ok) { closeModal('submitModal'); loadDetail(); }
+      else { const e = await res.json(); alert(e.error || '提交失败'); }
+    }
+
+    async function doReject() {
+      const reason = document.getElementById('rejectReason').value.trim();
+      const op = document.getElementById('rejectOp').value.trim();
+      if (!reason || !op) { alert('请填写退回原因和操作人'); return; }
+      const res = await fetch(`/api/observations/${OBS_ID}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reject_reason: reason, rejected_by: op }),
+      });
+      if (res.ok) { closeModal('rejectModal'); loadDetail(); }
+      else { const e = await res.json(); alert(e.error || '退回失败'); }
+    }
+
+    async function doCorrect() {
+      const content = document.getElementById('correctContent').value.trim();
+      const op = document.getElementById('correctOp').value.trim();
+      if (!content || !op) { alert('请填写整改内容和操作人'); return; }
+      const res = await fetch(`/api/observations/${OBS_ID}/correct`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correction_content: content, corrected_by: op }),
+      });
+      if (res.ok) { closeModal('correctModal'); loadDetail(); }
+      else { const e = await res.json(); alert(e.error || '提交失败'); }
+    }
+
+    async function doArchive() {
+      const res = await fetch(`/api/observations/${OBS_ID}/archive`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: document.getElementById('archiveOp').value.trim() || '主管' }),
+      });
+      if (res.ok) { closeModal('archiveModal'); loadDetail(); }
+      else { const e = await res.json(); alert(e.error || '归档失败'); }
+    }
+
+    function openEdit() {
+      fetch(`/api/observations/${OBS_ID}`).then(r => r.json()).then(d => {
+        document.getElementById('e_baby_name').value = d.baby_name;
+        document.getElementById('e_room_no').value = d.room_no || '';
+        document.getElementById('e_nurse_name').value = d.nurse_name;
+        document.getElementById('e_sleep_start').value = toLocalInput(d.sleep_start);
+        document.getElementById('e_sleep_end').value = toLocalInput(d.sleep_end);
+        document.getElementById('e_sleep_quality').value = d.sleep_quality || '';
+        document.getElementById('e_position').value = d.position || '';
+        document.getElementById('e_notes').value = d.notes || '';
+        openModal('editModal');
+      });
+    }
+
+    async function doEdit() {
+      const body = {
+        baby_name: document.getElementById('e_baby_name').value.trim(),
+        room_no: document.getElementById('e_room_no').value.trim(),
+        nurse_name: document.getElementById('e_nurse_name').value.trim(),
+        sleep_start: document.getElementById('e_sleep_start').value,
+        sleep_end: document.getElementById('e_sleep_end').value || null,
+        sleep_quality: document.getElementById('e_sleep_quality').value,
+        position: document.getElementById('e_position').value,
+        notes: document.getElementById('e_notes').value.trim(),
+      };
+      if (!body.baby_name || !body.nurse_name || !body.sleep_start) {
+        alert('必填项不可为空');
+        return;
+      }
+      const res = await fetch(`/api/observations/${OBS_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) { closeModal('editModal'); loadDetail(); }
+      else { const e = await res.json(); alert(e.error || '保存失败'); }
+    }
+
+    loadDetail();
+  </script>
+</body>
+</html>

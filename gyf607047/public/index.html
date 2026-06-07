@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>婴幼儿睡眠观察排程板 - 月子护理版</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🌙 婴幼儿睡眠观察排程板</h1>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="doExport()">📤 导出CSV</button>
+        <button class="btn btn-secondary" onclick="doExportAudit()">📋 导出审计</button>
+        <button class="btn btn-primary" onclick="openCreate()">➕ 新增记录</button>
+      </div>
+    </header>
+
+    <div class="alert alert-info">
+      💡 护理主管：点击任意记录的"查看详情"可查看完整时间线，包含照片说明、状态变更和整改记录，服务重启后数据仍然保留。
+    </div>
+
+    <div class="filters">
+      <label>状态筛选：
+        <select id="statusFilter" onchange="loadList()">
+          <option value="">全部</option>
+          <option value="DRAFT">录入材料（草稿）</option>
+          <option value="REVIEW">提交复核</option>
+          <option value="ARCHIVED">已归档</option>
+        </select>
+      </label>
+      <label>搜索：
+        <input type="text" id="searchInput" placeholder="婴幼儿/护理员/房间" oninput="applyFilter()">
+      </label>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>婴幼儿</th>
+          <th>房间</th>
+          <th>护理员</th>
+          <th>睡眠开始</th>
+          <th>睡眠结束</th>
+          <th>质量</th>
+          <th>状态</th>
+          <th>更新时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="listBody"></tbody>
+    </table>
+  </div>
+
+  <div class="modal-mask" id="createModal">
+    <div class="modal">
+      <h2>新增睡眠观察记录</h2>
+      <div class="form-row">
+        <label>婴幼儿姓名 *</label>
+        <input type="text" id="f_baby_name">
+      </div>
+      <div class="form-row">
+        <label>房间号</label>
+        <input type="text" id="f_room_no" placeholder="如：302">
+      </div>
+      <div class="form-row">
+        <label>护理员姓名 *</label>
+        <input type="text" id="f_nurse_name">
+      </div>
+      <div class="form-row">
+        <label>睡眠开始时间 *</label>
+        <input type="datetime-local" id="f_sleep_start">
+      </div>
+      <div class="form-row">
+        <label>睡眠结束时间</label>
+        <input type="datetime-local" id="f_sleep_end">
+      </div>
+      <div class="form-row">
+        <label>睡眠质量</label>
+        <select id="f_sleep_quality">
+          <option value="">请选择</option>
+          <option value="优">优（安稳无哭闹）</option>
+          <option value="良">良（偶有动静）</option>
+          <option value="中">中（易醒）</option>
+          <option value="差">差（哭闹多）</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>睡姿</label>
+        <select id="f_position">
+          <option value="">请选择</option>
+          <option value="仰睡">仰睡</option>
+          <option value="侧睡">侧睡</option>
+          <option value="趴睡">趴睡（需监护）</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>备注</label>
+        <textarea id="f_notes" placeholder="异常情况、处理措施等"></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('createModal')">取消</button>
+        <button class="btn btn-primary" onclick="submitCreate()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allData = [];
+    const STATUS_LABEL = { DRAFT: '录入材料', REVIEW: '复核中', ARCHIVED: '已归档' };
+    const STATUS_CLS = { DRAFT: 'badge-draft', REVIEW: 'badge-review', ARCHIVED: 'badge-archived' };
+
+    async function loadList() {
+      const status = document.getElementById('statusFilter').value;
+      const url = status ? `/api/observations?status=${status}` : '/api/observations';
+      const res = await fetch(url);
+      allData = await res.json();
+      applyFilter();
+    }
+
+    function applyFilter() {
+      const kw = document.getElementById('searchInput').value.trim();
+      const list = kw
+        ? allData.filter(r =>
+            (r.baby_name || '').includes(kw) ||
+            (r.nurse_name || '').includes(kw) ||
+            (r.room_no || '').includes(kw)
+          )
+        : allData;
+      render(list);
+    }
+
+    function render(rows) {
+      const tbody = document.getElementById('listBody');
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="empty">暂无记录，点击右上角"新增记录"开始录入</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td>#${r.id}</td>
+          <td><strong>${escapeHtml(r.baby_name)}</strong></td>
+          <td>${escapeHtml(r.room_no || '-')}</td>
+          <td>${escapeHtml(r.nurse_name)}</td>
+          <td>${fmtTime(r.sleep_start)}</td>
+          <td>${fmtTime(r.sleep_end)}</td>
+          <td>${escapeHtml(r.sleep_quality || '-')}</td>
+          <td><span class="badge ${STATUS_CLS[r.status]}">${STATUS_LABEL[r.status]}</span></td>
+          <td>${fmtTime(r.updated_at)}</td>
+          <td><a class="btn btn-sm btn-primary" href="/detail.html?id=${r.id}">查看详情</a></td>
+        </tr>
+      `).join('');
+    }
+
+    function fmtTime(s) {
+      if (!s) return '-';
+      try {
+        const d = new Date(s);
+        return d.toLocaleString('zh-CN', { hour12: false });
+      } catch { return s; }
+    }
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function openCreate() {
+      ['f_baby_name', 'f_room_no', 'f_nurse_name', 'f_sleep_start', 'f_sleep_end', 'f_sleep_quality', 'f_position', 'f_notes'].forEach(id => document.getElementById(id).value = '');
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById('f_sleep_start').value = now.toISOString().slice(0, 16);
+      document.getElementById('createModal').classList.add('show');
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    async function submitCreate() {
+      const body = {
+        baby_name: document.getElementById('f_baby_name').value.trim(),
+        room_no: document.getElementById('f_room_no').value.trim(),
+        nurse_name: document.getElementById('f_nurse_name').value.trim(),
+        sleep_start: document.getElementById('f_sleep_start').value,
+        sleep_end: document.getElementById('f_sleep_end').value || null,
+        sleep_quality: document.getElementById('f_sleep_quality').value,
+        position: document.getElementById('f_position').value,
+        notes: document.getElementById('f_notes').value.trim(),
+      };
+      if (!body.baby_name || !body.nurse_name || !body.sleep_start) {
+        alert('请填写必填项（婴幼儿姓名、护理员、睡眠开始时间）');
+        return;
+      }
+      const res = await fetch('/api/observations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        closeModal('createModal');
+        loadList();
+      } else {
+        const err = await res.json();
+        alert('保存失败：' + (err.error || '未知错误'));
+      }
+    }
+
+    function doExport() { window.location.href = '/api/export'; }
+    function doExportAudit() { window.location.href = '/api/export/audit'; }
+
+    loadList();
+  </script>
+</body>
+</html>

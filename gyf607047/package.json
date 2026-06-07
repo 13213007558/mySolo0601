@@ -1,0 +1,18 @@
+{
+  "name": "baby-sleep-board",
+  "version": "1.0.0",
+  "description": "婴幼儿睡眠观察排程板 - 月子护理版",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node scripts/seed.js",
+    "export-test": "node scripts/export-test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "multer": "^1.4.5-lts.1",
+    "csv-writer": "^1.6.0",
+    "cors": "^2.8.5"
+  }
+}
