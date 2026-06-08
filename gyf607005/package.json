@@ -1,0 +1,32 @@
+{
+  "name": "infant-fee-verification-board",
+  "version": "1.0.0",
+  "description": "婴幼儿费用核销排程板夜班交接版 - 完整链路追踪、权限隔离、口径一致、幂等导入、坏行隔离、部分成功",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "init:db": "node scripts/init-db.js",
+    "seed": "node scripts/seed-data.js",
+    "verify": "node scripts/verify-all.js",
+    "verify:teacher": "node scripts/verify-teacher-view.js",
+    "verify:admin": "node scripts/verify-admin-view.js",
+    "test": "npm run init:db && npm run seed && npm run verify"
+  },
+  "keywords": [
+    "daycare",
+    "fee-verification",
+    "audit-trail",
+    "permission-control",
+    "data-consistency"
+  ],
+  "author": "Daycare Center",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
