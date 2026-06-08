@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>婴幼儿照片授权追踪台门店售后版</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#eef5ff;margin:0;color:#1a2b4a}
+.hd{background:#2563b8;color:#fff;padding:16px 24px}.hd h1{font-size:18px;margin:0}
+.sub{font-size:12px;opacity:.85;margin-top:3px}
+.ct{padding:16px 24px;max-width:1600px;margin:0 auto}
+.scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px}
+.sc{background:#fff;border-radius:6px;padding:10px;border-left:3px solid #2563b8;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.sc.g{border-left-color:#10b981}.sc.r{border-left-color:#ef4444}.sc.o{border-left-color:#f59e0b}
+.sc.p{border-left-color:#8b5cf6}.sc.gr{border-left-color:#6b7280}.sc.c{border-left-color:#06b6d4}
+.sl{font-size:11px;color:#64748b}.sv{font-size:20px;font-weight:700;color:#1e4b8c}
+.sc.g .sv{color:#059669}.sc.r .sv{color:#dc2626}.sc.o .sv{color:#d97706}
+.sc.p .sv{color:#7c3aed}.sc.gr .sv{color:#4b5563}.sc.c .sv{color:#0891b2}
+.bar{background:#fff;border-radius:6px;padding:10px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bar label{font-size:12px;color:#475569;font-weight:500}.bar input{padding:6px 10px;border:1px solid #cbd5e1;border-radius:5px;font-size:12px;width:150px;outline:none}
+.bt{padding:6px 14px;border:none;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer}.bt.p{background:#2563b8;color:#fff}.bt.s{background:#10b981;color:#fff}.bt.w{background:#f59e0b;color:#fff}.bt.d{background:#f1f5f9;color:#334155}.bt.sm{padding:3px 8px;font-size:11px}
+.wp{background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}
+table{width:100%;border-collapse:collapse}thead{background:#f8fafc}
+th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:#475569;border-bottom:2px solid #e2e8f0}
+td{padding:8px 12px;font-size:12px;color:#334155;border-bottom:1px solid #f1f5f9}tr:hover{background:#f8fafc}
+.bd{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.ok{background:#d1fae5;color:#065f46}.no{background:#fee2e2;color:#991b1b}.rv{background:#fef3c7;color:#92400e}
+.sta{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;background:#e0e7ff;color:#3730a3}
+.sta.m{background:#fce7f3;color:#9d174d}
+.vt{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;background:#f1f5f9;color:#475563}
+.ca{display:flex;gap:5px}
+.mb{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,.6);z-index:1000;justify-content:center;align-items:flex-start;padding:30px 16px;overflow-y:auto}
+.mb.on{display:flex}
+.md{background:#fff;border-radius:12px;width:100%;max-width:760px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+.mh{background:#2563b8;color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.mh h2{font-size:15px;margin:0}.mc{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;opacity:.85}
+.mo{padding:20px}
+.mo h3{font-size:13px;color:#1e4b8c;margin:16px 0 10px;padding-bottom:6px;border-bottom:2px solid #e2e8f0}
+.mo h3:first-child{margin-top:0}
+.al{background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #ef4444;border-radius:6px;padding:10px 14px;color:#991b1b;font-size:12px;margin-bottom:12px}
+.ig{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 16px;margin-bottom:10px}
+.ii{display:flex;flex-direction:column;gap:3px}.il{font-size:11px;color:#64748b}.iv{font-size:13px;color:#1e293b;font-weight:500}.iv.f{grid-column:1/-1}
+.tll{position:relative;padding-left:22px}.tll::before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:#e2e8f0}
+.tli{position:relative;padding:10px 0;border-bottom:1px solid #f1f5f9}.tli:last-child{border-bottom:none}
+.tli::before{content:"";position:absolute;left:-19px;top:14px;width:12px;height:12px;border-radius:50%;background:#2563b8;border:2px solid #fff;box-shadow:0 0 0 2px #bfdbfe}
+.tlh{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.tlv{font-weight:600;color:#1e4b8c;font-size:12px}.tlt{font-size:11px;color:#64748b}
+.tlb{font-size:12px;color:#475569}.tlb p{margin:2px 0}.tlb .cr{color:#f59e0b;font-style:italic}
+.lg{display:flex;flex-direction:column;gap:6px}
+.li{background:#f8fafc;border-radius:6px;padding:8px 12px;font-size:12px}
+.lh{display:flex;justify-content:space-between;margin-bottom:3px}
+.lt{font-weight:600;color:#1e4b8c}.ld{color:#475569;font-size:11px}.lo{color:#64748b;font-size:11px}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:12px;font-weight:500;color:#334155;margin-bottom:4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:7px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;outline:none;font-family:inherit}
+.fg textarea{resize:vertical;min-height:60px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mf{padding:14px 20px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px}
+.em{padding:40px;text-align:center;color:#94a3b8;font-size:13px}
+</style>
+</head>
+<body>
+<div class="hd"><h1>婴幼儿照片授权追踪台 · 门店售后版</h1><div class="sub">Baby Photo Authorization Tracker · Store Support Edition</div></div>
+<div class="ct">
+<div class="scards" id="sg"></div>
+<div class="bar">
+<label>家长手机号：</label><input type="text" id="pf" placeholder="输入手机号搜索...">
+<label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="ib"> 包含坏数据</label>
+<button class="bt p" onclick="loadR()">查询</button>
+<button class="bt s" onclick="expCSV()">导出 CSV</button>
+<button class="bt w" onclick="openC()">+ 新建补录</button>
+</div>
+<div class="wp">
+<table>
+<thead><tr>
+<th>宝宝ID/姓名</th><th>家长手机</th><th>门店/班级</th><th>照片类型</th>
+<th>授权状态</th><th>结论</th><th>结论来源</th><th>版本</th><th>操作人</th><th>更新时间</th><th>操作</th>
+</tr></thead>
+<tbody id="rtb"></tbody>
+</table>
+</div>
+</div>
+
+<div class="mb" id="dm"><div class="md">
+<div class="mh"><h2 id="dtitle">记录详情</h2><button class="mc" onclick="cm('dm')">×</button></div>
+<div class="mo" id="dbody"></div>
+<div class="mf"><button class="bt d" onclick="cm('dm')">关闭</button></div>
+</div></div>
+
+<div class="mb" id="sm"><div class="md">
+<div class="mh"><h2>手工补录</h2><button class="mc" onclick="cm('sm')">×</button></div>
+<div class="mo">
+<form id="sf">
+<input type="hidden" id="sid">
+<div class="fr">
+<div class="fg"><label>授权状态</label><select id="sas"><option>已授权</option><option>未授权</option><option>授权撤回</option></select></div>
+<div class="fg"><label>操作人</label><input type="text" id="sop" placeholder="请输入操作人姓名"></div>
+</div>
+<div class="fg"><label>结论</label><input type="text" id="scon" placeholder="请输入处理结论"></div>
+<div class="fg"><label>变更原因</label><input type="text" id="scr" placeholder="请输入本次变更原因"></div>
+<div class="fg"><label>备注</label><textarea id="srm" placeholder="请输入补充备注..."></textarea></div>
+</form>
+</div>
+<div class="mf"><button class="bt d" onclick="cm('sm')">取消</button><button class="bt p" onclick="subS()">提交补录</button></div>
+</div></div>
+
+<div class="mb" id="cm"><div class="md">
+<div class="mh"><h2>新建补录记录</h2><button class="mc" onclick="cm('cm')">×</button></div>
+<div class="mo">
+<form id="cf">
+<div class="fr">
+<div class="fg"><label>宝宝ID *</label><input type="text" id="cbi" placeholder="例如：B005"></div>
+<div class="fg"><label>宝宝姓名 *</label><input type="text" id="cbn" placeholder="请输入宝宝姓名"></div>
+</div>
+<div class="fr">
+<div class="fg"><label>家长手机</label><input type="text" id="cpp" placeholder="请输入家长手机号"></div>
+<div class="fg"><label>门店</label><input type="text" id="csn" placeholder="请输入门店名称"></div>
+</div>
+<div class="fr">
+<div class="fg"><label>班级</label><input type="text" id="ccn" placeholder="例如：小班A"></div>
+<div class="fg"><label>照片类型</label><select id="cpt"><option value="">请选择</option><option>证件照</option><option>活动照</option><option>日常照</option><option>毕业照</option><option>艺术照</option></select></div>
+</div>
+<div class="fr">
+<div class="fg"><label>授权状态</label><select id="cas"><option>已授权</option><option>未授权</option><option>授权撤回</option></select></div>
+<div class="fg"><label>操作人</label><input type="text" id="cop" placeholder="请输入操作人姓名"></div>
+</div>
+<div class="fg"><label>结论</label><input type="text" id="ccon" placeholder="请输入处理结论"></div>
+<div class="fg"><label>备注</label><textarea id="crm" placeholder="请输入备注信息..."></textarea></div>
+</form>
+</div>
+<div class="mf"><button class="bt d" onclick="cm('cm')">取消</button><button class="bt p" onclick="subC()">创建记录</button></div>
+</div></div>
+
+<script>
+let curPhone='',curBad=false;
+function sb(s){if(s==='已授权')return'<span class="bd ok">已授权</span>';if(s==='未授权')return'<span class="bd no">未授权</span>';if(s==='授权撤回')return'<span class="bd rv">授权撤回</span>';return'<span class="bd">'+s+'</span>';}
+function ss(s){return s==='手工补录'?'<span class="sta m">手工补录</span>':'<span class="sta">系统判断</span>';}
+async function loadStats(){const r=await fetch('/api/stats');const d=await r.json();const byS={};d.byStatus.forEach(x=>byS[x.auth_status]=x.count);const bySo={};d.bySource.forEach(x=>bySo[x.conclusion_source]=x.count);document.getElementById('sg').innerHTML='<div class="sc"><div class="sl">总记录数</div><div class="sv">'+(d.total+d.badData)+'</div></div><div class="sc g"><div class="sl">已授权</div><div class="sv">'+(byS['已授权']||0)+'</div></div><div class="sc r"><div class="sl">未授权</div><div class="sv">'+(byS['未授权']||0)+'</div></div><div class="sc o"><div class="sl">授权撤回</div><div class="sv">'+(byS['授权撤回']||0)+'</div></div><div class="sc p"><div class="sl">手工补录</div><div class="sv">'+(bySo['手工补录']||0)+'</div></div><div class="sc gr"><div class="sl">坏数据</div><div class="sv">'+d.badData+'</div></div><div class="sc c"><div class="sl">历史版本</div><div class="sv">'+d.totalVersions+'</div></div>';}
+async function loadR(){curPhone=document.getElementById('pf').value.trim();curBad=document.getElementById('ib').checked;let u='/api/records';const p=[];if(curPhone)p.push('phone='+encodeURIComponent(curPhone));if(curBad)p.push('include_bad=1');if(p.length)u+='?'+p.join('&');const r=await fetch(u);const d=await r.json();const t=document.getElementById('rtb');if(!d.length){t.innerHTML='<tr><td colspan="11" class="em">暂无数据</td></tr>';return;}t.innerHTML=d.map(x=>'<tr><td><b>'+x.baby_id+'</b> '+x.baby_name+(x.is_bad_data?' <span class="bd no">坏数据</span>':'')+'</td><td>'+x.parent_phone+'</td><td>'+x.store_name+' / '+x.class_name+'</td><td>'+x.photo_type+'</td><td>'+sb(x.auth_status)+'</td><td>'+x.conclusion+'</td><td>'+ss(x.conclusion_source)+'</td><td><span class="vt">v'+x.version+'</span></td><td>'+x.operator+'</td><td>'+x.updated_at+'</td><td class="ca"><button class="bt p sm" onclick="openD('+x.id+')">详情</button><button class="bt w sm" onclick="openS('+x.id+')">补录</button></td></tr>').join('');}
+async function openD(id){const r=await fetch('/api/records/'+id);const d=await r.json();const rec=d.record;document.getElementById('dtitle').innerHTML=rec.baby_id+' '+rec.baby_name+' · 详情';let h='';if(d.accessReason)h+='<div class="al">⚠️ '+d.accessReason+'</div>';h+='<h3>基本信息</h3><div class="ig"><div class="ii"><div class="il">宝宝ID</div><div class="iv">'+rec.baby_id+'</div></div><div class="ii"><div class="il">宝宝姓名</div><div class="iv">'+rec.baby_name+'</div></div><div class="ii"><div class="il">家长手机</div><div class="iv">'+rec.parent_phone+'</div></div><div class="ii"><div class="il">门店</div><div class="iv">'+rec.store_name+'</div></div><div class="ii"><div class="il">班级</div><div class="iv">'+rec.class_name+'</div></div><div class="ii"><div class="il">照片类型</div><div class="iv">'+rec.photo_type+'</div></div><div class="ii"><div class="il">授权状态</div><div class="iv">'+sb(rec.auth_status)+'</div></div><div class="ii"><div class="il">版本</div><div class="iv">v'+rec.version+'</div></div><div class="ii"><div class="il">结论来源</div><div class="iv">'+ss(rec.conclusion_source)+'</div></div><div class="ii"><div class="il">操作人</div><div class="iv">'+rec.operator+'</div></div><div class="ii iv f"><div class="il">结论</div><div class="iv">'+rec.conclusion+'</div></div>'+(rec.remark?'<div class="ii iv f"><div class="il">备注</div><div class="iv">'+rec.remark+'</div></div>':'')+'<div class="ii"><div class="il">创建时间</div><div class="iv">'+rec.created_at+'</div></div><div class="ii"><div class="il">更新时间</div><div class="iv">'+rec.updated_at+'</div></div></div>';if(d.sameBaby&&d.sameBaby.length){h+='<h3>同宝宝其他记录（'+d.sameBaby.length+'条）</h3><div class="ig">';d.sameBaby.forEach(x=>{h+='<div class="ii iv f"><div class="iv">'+x.class_name+' · '+sb(x.auth_status)+' · v'+x.version+'</div></div>';});h+='</div>';}if(d.versions&&d.versions.length){h+='<h3>历史版本（'+d.versions.length+'个版本）</h3><div class="tll">';d.versions.forEach(v=>{h+='<div class="tli"><div class="tlh"><span class="tlv">v'+v.version+' '+sb(v.auth_status)+'</span><span class="tlt">'+v.updated_at+'</span></div><div class="tlb"><p><b>结论：</b>'+v.conclusion+'</p><p><b>操作人：</b>'+v.operator+' · <b>来源：</b>'+ss(v.conclusion_source)+'</p>'+(v.change_reason?'<p class="cr">变更原因：'+v.change_reason+'</p>':'')+'</div></div>';});h+='</div>';}if(d.logs&&d.logs.length){h+='<h3>操作日志（'+d.logs.length+'条）</h3><div class="lg">';d.logs.forEach(l=>{h+='<div class="li"><div class="lh"><span class="lt">'+l.operation_type+(l.operator_role?' ('+l.operator_role+')':'')+'</span><span class="ld">'+l.created_at+'</span></div><div>操作人：'+l.operator+'</div>'+(l.reason?'<div class="lo">原因：'+l.reason+'</div>':'')+(l.detail?'<div class="lo">详情：'+l.detail+'</div>':'')+'</div>';});h+='</div>';}document.getElementById('dbody').innerHTML=h;document.getElementById('dm').classList.add('on');}
+function openS(id){document.getElementById('sid').value=id;document.getElementById('sas').value='已授权';document.getElementById('sop').value='';document.getElementById('scon').value='';document.getElementById('scr').value='';document.getElementById('srm').value='';document.getElementById('sm').classList.add('on');}
+async function subS(){const id=document.getElementById('sid').value;const body={auth_status:document.getElementById('sas').value,conclusion:document.getElementById('scon').value,remark:document.getElementById('srm').value,operator:document.getElementById('sop').value||'未知操作人',change_reason:document.getElementById('scr').value};const r=await fetch('/api/records/'+id+'/supplement',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(r.ok){cm('sm');await loadStats();await loadR();}else alert('提交失败');}
+function openC(){['cbi','cbn','cpp','csn','ccn','cpt','cas','cop','ccon','crm'].forEach(x=>document.getElementById(x).value='');document.getElementById('cas').value='已授权';document.getElementById('cm').classList.add('on');}
+async function subC(){const body={baby_id:document.getElementById('cbi').value.trim(),baby_name:document.getElementById('cbn').value.trim(),parent_phone:document.getElementById('cpp').value.trim(),store_name:document.getElementById('csn').value.trim(),class_name:document.getElementById('ccn').value.trim(),photo_type:document.getElementById('cpt').value,auth_status:document.getElementById('cas').value,conclusion:document.getElementById('ccon').value.trim(),remark:document.getElementById('crm').value.trim(),operator:document.getElementById('cop').value.trim()||'未知操作人'};if(!body.baby_id||!body.baby_name){alert('宝宝ID和姓名必填');return;}const r=await fetch('/api/records',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(r.ok){cm('cm');await loadStats();await loadR();}else alert('创建失败');}
+function cm(id){document.getElementById(id).classList.remove('on');}
+async function expCSV(){let u='/api/export';const p=[];if(curPhone)p.push('phone='+encodeURIComponent(curPhone));if(curBad)p.push('include_bad=1');if(p.length)u+='?'+p.join('&');window.location.href=u;}
+window.onload=async()=>{await loadStats();await loadR();};
+</script>
+</body>
+</html>
