@@ -1,0 +1,107 @@
+2026-06-09 03:22:52 [INFO]: 隐私字段配置已加载 {"count":5}
+2026-06-09 03:22:52 [INFO]: 物品借出 {"recordId":5,"item":"测试奶瓶","babyId":4,"classId":4}
+2026-06-09 03:22:52 [WARN]: 归还异常 {"recordId":5,"scanResult":"消毒时间不足-异常"}
+2026-06-09 03:22:52 [INFO]: 记录已同步到所有终端 {"recordId":5}
+2026-06-09 03:22:52 [INFO]: [AUDIT] [MODIFY] DisinfectionRecord #5 (Baby: 4) (Class: 4) - 异常处理: 消毒时间不足 - 已重新消毒30分钟，确认合格 {"userId":8}
+2026-06-09 03:22:52 [INFO]: 异常已处理 {"recordId":5,"handledById":8,"partialSuccess":false,"syncResult":{"classPageSynced":true,"babyDetailSynced":true,"backendSynced":true,"exportSynced":true}}
+2026-06-09 03:23:16 [INFO]: 隐私字段配置已加载 {"count":5}
+2026-06-09 03:23:16 [INFO]: 物品借出 {"recordId":6,"item":"测试奶瓶","babyId":6,"classId":7}
+2026-06-09 03:23:16 [WARN]: 归还异常 {"recordId":6,"scanResult":"消毒时间不足-异常"}
+2026-06-09 03:23:16 [INFO]: 记录已同步到所有终端 {"recordId":6}
+2026-06-09 03:23:16 [INFO]: [AUDIT] [MODIFY] DisinfectionRecord #6 (Baby: 6) (Class: 7) - 异常处理: 消毒时间不足 - 已重新消毒30分钟，确认合格 {"userId":13}
+2026-06-09 03:23:16 [INFO]: 异常已处理 {"recordId":6,"handledById":13,"partialSuccess":false,"syncResult":{"classPageSynced":true,"babyDetailSynced":true,"backendSynced":true,"exportSynced":true}}
+2026-06-09 03:23:16 [INFO]: 物品借出 {"recordId":7,"item":"测试玩具","babyId":6,"classId":7}
+2026-06-09 03:23:16 [WARN]: 归还异常 {"recordId":7,"scanResult":"跨班测试异常"}
+2026-06-09 03:23:16 [INFO]: 记录已同步到所有终端 {"recordId":7}
+2026-06-09 03:23:16 [INFO]: [AUDIT] [MODIFY] DisinfectionRecord #7 (Baby: 6) (Class: 7) - 异常处理: 跨班测试异常 - 已处理 {"userId":13}
+2026-06-09 03:23:16 [INFO]: 异常已处理 {"recordId":7,"handledById":13,"partialSuccess":true,"syncResult":{"classPageSynced":true,"babyDetailSynced":true,"backendSynced":true,"exportSynced":true}}
+2026-06-09 03:23:16 [INFO]: 跨班处理完成 {"babyId":6,"processed":0,"failed":1,"partialSuccess":false}
+2026-06-09 03:23:16 [WARN]: [AUDIT] [UNAUTHORIZED_ACCESS] BabyDetail #6 - 角色 GENERAL 尝试访问需要 SUPERVISOR 权限的资源 {"userId":16,"ipAddress":"192.168.1.100","unauthorized":true}
+2026-06-09 03:23:16 [INFO]: 课后反馈已创建 {"feedbackId":2,"babyId":6,"courseId":6,"version":1,"source":"THERAPIST"}
+2026-06-09 03:23:16 [INFO]: 课后反馈已创建 {"feedbackId":3,"babyId":6,"courseId":6,"version":2,"source":"THERAPIST"}
+2026-06-09 03:23:16 [INFO]: 记录已同步到所有终端 {"recordId":8}
+2026-06-09 03:23:16 [INFO]: [AUDIT] [MANUAL_ENTRY] DisinfectionRecord #8 (Baby: 7) (Class: 7) - 手工补录: 扫码枪故障，手工补录昨日记录 {"userId":15}
+2026-06-09 03:23:16 [INFO]: 手工补录记录 {"recordId":8,"userId":15,"note":"扫码枪故障，手工补录昨日记录"}
+2026-06-09 03:23:16 [INFO]: [AUDIT] [EXPORT] 消毒记录CSV导出 - 导出 3 条记录, 过滤条件: {"classId":7} {"userId":15}
+2026-06-09 03:23:16 [INFO]: 导出成功 {"filename":"消毒记录_2026-06-08T19-23-16-916Z.csv","recordCount":3,"userId":15}
+2026-06-09 03:23:16 [INFO]: [AUDIT] [EXPORT] 消毒记录JSON导出 - 导出 3 条记录, 过滤条件: {} {"userId":15}
+2026-06-09 03:23:16 [INFO]: JSON导出成功 {"filename":"消毒记录_2026-06-08T19-23-16-920Z.json","recordCount":3,"userId":15}
+2026-06-09 03:25:52 [INFO]: 隐私字段配置已加载 {"count":5}
+2026-06-09 03:25:52 [INFO]: 物品借出 {"recordId":9,"item":"测试奶瓶","babyId":8,"classId":10}
+2026-06-09 03:25:52 [WARN]: 归还异常 {"recordId":9,"scanResult":"消毒时间不足-异常"}
+2026-06-09 03:25:52 [INFO]: 记录已同步到所有终端 {"recordId":9}
+2026-06-09 03:25:52 [INFO]: [AUDIT] [MODIFY] DisinfectionRecord #9 (Baby: 8) (Class: 10) - 异常处理: 消毒时间不足 - 已重新消毒30分钟，确认合格 {"userId":18}
+2026-06-09 03:25:52 [INFO]: 异常已处理 {"recordId":9,"handledById":18,"partialSuccess":false,"syncResult":{"classPageSynced":true,"babyDetailSynced":true,"backendSynced":true,"exportSynced":true}}
+2026-06-09 03:25:52 [INFO]: 物品借出 {"recordId":10,"item":"测试玩具","babyId":8,"classId":10}
+2026-06-09 03:25:52 [WARN]: 归还异常 {"recordId":10,"scanResult":"跨班测试异常"}
+2026-06-09 03:25:52 [INFO]: [AUDIT] [CROSS_CLASS_PROCESS] Baby #8 (Baby: 8) (Class: 12) - 跨班处理: 从班级 10 到 12, 部分成功: true {"userId":18}
+2026-06-09 03:25:52 [INFO]: 跨班处理完成 {"babyId":8,"processed":1,"failed":1,"partialSuccess":true}
+2026-06-09 03:25:52 [INFO]: 记录已同步到所有终端 {"recordId":10}
+2026-06-09 03:25:52 [INFO]: [AUDIT] [MODIFY] DisinfectionRecord #10 (Baby: 8) (Class: 10) - 异常处理: 跨班测试异常 - 已处理 {"userId":18}
+2026-06-09 03:25:52 [INFO]: 异常已处理 {"recordId":10,"handledById":18,"partialSuccess":true,"syncResult":{"classPageSynced":true,"babyDetailSynced":true,"backendSynced":true,"exportSynced":true}}
+2026-06-09 03:25:52 [WARN]: [AUDIT] [UNAUTHORIZED_ACCESS] BabyDetail #8 - 角色 GENERAL 尝试访问需要 SUPERVISOR 权限的资源 {"userId":21,"ipAddress":"192.168.1.100","unauthorized":true}
+2026-06-09 03:25:52 [INFO]: 课后反馈已创建 {"feedbackId":4,"babyId":8,"courseId":7,"version":1,"source":"THERAPIST"}
+2026-06-09 03:25:52 [INFO]: 课后反馈已创建 {"feedbackId":5,"babyId":8,"courseId":7,"version":2,"source":"THERAPIST"}
+2026-06-09 03:25:52 [INFO]: 记录已同步到所有终端 {"recordId":12}
+2026-06-09 03:25:52 [INFO]: [AUDIT] [MANUAL_ENTRY] DisinfectionRecord #12 (Baby: 9) (Class: 10) - 手工补录: 扫码枪故障，手工补录昨日记录 {"userId":20}
+2026-06-09 03:25:52 [INFO]: 手工补录记录 {"recordId":12,"userId":20,"note":"扫码枪故障，手工补录昨日记录"}
+2026-06-09 03:25:52 [INFO]: [AUDIT] [EXPORT] 消毒记录CSV导出 - 导出 3 条记录, 过滤条件: {"classId":10} {"userId":20}
+2026-06-09 03:25:52 [INFO]: 导出成功 {"filename":"消毒记录_2026-06-08T19-25-52-667Z.csv","recordCount":3,"userId":20}
+2026-06-09 03:25:52 [INFO]: [AUDIT] [EXPORT] 消毒记录JSON导出 - 导出 4 条记录, 过滤条件: {} {"userId":20}
+2026-06-09 03:25:52 [INFO]: JSON导出成功 {"filename":"消毒记录_2026-06-08T19-25-52-670Z.json","recordCount":4,"userId":20}
+2026-06-09 03:25:52 [INFO]: [AUDIT] [EXPORT] 消毒记录JSON导出 - 导出 4 条记录, 过滤条件: {} {"userId":21}
+2026-06-09 03:25:52 [INFO]: JSON导出成功 {"filename":"消毒记录_2026-06-08T19-25-52-673Z.json","recordCount":4,"userId":21}
+2026-06-09 03:26:07 [INFO]: 隐私字段配置已加载 {"count":5}
+2026-06-09 03:26:07 [INFO]: 物品借出 {"recordId":13,"item":"测试奶瓶","babyId":10,"classId":13}
+2026-06-09 03:26:07 [WARN]: 归还异常 {"recordId":13,"scanResult":"消毒时间不足-异常"}
+2026-06-09 03:26:07 [INFO]: 记录已同步到所有终端 {"recordId":13}
+2026-06-09 03:26:07 [INFO]: [AUDIT] [MODIFY] DisinfectionRecord #13 (Baby: 10) (Class: 13) - 异常处理: 消毒时间不足 - 已重新消毒30分钟，确认合格 {"userId":23}
+2026-06-09 03:26:07 [INFO]: 异常已处理 {"recordId":13,"handledById":23,"partialSuccess":false,"syncResult":{"classPageSynced":true,"babyDetailSynced":true,"backendSynced":true,"exportSynced":true}}
+2026-06-09 03:26:07 [INFO]: 物品借出 {"recordId":14,"item":"测试玩具","babyId":10,"classId":13}
+2026-06-09 03:26:07 [WARN]: 归还异常 {"recordId":14,"scanResult":"跨班测试异常"}
+2026-06-09 03:26:07 [INFO]: [AUDIT] [CROSS_CLASS_PROCESS] Baby #10 (Baby: 10) (Class: 15) - 跨班处理: 从班级 13 到 15, 部分成功: true {"userId":23}
+2026-06-09 03:26:07 [INFO]: 跨班处理完成 {"babyId":10,"processed":1,"failed":1,"partialSuccess":true}
+2026-06-09 03:26:07 [INFO]: 记录已同步到所有终端 {"recordId":14}
+2026-06-09 03:26:07 [INFO]: [AUDIT] [MODIFY] DisinfectionRecord #14 (Baby: 10) (Class: 13) - 异常处理: 跨班测试异常 - 已处理 {"userId":23}
+2026-06-09 03:26:07 [INFO]: 异常已处理 {"recordId":14,"handledById":23,"partialSuccess":true,"syncResult":{"classPageSynced":true,"babyDetailSynced":true,"backendSynced":true,"exportSynced":true}}
+2026-06-09 03:26:07 [WARN]: [AUDIT] [UNAUTHORIZED_ACCESS] BabyDetail #10 - 角色 GENERAL 尝试访问需要 SUPERVISOR 权限的资源 {"userId":26,"ipAddress":"192.168.1.100","unauthorized":true}
+2026-06-09 03:26:07 [INFO]: 课后反馈已创建 {"feedbackId":6,"babyId":10,"courseId":8,"version":1,"source":"THERAPIST"}
+2026-06-09 03:26:07 [INFO]: 课后反馈已创建 {"feedbackId":7,"babyId":10,"courseId":8,"version":2,"source":"THERAPIST"}
+2026-06-09 03:26:07 [INFO]: 记录已同步到所有终端 {"recordId":16}
+2026-06-09 03:26:07 [INFO]: [AUDIT] [MANUAL_ENTRY] DisinfectionRecord #16 (Baby: 11) (Class: 13) - 手工补录: 扫码枪故障，手工补录昨日记录 {"userId":25}
+2026-06-09 03:26:07 [INFO]: 手工补录记录 {"recordId":16,"userId":25,"note":"扫码枪故障，手工补录昨日记录"}
+2026-06-09 03:26:07 [INFO]: [AUDIT] [EXPORT] 消毒记录CSV导出 - 导出 3 条记录, 过滤条件: {"classId":13} {"userId":25}
+2026-06-09 03:26:07 [INFO]: 导出成功 {"filename":"消毒记录_2026-06-08T19-26-07-873Z.csv","recordCount":3,"userId":25}
+2026-06-09 03:26:07 [INFO]: [AUDIT] [EXPORT] 消毒记录JSON导出 - 导出 4 条记录, 过滤条件: {} {"userId":25}
+2026-06-09 03:26:07 [INFO]: JSON导出成功 {"filename":"消毒记录_2026-06-08T19-26-07-876Z.json","recordCount":4,"userId":25}
+2026-06-09 03:26:07 [INFO]: [AUDIT] [EXPORT] 消毒记录JSON导出 - 导出 4 条记录, 过滤条件: {} {"userId":26}
+2026-06-09 03:26:07 [INFO]: JSON导出成功 {"filename":"消毒记录_2026-06-08T19-26-07-878Z.json","recordCount":4,"userId":26}
+2026-06-09 03:28:55 [INFO]: 隐私字段配置已加载 {"count":5}
+2026-06-09 03:28:55 [INFO]: ==============================================
+2026-06-09 03:28:55 [INFO]: 婴幼儿用品消毒复核墙康复课务版
+2026-06-09 03:28:55 [INFO]: 服务已启动在 http://localhost:3000
+2026-06-09 03:28:55 [INFO]: ==============================================
+2026-06-09 03:28:55 [INFO]: 
+2026-06-09 03:28:55 [INFO]: 测试账号:
+2026-06-09 03:28:55 [INFO]:   管理员: admin / 123456
+2026-06-09 03:28:55 [INFO]:   主管: supervisor / 123456
+2026-06-09 03:28:55 [INFO]:   治疗师: therapist1 / 123456
+2026-06-09 03:28:55 [INFO]:   前台: reception / 123456
+2026-06-09 03:28:55 [INFO]:   普通用户: general / 123456
+2026-06-09 03:28:55 [INFO]: 
+2026-06-09 03:28:55 [INFO]: 主要接口:
+2026-06-09 03:28:55 [INFO]:   POST /api/auth/login - 登录
+2026-06-09 03:28:55 [INFO]:   GET  /api/disinfection/class/:id - 班级消毒记录
+2026-06-09 03:28:55 [INFO]:   GET  /api/disinfection/baby/:id - 宝宝消毒记录
+2026-06-09 03:28:55 [INFO]:   POST /api/disinfection/:id/resolve - 处理异常
+2026-06-09 03:28:55 [INFO]:   POST /api/disinfection/manual - 手工补录
+2026-06-09 03:28:55 [INFO]:   POST /api/feedback - 创建课后反馈
+2026-06-09 03:28:55 [INFO]:   GET  /api/audit/unauthorized - 越权审计日志
+2026-06-09 03:28:55 [INFO]:   POST /api/export/csv - 导出CSV
+2026-06-09 03:28:55 [INFO]: 
+2026-06-09 03:29:29 [INFO]: 隐私字段配置已加载 {"count":5}
+2026-06-09 03:30:01 [INFO]: 隐私字段配置已加载 {"count":5}
+2026-06-09 03:30:25 [INFO]: 隐私字段配置已加载 {"count":5}
+2026-06-09 03:30:36 [INFO]: GET /health {"ip":"::1"}
+2026-06-09 03:30:42 [INFO]: GET /health {"ip":"::1"}
+2026-06-09 03:30:42 [INFO]: GET /@vite/client {"ip":"::1"}

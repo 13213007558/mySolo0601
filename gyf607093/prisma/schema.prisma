@@ -1,0 +1,247 @@
+// 婴幼儿用品消毒复核墙康复课务版 - 数据库模型
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  username        String    @unique
+  name            String
+  passwordHash    String
+  role            String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  therapistClasses Class[] @relation("ClassTherapist")
+  createdRecords  DisinfectionRecord[] @relation("CreatedBy")
+  handledRecords  DisinfectionRecord[] @relation("HandledBy")
+  handledAnomalies AnomalyResolution[]
+  feedbacks       Feedback[]
+  auditLogs       AuditLog[]
+  exportedReports ExportLog[]
+
+  @@map("users")
+}
+
+model Baby {
+  id              Int       @id @default(autoincrement())
+  name            String
+  idCard          String    @unique
+  birthDate       DateTime
+  gender          String
+  phone           String
+  address         String
+  parentName      String
+  medicalRecord   String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  enrollments     ClassEnrollment[]
+  records         DisinfectionRecord[]
+  feedbacks       Feedback[]
+
+  @@map("babies")
+}
+
+model Class {
+  id              Int       @id @default(autoincrement())
+  name            String
+  code            String    @unique
+  description     String?
+  therapistId     Int?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  therapist       User?     @relation("ClassTherapist", fields: [therapistId], references: [id])
+  enrollments     ClassEnrollment[]
+  courses         Course[]
+  records         DisinfectionRecord[]
+
+  @@map("classes")
+}
+
+model ClassEnrollment {
+  id              Int       @id @default(autoincrement())
+  babyId          Int
+  classId         Int
+  enrollDate      DateTime  @default(now())
+  status          String    @default("ACTIVE")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  baby            Baby      @relation(fields: [babyId], references: [id])
+  class           Class     @relation(fields: [classId], references: [id])
+
+  @@unique([babyId, classId])
+  @@map("class_enrollments")
+}
+
+model Course {
+  id              Int       @id @default(autoincrement())
+  classId         Int
+  name            String
+  scheduledDate   DateTime
+  actualDate      DateTime?
+  status          String    @default("SCHEDULED")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  class           Class     @relation(fields: [classId], references: [id])
+  feedbacks       Feedback[]
+
+  @@map("courses")
+}
+
+model DisinfectionItem {
+  id              Int       @id @default(autoincrement())
+  barcode         String    @unique
+  name            String
+  type            String
+  description     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  records         DisinfectionRecord[]
+
+  @@map("disinfection_items")
+}
+
+model DisinfectionRecord {
+  id              Int       @id @default(autoincrement())
+  itemId          Int
+  babyId          Int
+  classId         Int
+  borrowTime      DateTime?
+  returnTime      DateTime?
+  status          String    @default("PENDING")
+  scanResult      String?
+  createdById     Int
+  handledById     Int?
+  isManualEntry   Boolean   @default(false)
+  manualEntryNote String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  item            DisinfectionItem @relation(fields: [itemId], references: [id])
+  baby            Baby      @relation(fields: [babyId], references: [id])
+  class           Class     @relation(fields: [classId], references: [id])
+  createdBy       User      @relation("CreatedBy", fields: [createdById], references: [id])
+  handledBy       User?     @relation("HandledBy", fields: [handledById], references: [id])
+  anomaly         AnomalyResolution?
+  syncStatus      SyncStatus?
+
+  @@index([babyId, classId])
+  @@index([status])
+  @@map("disinfection_records")
+}
+
+model AnomalyResolution {
+  id              Int       @id @default(autoincrement())
+  recordId        Int       @unique
+  anomalyType     String
+  description     String
+  resolution      String
+  handledById     Int
+  handledAt       DateTime  @default(now())
+  partialSuccess  Boolean   @default(false)
+  affectedClasses String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  record          DisinfectionRecord @relation(fields: [recordId], references: [id])
+  handledBy       User      @relation(fields: [handledById], references: [id])
+
+  @@map("anomaly_resolutions")
+}
+
+model SyncStatus {
+  id              Int       @id @default(autoincrement())
+  recordId        Int       @unique
+  classPageSynced Boolean   @default(false)
+  babyDetailSynced Boolean  @default(false)
+  backendSynced   Boolean   @default(false)
+  exportSynced    Boolean   @default(false)
+  lastSyncAt      DateTime?
+  syncError       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  record          DisinfectionRecord @relation(fields: [recordId], references: [id])
+
+  @@map("sync_status")
+}
+
+model Feedback {
+  id              Int       @id @default(autoincrement())
+  babyId          Int
+  courseId        Int?
+  content         String
+  source          String
+  createdById     Int
+  version         Int       @default(1)
+  isLatest        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  baby            Baby      @relation(fields: [babyId], references: [id])
+  course          Course?   @relation(fields: [courseId], references: [id])
+  createdBy       User      @relation(fields: [createdById], references: [id])
+
+  @@index([babyId, isLatest])
+  @@index([babyId, version])
+  @@map("feedbacks")
+}
+
+model AuditLog {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  action          String
+  targetType      String
+  targetId        Int?
+  babyId          Int?
+  classId         Int?
+  ipAddress       String?
+  userAgent       String?
+  details         String?
+  isUnauthorized  Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+
+  user            User      @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([babyId, action])
+  @@map("audit_logs")
+}
+
+model ExportLog {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  exportType      String
+  filters         String?
+  recordCount     Int
+  filename        String
+  createdAt       DateTime  @default(now())
+
+  user            User      @relation(fields: [userId], references: [id])
+
+  @@map("export_logs")
+}
+
+model PrivacyField {
+  id              Int       @id @default(autoincrement())
+  tableName       String
+  fieldName       String
+  displayName     String
+  requiredRoles   String
+  maskPattern     String?
+  createdAt       DateTime  @default(now())
+
+  @@unique([tableName, fieldName])
+  @@map("privacy_fields")
+}
