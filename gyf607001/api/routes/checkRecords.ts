@@ -212,7 +212,17 @@ async function parseFile(file: Express.Multer.File): Promise<ParseResult> {
         continue;
       }
 
-      const tempStr = String(row.temperature);
+      const tempStr = String(row.temperature).trim();
+      if (!/^-?\d+(\.\d+)?$/.test(tempStr)) {
+        dirtyRows++;
+        dirtyRowDetails.push({
+          rowNumber,
+          rowData: originalRow,
+          errorType: 'invalid_temperature',
+          errorMessage: `体温值 "${tempStr}" 不是有效数字，应填写纯数字（如 36.5）`,
+        });
+        continue;
+      }
       const temp = parseFloat(tempStr);
       if (isNaN(temp) || temp < 34 || temp > 43) {
         dirtyRows++;
@@ -220,7 +230,7 @@ async function parseFile(file: Express.Multer.File): Promise<ParseResult> {
           rowNumber,
           rowData: originalRow,
           errorType: 'invalid_temperature',
-          errorMessage: `体温值 "${tempStr}" 不是有效数字，应在 34-43℃ 范围内`,
+          errorMessage: `体温值 "${tempStr}" 超出有效范围，应在 34-43℃ 范围内`,
         });
         continue;
       }
