@@ -119,6 +119,8 @@ export interface HandleExceptionResponse {
   exception: ExceptionRecord;
   syncResults: SyncTarget;
   auditLogId: string;
+  historyLost?: boolean;
+  historyLostItems?: string[];
 }
 
 export interface ClassInfo {

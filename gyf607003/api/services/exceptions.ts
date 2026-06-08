@@ -6,7 +6,31 @@ import type {
   HandleExceptionResponse,
   User,
   SyncTarget,
+  FailureSimulationConfig,
 } from '../../shared/types.js';
+
+let failureSimulationConfig: FailureSimulationConfig = {
+  enabled: process.env.SIMULATE_FAILURES === '1',
+  failureRate: Number(process.env.FAILURE_RATE || '0.05'),
+  failTargets: undefined,
+};
+
+export function setFailureSimulation(config: Partial<FailureSimulationConfig>): void {
+  failureSimulationConfig = { ...failureSimulationConfig, ...config };
+  console.log('[FAILURE-SIM] config updated:', failureSimulationConfig);
+}
+
+export function getFailureSimulation(): FailureSimulationConfig {
+  return { ...failureSimulationConfig };
+}
+
+function shouldSimulateFailure(targetName: keyof SyncTarget): boolean {
+  if (!failureSimulationConfig.enabled) return false;
+  if (failureSimulationConfig.failTargets && !failureSimulationConfig.failTargets.includes(targetName)) {
+    return false;
+  }
+  return Math.random() < failureSimulationConfig.failureRate;
+}
 
 function getExceptionById(id: string): ExceptionRecord | null {
   const db = getDb();
@@ -62,9 +86,11 @@ export function listExceptions(status?: string): ExceptionRecord[] {
   }));
 }
 
-function trySyncStep(name: string, fn: () => void): 'success' | 'failed' {
+function trySyncStep(name: keyof SyncTarget, fn: () => void): 'success' | 'failed' {
   try {
-    if (Math.random() < 0.05) throw new Error(name + ' simulated failure');
+    if (shouldSimulateFailure(name)) {
+      throw new Error(`${name} simulated failure (configurable)`);
+    }
     fn();
     return 'success';
   } catch (e) {
@@ -79,21 +105,63 @@ export function handleException(
   handler: User,
 ): HandleExceptionResponse {
   const db = getDb();
+  const now = new Date().toISOString();
   const before = getExceptionById(id);
+
   if (!before) {
-    return { success: false, exception: null as unknown as ExceptionRecord, syncResults: {} as SyncTarget, auditLogId: '' };
+    const audit = createAuditLog(
+      handler,
+      'history_lost',
+      'exception',
+      id,
+      { exceptionId: id, handleMeasure: req.handleMeasure },
+      { status: 'resolved', handlerName: handler.name, historyLost: true, note: '异常记录已丢失，仅记录审计确保可追溯' },
+    );
+    console.warn('[HISTORY-LOST] exception', id, 'not found, audit log created:', audit.id);
+    return {
+      success: true,
+      exception: {
+        id,
+        recordId: '',
+        babyId: '',
+        babyName: '未知',
+        classId: '',
+        type: 'other',
+        reason: '历史记录丢失',
+        status: 'resolved',
+        handlerId: req.handlerId,
+        handlerName: handler.name,
+        handleMeasure: req.handleMeasure,
+        handleTime: now,
+        createTime: now,
+      },
+      syncResults: { classPage: 'success', babyDetail: 'success', backendCache: 'success', exportData: 'success' },
+      auditLogId: audit.id,
+      historyLost: true,
+    };
   }
 
-  const now = new Date().toISOString();
   const syncResults: SyncTarget = { classPage: 'failed', babyDetail: 'failed', backendCache: 'failed', exportData: 'failed' };
+  const historyLostItems: string[] = [];
 
   const tx = db.transaction(() => {
-    db.prepare(
+    const exResult = db.prepare(
       'UPDATE exception_records SET status = ?, handler_id = ?, handler_name = ?, handle_measure = ?, handle_time = ? WHERE id = ?',
     ).run('resolved', req.handlerId, handler.name, req.handleMeasure, now, id);
 
-    db.prepare('UPDATE disinfection_records SET status = ? WHERE id = ?').run('recycled', before.recordId);
-    db.prepare('UPDATE babies SET status = ? WHERE id = ?').run('normal', before.babyId);
+    if (exResult.changes === 0) {
+      historyLostItems.push('exception_record_update_failed');
+    }
+
+    const recordResult = db.prepare('UPDATE disinfection_records SET status = ? WHERE id = ?').run('recycled', before.recordId);
+    if (recordResult.changes === 0) {
+      historyLostItems.push(`disinfection_record:${before.recordId}`);
+    }
+
+    const babyResult = db.prepare('UPDATE babies SET status = ? WHERE id = ?').run('normal', before.babyId);
+    if (babyResult.changes === 0) {
+      historyLostItems.push(`baby:${before.babyId}`);
+    }
 
     syncResults.backendCache = trySyncStep('backendCache', () => { /* cache invalidated by DB write */ });
     syncResults.classPage = trySyncStep('classPage', () => { /* class state derived via SQL */ });
@@ -105,13 +173,24 @@ export function handleException(
 
   const after = getExceptionById(id)!;
 
+  const afterAuditData: Record<string, unknown> = {
+    ...after,
+    syncResults,
+  };
+
+  if (historyLostItems.length > 0) {
+    afterAuditData.historyLost = true;
+    afterAuditData.historyLostItems = historyLostItems;
+    console.warn('[HISTORY-LOST] some records missing during handle:', historyLostItems);
+  }
+
   const audit = createAuditLog(
     handler,
-    'handle_exception',
+    historyLostItems.length > 0 ? 'history_lost' : 'handle_exception',
     'exception',
     id,
     before as unknown as Record<string, unknown>,
-    after as unknown as Record<string, unknown>,
+    afterAuditData,
     syncResults,
   );
 
@@ -121,10 +200,18 @@ export function handleException(
       exceptionId: id,
       handleMeasure: req.handleMeasure,
       handlerId: req.handlerId,
+      historyLostItems,
     });
   }
 
-  return { success: true, exception: after, syncResults, auditLogId: audit.id };
+  return {
+    success: true,
+    exception: after,
+    syncResults,
+    auditLogId: audit.id,
+    historyLost: historyLostItems.length > 0,
+    historyLostItems: historyLostItems.length > 0 ? historyLostItems : undefined,
+  };
 }
 
 export function createManualRecord(payload: {
