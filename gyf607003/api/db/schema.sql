@@ -81,7 +81,9 @@ CREATE TABLE IF NOT EXISTS compensation_tasks (
   payload TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending',
   retry_count INTEGER NOT NULL DEFAULT 0,
+  max_retries INTEGER NOT NULL DEFAULT 5,
   next_retry_at TEXT,
+  last_error TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

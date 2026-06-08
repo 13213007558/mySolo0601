@@ -57,9 +57,10 @@ export interface ExceptionRecord {
   reviewComment?: string;
 }
 
-export type AuditAction = 'create' | 'update' | 'delete' | 'handle_exception' | 'manual_record';
+export type AuditAction = 'create' | 'update' | 'delete' | 'handle_exception' | 'manual_record' | 'history_lost';
 export type AuditTargetType = 'record' | 'exception' | 'baby' | 'export';
 export type SyncStatus = 'success' | 'failed' | 'partial';
+export type CompensationTaskStatus = 'pending' | 'processing' | 'success' | 'failed';
 
 export interface AuditLog {
   id: string;
@@ -74,6 +75,32 @@ export interface AuditLog {
   syncStatus: SyncStatus;
   retryCount: number;
 }
+
+export interface CompensationTask {
+  id: string;
+  auditLogId: string;
+  targetType: AuditTargetType;
+  targetId: string;
+  payload: Record<string, unknown>;
+  status: CompensationTaskStatus;
+  retryCount: number;
+  maxRetries: number;
+  nextRetryAt: string;
+  createdAt: string;
+  lastError?: string;
+}
+
+export interface FailureSimulationConfig {
+  enabled: boolean;
+  failureRate: number;
+  failTargets?: (keyof SyncTarget)[];
+}
+
+export const COMPENSATION_CONFIG = {
+  MAX_RETRIES: 5,
+  RETRY_INTERVAL_MS: 30 * 1000,
+  BACKOFF_FACTOR: 2,
+} as const;
 
 export interface HandleExceptionRequest {
   handleMeasure: string;
