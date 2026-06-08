@@ -1,0 +1,446 @@
+{
+  "records": [
+    {
+      "id": "rec_seed_001",
+      "childName": "李小宝",
+      "childId": "CHILD_001",
+      "photoContext": {
+        "activityName": "春季亲子运动会",
+        "activityDate": "2026-06-01",
+        "location": "幼儿园操场",
+        "photographer": "王老师",
+        "description": "开幕式合影及比赛瞬间"
+      },
+      "status": "authorized",
+      "authorizedScopes": [
+        "课堂内部展示",
+        "幼儿园公众号"
+      ],
+      "guardianName": "李爸爸",
+      "guardianContact": "138****1234",
+      "createdAt": "2026-06-01T13:53:18.382Z",
+      "updatedAt": "2026-06-01T13:53:18.382Z",
+      "isSupplement": false,
+      "version": 1,
+      "changeReason": "initial_create",
+      "dataValid": true
+    },
+    {
+      "id": "rec_seed_002",
+      "childName": "张朵朵",
+      "childId": "CHILD_002",
+      "photoContext": {
+        "activityName": "美术作品展",
+        "activityDate": "2026-06-05",
+        "location": "幼儿园多功能厅",
+        "photographer": "陈老师",
+        "description": "作品展示及颁奖"
+      },
+      "status": "conflicted",
+      "authorizedScopes": [
+        "宣传册印刷"
+      ],
+      "guardianName": "张妈妈",
+      "guardianContact": "139****5678",
+      "createdAt": "2026-06-05T13:53:18.382Z",
+      "updatedAt": "2026-06-05T13:53:18.382Z",
+      "isSupplement": false,
+      "version": 1,
+      "changeReason": "initial_create",
+      "conflictInfo": {
+        "conflictingRecordId": "rec_seed_001",
+        "conflictDescription": "与已有记录存在潜在冲突：家长表示对宣传册印刷范围有异议，需进一步确认"
+      },
+      "dataValid": true
+    },
+    {
+      "id": "rec_seed_003",
+      "childName": "王壮壮",
+      "childId": "CHILD_003",
+      "photoContext": {
+        "activityName": "端午节手工课",
+        "activityDate": "2026-06-07",
+        "location": "中班教室",
+        "photographer": "刘老师",
+        "description": "包粽子活动"
+      },
+      "status": "revoked",
+      "authorizedScopes": [
+        "课堂内部展示",
+        "校园视频制作"
+      ],
+      "guardianName": "王奶奶",
+      "guardianContact": "137****9012",
+      "createdAt": "2026-06-07T13:53:18.382Z",
+      "updatedAt": "2026-06-07T14:53:18.382Z",
+      "isSupplement": false,
+      "version": 2,
+      "changeReason": "confirmation_revoked",
+      "changeReasonNote": "家长后续要求撤回此前授权",
+      "revocationInfo": {
+        "revokedBy": "王妈妈",
+        "revocationReason": "孩子当天请假未参加活动，照片中并非本人，要求撤回授权记录",
+        "revokedAt": "2026-06-07T14:53:18.382Z"
+      },
+      "dataValid": true
+    },
+    {
+      "id": "rec_seed_004",
+      "childName": "赵乐乐",
+      "childId": "CHILD_004",
+      "photoContext": {
+        "activityName": "户外自然观察",
+        "activityDate": "2026-06-03",
+        "location": "社区公园",
+        "photographer": "孙老师",
+        "description": "观察植物生长"
+      },
+      "status": "supplemented",
+      "authorizedScopes": [
+        "课堂内部展示"
+      ],
+      "guardianName": "赵爸爸",
+      "guardianContact": "136****3456",
+      "createdAt": "2026-06-05T13:53:18.382Z",
+      "updatedAt": "2026-06-08T13:53:18.383Z",
+      "isSupplement": false,
+      "version": 2,
+      "changeReason": "manual_supplement",
+      "changeReasonNote": "已存在补录记录：rec_seed_005",
+      "dataValid": true
+    },
+    {
+      "id": "rec_seed_005",
+      "childName": "赵乐乐",
+      "childId": "CHILD_004",
+      "photoContext": {
+        "activityName": "户外自然观察",
+        "activityDate": "2026-06-03",
+        "location": "社区公园",
+        "photographer": "孙老师",
+        "description": "观察植物生长 - 补录：包含特写及家长合影"
+      },
+      "status": "authorized",
+      "authorizedScopes": [
+        "课堂内部展示",
+        "幼儿园公众号",
+        "宣传册印刷"
+      ],
+      "guardianName": "赵爸爸",
+      "guardianContact": "136****3456",
+      "createdAt": "2026-06-08T13:53:18.383Z",
+      "updatedAt": "2026-06-08T13:53:18.383Z",
+      "isSupplement": true,
+      "supplementOf": "rec_seed_004",
+      "version": 1,
+      "changeReason": "manual_supplement",
+      "changeReasonNote": "手工补录：育儿嫂发现课堂照片不完整，补充当天下午活动照片授权",
+      "dataValid": true
+    },
+    {
+      "id": "rec_seed_006",
+      "childName": "孙一一",
+      "childId": "CHILD_005",
+      "photoContext": {
+        "activityName": "音乐课",
+        "activityDate": "2026-06-06",
+        "location": "音乐教室",
+        "photographer": "周老师"
+      },
+      "status": "pending",
+      "authorizedScopes": [
+        "课堂内部展示",
+        "幼儿园公众号"
+      ],
+      "guardianName": "孙妈妈",
+      "createdAt": "2026-06-07T13:53:18.382Z",
+      "updatedAt": "2026-06-07T13:53:18.382Z",
+      "isSupplement": false,
+      "version": 1,
+      "changeReason": "initial_create",
+      "dataValid": true
+    }
+  ],
+  "history": {
+    "rec_seed_001": [
+      {
+        "version": 1,
+        "timestamp": "2026-06-01T13:53:18.382Z",
+        "snapshot": {
+          "id": "rec_seed_001",
+          "childName": "李小宝",
+          "childId": "CHILD_001",
+          "photoContext": {
+            "activityName": "春季亲子运动会",
+            "activityDate": "2026-06-01",
+            "location": "幼儿园操场",
+            "photographer": "王老师",
+            "description": "开幕式合影及比赛瞬间"
+          },
+          "status": "authorized",
+          "authorizedScopes": [
+            "课堂内部展示",
+            "幼儿园公众号"
+          ],
+          "guardianName": "李爸爸",
+          "guardianContact": "138****1234",
+          "createdAt": "2026-06-01T13:53:18.382Z",
+          "updatedAt": "2026-06-01T13:53:18.382Z",
+          "isSupplement": false,
+          "version": 1,
+          "changeReason": "initial_create",
+          "dataValid": true
+        },
+        "changeReason": "initial_create",
+        "operatorRole": "parent",
+        "operatorName": "系统管理员"
+      }
+    ],
+    "rec_seed_002": [
+      {
+        "version": 1,
+        "timestamp": "2026-06-05T13:53:18.382Z",
+        "snapshot": {
+          "id": "rec_seed_002",
+          "childName": "张朵朵",
+          "childId": "CHILD_002",
+          "photoContext": {
+            "activityName": "美术作品展",
+            "activityDate": "2026-06-05",
+            "location": "幼儿园多功能厅",
+            "photographer": "陈老师",
+            "description": "作品展示及颁奖"
+          },
+          "status": "conflicted",
+          "authorizedScopes": [
+            "宣传册印刷"
+          ],
+          "guardianName": "张妈妈",
+          "guardianContact": "139****5678",
+          "createdAt": "2026-06-05T13:53:18.382Z",
+          "updatedAt": "2026-06-05T13:53:18.382Z",
+          "isSupplement": false,
+          "version": 1,
+          "changeReason": "initial_create",
+          "conflictInfo": {
+            "conflictingRecordId": "rec_seed_001",
+            "conflictDescription": "与已有记录存在潜在冲突：家长表示对宣传册印刷范围有异议，需进一步确认"
+          },
+          "dataValid": true
+        },
+        "changeReason": "initial_create",
+        "operatorRole": "parent",
+        "operatorName": "系统管理员"
+      }
+    ],
+    "rec_seed_003": [
+      {
+        "version": 1,
+        "timestamp": "2026-06-07T13:53:18.382Z",
+        "snapshot": {
+          "id": "rec_seed_003",
+          "childName": "王壮壮",
+          "childId": "CHILD_003",
+          "photoContext": {
+            "activityName": "端午节手工课",
+            "activityDate": "2026-06-07",
+            "location": "中班教室",
+            "photographer": "刘老师",
+            "description": "包粽子活动"
+          },
+          "status": "authorized",
+          "authorizedScopes": [
+            "课堂内部展示",
+            "校园视频制作"
+          ],
+          "guardianName": "王奶奶",
+          "guardianContact": "137****9012",
+          "createdAt": "2026-06-07T13:53:18.382Z",
+          "updatedAt": "2026-06-07T13:53:18.382Z",
+          "isSupplement": false,
+          "version": 1,
+          "changeReason": "initial_create",
+          "dataValid": true
+        },
+        "changeReason": "initial_create",
+        "operatorRole": "parent",
+        "operatorName": "系统管理员"
+      },
+      {
+        "version": 2,
+        "timestamp": "2026-06-07T14:53:18.382Z",
+        "snapshot": {
+          "id": "rec_seed_003",
+          "childName": "王壮壮",
+          "childId": "CHILD_003",
+          "photoContext": {
+            "activityName": "端午节手工课",
+            "activityDate": "2026-06-07",
+            "location": "中班教室",
+            "photographer": "刘老师",
+            "description": "包粽子活动"
+          },
+          "status": "revoked",
+          "authorizedScopes": [
+            "课堂内部展示",
+            "校园视频制作"
+          ],
+          "guardianName": "王奶奶",
+          "guardianContact": "137****9012",
+          "createdAt": "2026-06-07T13:53:18.382Z",
+          "updatedAt": "2026-06-07T14:53:18.382Z",
+          "isSupplement": false,
+          "version": 2,
+          "changeReason": "confirmation_revoked",
+          "changeReasonNote": "家长后续要求撤回此前授权",
+          "revocationInfo": {
+            "revokedBy": "王妈妈",
+            "revocationReason": "孩子当天请假未参加活动，照片中并非本人，要求撤回授权记录",
+            "revokedAt": "2026-06-07T14:53:18.382Z"
+          },
+          "dataValid": true
+        },
+        "changeReason": "confirmation_revoked",
+        "changeReasonNote": "家长后续要求撤回此前授权",
+        "operatorRole": "parent",
+        "operatorName": "系统管理员"
+      }
+    ],
+    "rec_seed_004": [
+      {
+        "version": 1,
+        "timestamp": "2026-06-05T13:53:18.382Z",
+        "snapshot": {
+          "id": "rec_seed_004",
+          "childName": "赵乐乐",
+          "childId": "CHILD_004",
+          "photoContext": {
+            "activityName": "户外自然观察",
+            "activityDate": "2026-06-03",
+            "location": "社区公园",
+            "photographer": "孙老师",
+            "description": "观察植物生长"
+          },
+          "status": "authorized",
+          "authorizedScopes": [
+            "课堂内部展示"
+          ],
+          "guardianName": "赵爸爸",
+          "guardianContact": "136****3456",
+          "createdAt": "2026-06-05T13:53:18.382Z",
+          "updatedAt": "2026-06-05T13:53:18.382Z",
+          "isSupplement": false,
+          "version": 1,
+          "changeReason": "initial_create",
+          "dataValid": true
+        },
+        "changeReason": "initial_create",
+        "operatorRole": "parent",
+        "operatorName": "系统管理员"
+      },
+      {
+        "version": 2,
+        "timestamp": "2026-06-08T13:53:18.384Z",
+        "snapshot": {
+          "id": "rec_seed_004",
+          "childName": "赵乐乐",
+          "childId": "CHILD_004",
+          "photoContext": {
+            "activityName": "户外自然观察",
+            "activityDate": "2026-06-03",
+            "location": "社区公园",
+            "photographer": "孙老师",
+            "description": "观察植物生长"
+          },
+          "status": "supplemented",
+          "authorizedScopes": [
+            "课堂内部展示"
+          ],
+          "guardianName": "赵爸爸",
+          "guardianContact": "136****3456",
+          "createdAt": "2026-06-05T13:53:18.382Z",
+          "updatedAt": "2026-06-08T13:53:18.383Z",
+          "isSupplement": false,
+          "version": 2,
+          "changeReason": "manual_supplement",
+          "changeReasonNote": "已存在补录记录：rec_seed_005",
+          "dataValid": true
+        },
+        "changeReason": "manual_supplement",
+        "changeReasonNote": "已存在补录记录：rec_seed_005",
+        "operatorRole": "parent",
+        "operatorName": "系统管理员"
+      }
+    ],
+    "rec_seed_005": [
+      {
+        "version": 1,
+        "timestamp": "2026-06-08T13:53:18.383Z",
+        "snapshot": {
+          "id": "rec_seed_005",
+          "childName": "赵乐乐",
+          "childId": "CHILD_004",
+          "photoContext": {
+            "activityName": "户外自然观察",
+            "activityDate": "2026-06-03",
+            "location": "社区公园",
+            "photographer": "孙老师",
+            "description": "观察植物生长 - 补录：包含特写及家长合影"
+          },
+          "status": "authorized",
+          "authorizedScopes": [
+            "课堂内部展示",
+            "幼儿园公众号",
+            "宣传册印刷"
+          ],
+          "guardianName": "赵爸爸",
+          "guardianContact": "136****3456",
+          "createdAt": "2026-06-08T13:53:18.383Z",
+          "updatedAt": "2026-06-08T13:53:18.383Z",
+          "isSupplement": true,
+          "supplementOf": "rec_seed_004",
+          "version": 1,
+          "changeReason": "manual_supplement",
+          "changeReasonNote": "手工补录：育儿嫂发现课堂照片不完整，补充当天下午活动照片授权",
+          "dataValid": true
+        },
+        "changeReason": "manual_supplement",
+        "changeReasonNote": "手工补录：育儿嫂发现课堂照片不完整，补充当天下午活动照片授权",
+        "operatorRole": "parent",
+        "operatorName": "系统管理员"
+      }
+    ],
+    "rec_seed_006": [
+      {
+        "version": 1,
+        "timestamp": "2026-06-07T13:53:18.382Z",
+        "snapshot": {
+          "id": "rec_seed_006",
+          "childName": "孙一一",
+          "childId": "CHILD_005",
+          "photoContext": {
+            "activityName": "音乐课",
+            "activityDate": "2026-06-06",
+            "location": "音乐教室",
+            "photographer": "周老师"
+          },
+          "status": "pending",
+          "authorizedScopes": [
+            "课堂内部展示",
+            "幼儿园公众号"
+          ],
+          "guardianName": "孙妈妈",
+          "createdAt": "2026-06-07T13:53:18.382Z",
+          "updatedAt": "2026-06-07T13:53:18.382Z",
+          "isSupplement": false,
+          "version": 1,
+          "changeReason": "initial_create",
+          "dataValid": true
+        },
+        "changeReason": "initial_create",
+        "operatorRole": "parent",
+        "operatorName": "系统管理员"
+      }
+    ]
+  }
+}
