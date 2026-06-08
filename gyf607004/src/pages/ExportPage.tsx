@@ -38,6 +38,7 @@ type Format = 'excel' | 'csv';
 export default function ExportPage() {
   const navigate = useNavigate();
   const {
+    init,
     currentUser,
     switchUser,
     records,
@@ -59,6 +60,13 @@ export default function ExportPage() {
   const [exportSuccess, setExportSuccess] = useState(false);
 
   useEffect(() => {
+    const initialize = async () => {
+      await init();
+    };
+    initialize();
+  }, [init]);
+
+  useEffect(() => {
     if (currentUser && currentUser.role !== 'supervisor') {
       const state = useAppStore.getState();
       state.accessDeniedInfo = {
@@ -77,13 +85,13 @@ export default function ExportPage() {
         navigate('/');
         break;
       case 'new':
-        navigate('/record/create');
+        navigate('/records/new');
         break;
       case 'approve':
-        navigate('/approval');
+        navigate('/approvals');
         break;
       case 'import':
-        navigate('/import');
+        navigate('/records/import');
         break;
       case 'export':
         break;
@@ -128,15 +136,15 @@ export default function ExportPage() {
 
   const handlePreview = async () => {
     const filters = buildFilters();
-    await loadRecords(filters);
-    setPreviewCount(records.length);
+    const filteredRecords = await loadRecords(filters);
+    setPreviewCount(filteredRecords.length);
   };
 
   const handleExport = async () => {
     const filters = buildFilters();
-    await loadRecords(filters);
+    const filteredRecords = await loadRecords(filters);
     try {
-      await exportRecords(format, records, selectedFields);
+      await exportRecords(format, filteredRecords, selectedFields);
       setExportSuccess(true);
       setTimeout(() => {
         setExportSuccess(false);

@@ -76,12 +76,20 @@ export default function RecordList() {
   };
 
   const handleImport = () => {
-    navigate('/import');
+    navigate('/records/import');
   };
 
   const handleExport = async () => {
+    const filters = {
+      search: search || undefined,
+      status: status || undefined,
+      includeIsolated,
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+    };
     try {
-      await exportRecords('excel', records);
+      const filteredRecords = await loadRecords(filters);
+      await exportRecords('excel', filteredRecords);
     } catch {
       //
     }

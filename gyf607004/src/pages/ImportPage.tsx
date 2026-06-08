@@ -10,13 +10,20 @@ import type { User, ImportDryRunResult } from '@/types';
 
 export default function ImportPage() {
   const navigate = useNavigate();
-  const { currentUser, switchUser, dryRunImport, commitImport } = useAppStore();
+  const { init, currentUser, switchUser, dryRunImport, commitImport } = useAppStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dryRunResult, setDryRunResult] = useState<ImportDryRunResult | null>(null);
   const [dryRunLoading, setDryRunLoading] = useState(false);
   const [commitLoading, setCommitLoading] = useState(false);
   const [commitResult, setCommitResult] = useState<{ success: number; failed: number } | null>(null);
+
+  useEffect(() => {
+    const initialize = async () => {
+      await init();
+    };
+    initialize();
+  }, [init]);
 
   useEffect(() => {
     if (currentUser && currentUser.role !== 'supervisor') {
@@ -37,10 +44,10 @@ export default function ImportPage() {
         navigate('/');
         break;
       case 'new':
-        navigate('/record/create');
+        navigate('/records/new');
         break;
       case 'approve':
-        navigate('/approval');
+        navigate('/approvals');
         break;
       case 'import':
         break;

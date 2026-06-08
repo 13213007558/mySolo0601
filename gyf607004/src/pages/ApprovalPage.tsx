@@ -14,6 +14,7 @@ type TabKey = 'pending' | 'cross_shift';
 export default function ApprovalPage() {
   const navigate = useNavigate();
   const {
+    init,
     currentUser,
     switchUser,
     records,
@@ -24,6 +25,13 @@ export default function ApprovalPage() {
     loading,
   } = useAppStore();
   const [activeTab, setActiveTab] = useState<TabKey>('pending');
+
+  useEffect(() => {
+    const initialize = async () => {
+      await init();
+    };
+    initialize();
+  }, [init]);
 
   useEffect(() => {
     if (currentUser && currentUser.role !== 'supervisor') {
@@ -39,8 +47,10 @@ export default function ApprovalPage() {
   }, [currentUser, navigate]);
 
   useEffect(() => {
-    loadRecords();
-  }, [loadRecords]);
+    if (currentUser) {
+      loadRecords();
+    }
+  }, [currentUser, loadRecords]);
 
   const handleNavChange = (key: NavKey) => {
     switch (key) {
@@ -48,12 +58,12 @@ export default function ApprovalPage() {
         navigate('/');
         break;
       case 'new':
-        navigate('/record/create');
+        navigate('/records/new');
         break;
       case 'approve':
         break;
       case 'import':
-        navigate('/import');
+        navigate('/records/import');
         break;
       case 'export':
         navigate('/export');

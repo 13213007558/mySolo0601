@@ -18,13 +18,13 @@ export default function AccessDeniedPage() {
         navigate('/');
         break;
       case 'new':
-        navigate('/record/create');
+        navigate('/records/new');
         break;
       case 'approve':
-        navigate('/approval');
+        navigate('/approvals');
         break;
       case 'import':
-        navigate('/import');
+        navigate('/records/import');
         break;
       case 'export':
         navigate('/export');

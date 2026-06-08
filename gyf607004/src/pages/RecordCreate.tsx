@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useAppStore } from '@/store';
@@ -9,9 +9,16 @@ import type { User } from '@/types';
 
 export default function RecordCreate() {
   const navigate = useNavigate();
-  const { currentUser, createRecord, switchUser } = useAppStore();
+  const { init, currentUser, createRecord, switchUser } = useAppStore();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const initialize = async () => {
+      await init();
+    };
+    initialize();
+  }, [init]);
 
   const handleNavChange = (key: NavKey) => {
     switch (key) {
@@ -21,10 +28,10 @@ export default function RecordCreate() {
       case 'new':
         break;
       case 'approve':
-        navigate('/approval');
+        navigate('/approvals');
         break;
       case 'import':
-        navigate('/import');
+        navigate('/records/import');
         break;
       case 'export':
         navigate('/export');

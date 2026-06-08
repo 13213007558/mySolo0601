@@ -21,7 +21,7 @@ interface AppState {
     handlerId?: string;
     startDate?: string;
     endDate?: string;
-  }) => Promise<void>;
+  }) => Promise<RescheduleRecord[]>;
   createRecord: (
     data: Partial<RescheduleRecord>,
     operator: User
@@ -92,8 +92,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     try {
       const records = await RecordService.getAll(filters);
       set({ records });
+      return records;
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载记录失败' });
+      throw err;
     } finally {
       set({ loading: false });
     }
