@@ -322,62 +322,59 @@ async function parseFile(file: Express.Multer.File): Promise<ParseResult> {
   };
 }
 
-router.post('/import/upload', upload.single('file'), async (req, res) => {
+router.post('/import', upload.single('file'), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: '未接收到文件' });
+    if (req.file) {
+      const parseResult = await parseFile(req.file);
+      const result: ImportResult = {
+        totalRows: parseResult.totalRows,
+        successRows: parseResult.successRows,
+        dirtyRows: parseResult.dirtyRows,
+        emptyRows: parseResult.emptyRows,
+        partialSuccess: parseResult.partialSuccess,
+        dirtyRowDetails: parseResult.dirtyRowDetails,
+        importedRecords: parseResult.importedRecords,
+      };
+
+      if (parseResult.dateOutOfOrderWarning && parseResult.dirtyRowDetails.every(d => d.errorMessage.indexOf('日期') === -1)) {
+        result.dirtyRowDetails.unshift({
+          rowNumber: 0,
+          rowData: { warning: '日期倒序' },
+          errorType: 'format_error',
+          errorMessage: '检测到日期未按倒序排列，部分日期数据可能顺序错乱，已继续解析所有有效数据',
+        });
+      }
+
+      res.json(result);
+      return;
     }
 
-    const parseResult = await parseFile(req.file);
-    const result: ImportResult = {
-      totalRows: parseResult.totalRows,
-      successRows: parseResult.successRows,
-      dirtyRows: parseResult.dirtyRows,
-      emptyRows: parseResult.emptyRows,
-      partialSuccess: parseResult.partialSuccess,
-      dirtyRowDetails: parseResult.dirtyRowDetails,
-      importedRecords: parseResult.importedRecords,
-    };
-
-    if (parseResult.dateOutOfOrderWarning && parseResult.dirtyRowDetails.every(d => d.errorMessage.indexOf('日期') === -1)) {
-      result.dirtyRowDetails.unshift({
-        rowNumber: 0,
-        rowData: { warning: '日期倒序' },
-        errorType: 'format_error',
-        errorMessage: '检测到日期未按倒序排列，部分日期数据可能顺序错乱，已继续解析所有有效数据',
-      });
+    const scenario = (req.body as { scenario?: string })?.scenario;
+    let result: ImportResult;
+    if (scenario === 'empty') {
+      result = generateEmptyImportSample();
+    } else if (scenario === 'dirty') {
+      result = generateDirtyImportSample();
+      records = [...result.importedRecords, ...records.filter(r => !result.importedRecords.some(nr => nr.babyId === r.babyId && nr.date === r.date))];
+    } else {
+      const todayRecords = records.filter(r => r.date === new Date().toISOString().split('T')[0]);
+      result = {
+        totalRows: todayRecords.length,
+        successRows: todayRecords.length,
+        dirtyRows: 0,
+        emptyRows: 0,
+        partialSuccess: false,
+        dirtyRowDetails: [],
+        importedRecords: todayRecords,
+      };
     }
-
     res.json(result);
   } catch (err) {
     res.status(500).json({
-      error: '文件处理失败',
+      error: '处理失败',
       message: (err as Error).message,
     });
   }
-});
-
-router.post('/import', (_req, res) => {
-  const scenario = (_req.body as { scenario?: string })?.scenario;
-  let result: ImportResult;
-  if (scenario === 'empty') {
-    result = generateEmptyImportSample();
-  } else if (scenario === 'dirty') {
-    result = generateDirtyImportSample();
-    records = [...result.importedRecords, ...records.filter(r => !result.importedRecords.some(nr => nr.babyId === r.babyId && nr.date === r.date))];
-  } else {
-    const todayRecords = records.filter(r => r.date === new Date().toISOString().split('T')[0]);
-    result = {
-      totalRows: todayRecords.length,
-      successRows: todayRecords.length,
-      dirtyRows: 0,
-      emptyRows: 0,
-      partialSuccess: false,
-      dirtyRowDetails: [],
-      importedRecords: todayRecords,
-    };
-  }
-  res.json(result);
 });
 
 router.get('/records', (req, res) => {

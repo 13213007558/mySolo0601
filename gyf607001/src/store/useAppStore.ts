@@ -125,7 +125,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   uploadFile: async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await fetch('/api/import/upload', {
+    const res = await fetch('/api/import', {
       method: 'POST',
       body: formData,
     });
