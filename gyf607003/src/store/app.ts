@@ -9,6 +9,7 @@ import type {
   TimelineEvent,
   AuditLog,
   HandleExceptionResponse,
+  CompensationTask,
 } from '@shared/types';
 
 interface ApiState {
@@ -21,6 +22,7 @@ interface ApiState {
   babyTimeline: Record<string, TimelineEvent[]>;
   babyExceptions: Record<string, ExceptionRecord[]>;
   auditLogs: AuditLog[];
+  compensationTasks: CompensationTask[];
   records: DisinfectionRecord[];
   exportConfig: { fields: { key: string; label: string; category: string; privacy?: boolean }[] } | null;
   selectedRole: User['role'];
@@ -38,6 +40,8 @@ interface ApiActions {
   fetchBabyTimeline: (id: string) => Promise<void>;
   fetchBabyExceptions: (id: string) => Promise<void>;
   fetchAuditLogs: () => Promise<void>;
+  fetchCompensationTasks: () => Promise<void>;
+  retryCompensationTask: (taskId: string) => Promise<boolean>;
   fetchRecords: (q?: { classId?: string; babyId?: string; status?: string }) => Promise<void>;
   fetchExportConfig: () => Promise<void>;
   createManualRecord: (payload: Partial<DisinfectionRecord>) => Promise<{ id: string } | null>;
@@ -68,6 +72,7 @@ export const appStore = create<ApiState & ApiActions>((set, get) => ({
   babyTimeline: {},
   babyExceptions: {},
   auditLogs: [],
+  compensationTasks: [],
   records: [],
   exportConfig: null,
   selectedRole: 'supervisor',
@@ -140,6 +145,35 @@ export const appStore = create<ApiState & ApiActions>((set, get) => ({
     set({ auditLogs: (await res.json()) as AuditLog[] });
   },
 
+  fetchCompensationTasks: async () => {
+    try {
+      const res = await fetch('/api/compensation/tasks', { headers: DEFAULT_HEADERS() });
+      if (res.ok) {
+        const data = await res.json();
+        set({ compensationTasks: data.data as CompensationTask[] });
+      }
+    } catch (e) {
+      console.warn('Failed to fetch compensation tasks', e);
+    }
+  },
+
+  retryCompensationTask: async (taskId) => {
+    try {
+      const res = await fetch(`/api/compensation/tasks/${taskId}/retry`, {
+        method: 'PUT',
+        headers: DEFAULT_HEADERS(),
+      });
+      if (res.ok) {
+        get().fetchCompensationTasks();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.warn('Failed to retry compensation task', e);
+      return false;
+    }
+  },
+
   fetchRecords: async (q) => {
     const params = new URLSearchParams();
     if (q?.classId) params.set('classId', q.classId);
@@ -197,6 +231,7 @@ export const appStore = create<ApiState & ApiActions>((set, get) => ({
       get().fetchExceptions(),
       get().fetchClasses(),
       get().fetchAuditLogs(),
+      get().fetchCompensationTasks(),
       get().fetchRecords(),
     ]);
   },

@@ -97,15 +97,36 @@ export default function HandleExceptionModal({ record, onClose }: Props) {
           </div>
         ) : (
           <div className="p-5 space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white">
-                <Check className="w-6 h-6" />
+            {result.historyLost ? (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="font-semibold text-amber-800">历史记录已丢失</p>
+                  <p className="text-sm text-amber-700">
+                    原异常记录不存在，可能因历史数据清理或丢失导致。系统已创建审计记录确保可追溯，
+                    四端同步状态标记为成功。
+                  </p>
+                  {result.historyLostItems && result.historyLostItems.length > 0 && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      缺失数据：{result.historyLostItems.join('、')}
+                    </p>
+                  )}
+                  <p className="text-xs text-amber-600 mt-1">审计日志ID：{result.auditLogId}</p>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold text-green-800">处理提交成功</p>
-                <p className="text-sm text-green-600">审计日志ID：{result.auditLogId}</p>
+            ) : (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white">
+                  <Check className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="font-semibold text-green-800">处理提交成功</p>
+                  <p className="text-sm text-green-600">审计日志ID：{result.auditLogId}</p>
+                </div>
               </div>
-            </div>
+            )}
 
             <div>
               <p className="text-sm font-semibold text-gray-700 mb-2">四端同步状态：</p>

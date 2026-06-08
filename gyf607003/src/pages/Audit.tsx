@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { FileText, Clock, CheckCircle, AlertTriangle, AlertOctagon, UserCheck, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { FileText, Clock, CheckCircle, AlertTriangle, AlertOctagon, UserCheck, ChevronDown, ChevronUp, Eye, EyeOff, Database, RefreshCw } from 'lucide-react';
 import { appStore } from '@/store/app';
-import type { AuditLog } from '@shared/types';
+import type { AuditLog, CompensationTask, UserRole } from '@shared/types';
 
 const actionLabels: Record<AuditLog['action'], string> = {
   create: '创建',
@@ -9,6 +9,7 @@ const actionLabels: Record<AuditLog['action'], string> = {
   delete: '删除',
   handle_exception: '处理异常',
   manual_record: '手工补录',
+  history_lost: '历史丢失',
 };
 
 const targetLabels: Record<AuditLog['targetType'], string> = {
@@ -69,11 +70,17 @@ function JsonDiff({ before, after }: { before: unknown; after: unknown }) {
 }
 
 export default function Audit() {
-  const { auditLogs, selectedRole, reviewAudit } = appStore();
+  const { auditLogs, compensationTasks, selectedRole, reviewAudit, fetchCompensationTasks, retryCompensationTask } = appStore();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [reviewComment, setReviewComment] = useState('');
   const [reviewId, setReviewId] = useState<string | null>(null);
   const isSupervisor = selectedRole === 'supervisor' || selectedRole === 'admin';
+
+  useEffect(() => {
+    fetchCompensationTasks();
+    const timer = setInterval(() => fetchCompensationTasks(), 10 * 1000);
+    return () => clearInterval(timer);
+  }, [fetchCompensationTasks]);
 
   async function doReview() {
     if (!reviewId || !reviewComment.trim()) return;
@@ -81,6 +88,13 @@ export default function Audit() {
     setReviewId(null);
     setReviewComment('');
   }
+
+  const statusLabels: Record<CompensationTask['status'], { label: string; cls: string; icon: typeof Clock }> = {
+    pending: { label: '等待重试', cls: 'bg-amber-100 text-amber-700', icon: Clock },
+    processing: { label: '处理中', cls: 'bg-blue-100 text-blue-700', icon: RefreshCw },
+    success: { label: '补偿成功', cls: 'bg-green-100 text-green-700', icon: CheckCircle },
+    failed: { label: '补偿失败', cls: 'bg-red-100 text-red-700', icon: AlertOctagon },
+  };
 
   return (
     <div className="space-y-6">
@@ -98,6 +112,67 @@ export default function Audit() {
           </span>
         </div>
       </div>
+
+      {isSupervisor && compensationTasks.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-amber-200 overflow-hidden">
+          <div className="px-5 py-3 bg-amber-50 border-b border-amber-200 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Database className="w-4 h-4 text-amber-700" />
+              <h3 className="font-semibold text-amber-800 text-sm">补偿任务队列</h3>
+              <span className="px-2 py-0.5 rounded bg-amber-200 text-amber-800 text-xs font-semibold">
+                {compensationTasks.filter((t) => t.status !== 'success').length} 待处理
+              </span>
+            </div>
+            <button
+              onClick={fetchCompensationTasks}
+              className="text-xs text-amber-700 hover:text-amber-800 flex items-center gap-1"
+            >
+              <RefreshCw className="w-3 h-3" /> 刷新
+            </button>
+          </div>
+          <div className="divide-y divide-amber-100">
+            {compensationTasks.map((task) => {
+              const s = statusLabels[task.status];
+              const StatusIcon = s.icon;
+              return (
+                <div key={task.id} className="px-5 py-3 grid grid-cols-12 items-center text-sm">
+                  <div className="col-span-3 text-xs text-gray-500 font-mono">
+                    {task.createdAt ? new Date(task.createdAt).toLocaleString('zh-CN') : '-'}
+                  </div>
+                  <div className="col-span-2 text-xs text-gray-600">
+                    {task.targetType === 'exception' ? '异常记录' : task.targetType}
+                  </div>
+                  <div className="col-span-2">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold ${s.cls}`}>
+                      <StatusIcon className="w-3 h-3" />
+                      {s.label}
+                    </span>
+                  </div>
+                  <div className="col-span-2 text-xs text-gray-600">
+                    重试 {task.retryCount}/{task.maxRetries}
+                  </div>
+                  <div className="col-span-2 text-xs text-gray-500 truncate">
+                    {task.lastError || '-'}
+                  </div>
+                  <div className="col-span-1 text-right">
+                    {task.status !== 'success' && task.retryCount < task.maxRetries && (
+                      <button
+                        onClick={() => retryCompensationTask(task.id)}
+                        className="text-xs bg-amber-500 text-white px-2 py-1 rounded hover:bg-amber-600 transition"
+                      >
+                        手动重试
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="px-5 py-2 bg-amber-50/50 text-xs text-amber-700 border-t border-amber-100">
+            补偿任务由系统自动重试（最大{compensationTasks[0]?.maxRetries || 5}次），服务重启后自动加载未完成任务继续执行。
+          </p>
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="grid grid-cols-12 px-5 py-3 bg-gray-50 text-xs font-semibold text-gray-600 border-b border-gray-100">
@@ -133,7 +208,9 @@ export default function Audit() {
                       {log.operateTime ? new Date(log.operateTime).toLocaleString('zh-CN') : '-'}
                     </div>
                     <div className="col-span-1">
-                      <span className="px-2 py-0.5 rounded bg-primary-50 text-primary text-xs font-semibold">
+                      <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                        log.action === 'history_lost' ? 'bg-amber-100 text-amber-700' : 'bg-primary-50 text-primary'
+                      }`}>
                         {actionLabel}
                       </span>
                     </div>
@@ -157,7 +234,7 @@ export default function Audit() {
                         : '-'}
                     </div>
                     <div className="col-span-2 flex items-center justify-end gap-2">
-                      {isSupervisor && log.action === 'handle_exception' && (
+                      {isSupervisor && (log.action === 'handle_exception' || log.action === 'history_lost') && (
                         <button
                           onClick={(e) => { e.stopPropagation(); setReviewId(log.id); }}
                           className="px-2.5 py-1 rounded text-xs font-semibold bg-primary text-white hover:bg-primary-600 transition"
