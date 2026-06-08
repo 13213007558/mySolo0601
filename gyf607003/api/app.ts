@@ -16,6 +16,7 @@ import classesRoutes from './routes/classes.js'
 import babiesRoutes from './routes/babies.js'
 import auditRoutes from './routes/audit.js'
 import exportRoutes from './routes/export.js'
+import compensationRoutes from './routes/compensation.js'
 import { sanitizeLogData } from '../shared/privacy.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -46,6 +47,7 @@ app.use('/api/classes', classesRoutes)
 app.use('/api/babies', babiesRoutes)
 app.use('/api/audit-logs', auditRoutes)
 app.use('/api/export', exportRoutes)
+app.use('/api/compensation', compensationRoutes)
 
 /**
  * health
