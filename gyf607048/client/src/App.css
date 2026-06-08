@@ -1,0 +1,16 @@
+.row-bad > td {
+  background-color: #fff1f0 !important;
+}
+.row-bad:hover > td {
+  background-color: #ffccc7 !important;
+}
+.row-temp > td {
+  background-color: #fffbe6 !important;
+}
+.row-temp:hover > td {
+  background-color: #fff1b8 !important;
+}
+.ant-layout-header {
+  height: 60px;
+  line-height: 60px;
+}
