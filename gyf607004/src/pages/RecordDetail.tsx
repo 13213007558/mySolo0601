@@ -71,7 +71,7 @@ export default function RecordDetail() {
     } else if (key === 'approve') {
       navigate('/approvals');
     } else if (key === 'import') {
-      navigate('/import');
+      navigate('/records/import');
     }
   };
 
