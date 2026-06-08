@@ -153,14 +153,20 @@ export default function ImportDashboard() {
                   <FileSpreadsheet className={`w-10 h-10 ${isDragging ? 'text-white' : 'text-brand-500'}`} />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-gray-900 mb-2">
-                  {isDragging ? '释放即可开始导入' : '拖拽导出表到此处，或点击上传'}
+                  {isDragging ? '释放即可解析真实导出表' : '拖拽真实体温枪导出表到此处，或点击选择文件'}
                 </h3>
                 <p className="text-gray-500 text-sm max-w-md">
-                  支持 CSV / Excel 格式的体温枪导出表，系统将自动逐行解析，并对异常数据标记错误原因
+                  支持 CSV / Excel 格式，系统将真实逐行解析文件内容，校验日期倒序、隔离坏行并标记错误原因
                 </p>
+                {selectedFile && (
+                  <div className="mt-4 flex items-center gap-2 px-4 py-2 bg-brand-50 rounded-full text-sm text-brand-700">
+                    <FileSpreadsheet className="w-4 h-4" />
+                    已选择文件：{selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+                  </div>
+                )}
                 <div className="mt-6 flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-xs text-gray-600">
                   <Sparkles className="w-3.5 h-3.5 text-brand-500" />
-                  解析遇到坏行不会中断，正常数据照常入库
+                  逐行解析 · 坏行自动隔离 · 日期倒序校验 · 不中断正常数据入库
                 </div>
               </div>
             </div>
@@ -169,8 +175,11 @@ export default function ImportDashboard() {
           <div className="card">
             <h3 className="font-display text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-brand-500" />
-              选择试跑场景
+              模拟试跑场景（备用）
             </h3>
+            <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+              上传真实导出表请使用左侧拖拽区域。以下场景用于无真实文件时的演示测试：
+            </p>
             <div className="space-y-3">
               {scenarioOptions.map((opt) => {
                 const Icon = opt.icon;
