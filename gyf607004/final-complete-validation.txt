@@ -1,0 +1,43 @@
+=== 类型检查 ===
+✅ 类型检查通过
+
+=== 生产构建 ===
+computing gzip size...
+dist/index.html                    26.44 kB │ gzip:   6.72 kB
+dist/assets/index-Db8Annpw.css     20.10 kB │ gzip:   4.81 kB
+dist/assets/index-BNjOvsLu.js   1,115.00 kB │ gzip: 321.57 kB │ map: 3,816.58 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 2.24s
+
+✅ 生产构建成功
+
+=== 功能测试 ===
+  6. 数据导出 → /export 按条件筛选导出 ✅
+  7. 权限控制 → viewer 角色越权被拦截 ✅
+
+========= 全部测试通过 =========
+
+测试结果汇总:
+{
+  "导入文件1": {
+    "文件名": "旧记录_20260601.csv",
+    "总行数": 9,
+    "有效记录": 6,
+    "坏数据": 3,
+    "跨班冲突": 0
+  },
+  "导入文件2": {
+    "文件名": "补充材料_20260609.csv",
+    "总行数": 6,
+    "有效记录": 4,
+    "坏数据": 2,
+    "跨班冲突": 0
+  },
+  "隔离机制验证": "✅ 坏数据不污染正常记录",
+  "闭环验证": "✅ 录入→审批→导入→导出 全流程可用",
+  "路由验证": "✅ 所有页面路由正常可访问"
+}
