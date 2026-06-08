@@ -1,0 +1,18 @@
+const fs=require("fs");const p="api/routes/export.ts";
+const L=[];
+L.push("import { Router, type Request, type Response } from \\"express\\";");
+L.push("import { store } from \\"../data/store.js\\";");
+L.push("import type { VerifyStatus, CourseTransaction } from \\"../../shared/types.js\\";");
+L.push("");
+L.push("const router = Router();");
+L.push("");
+L.push("function csvEscape(s: unknown): string {");
+L.push("  const v = s == null ? \\"\\" : String(s);");
+L.push("  if (v.includes(\\",\\") || v.includes(\"\) || v.includes(\\"\\n\\")) {");
+L.push("    return `\"${v.replace(/\"/g, \""\)}\"`;");
+L.push("  }");
+L.push("  return v;");
+L.push("}");
+L.push("");
+fs.writeFileSync(p, L.join("\n") + "\n");
+console.log("part1 written");
