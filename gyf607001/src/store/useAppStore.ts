@@ -26,6 +26,7 @@ interface AppState {
   submitReview: (recordId: string, newStatus: CheckStatus, newReason: string) => Promise<boolean>;
   confirmAudit: (auditId: string) => Promise<boolean>;
   triggerImport: (scenario?: 'normal' | 'dirty' | 'empty') => Promise<ImportResult | null>;
+  uploadFile: (file: File) => Promise<ImportResult | null>;
 }
 
 const api = async (path: string, options?: RequestInit) => {
@@ -117,6 +118,23 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({ importResult: res });
       await get().fetchRecords();
       return res;
+    }
+    return null;
+  },
+
+  uploadFile: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/import/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data) {
+      set({ importResult: data });
+      await get().fetchRecords();
+      return data;
     }
     return null;
   },

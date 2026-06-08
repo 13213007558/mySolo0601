@@ -26,16 +26,49 @@ const scenarioOptions: { key: Scenario; label: string; desc: string; icon: any }
 
 export default function ImportDashboard() {
   const navigate = useNavigate();
-  const { importResult, triggerImport, setImportResult } = useAppStore();
+  const { importResult, triggerImport, setImportResult, uploadFile } = useAppStore();
   const [scenario, setScenario] = useState<Scenario>('dirty');
   const [loading, setLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [expandedDirty, setExpandedDirty] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useState<HTMLInputElement | null>(null)[0];
 
   const handleImport = async () => {
     setLoading(true);
     await triggerImport(scenario);
     setLoading(false);
+  };
+
+  const processFile = async (file: File) => {
+    if (!file) return;
+    const validTypes = ['.csv', '.xlsx', '.xls'];
+    const fileName = file.name.toLowerCase();
+    if (!validTypes.some(t => fileName.endsWith(t))) {
+      alert('仅支持 CSV、Excel (.xlsx/.xls) 格式的文件');
+      return;
+    }
+    setSelectedFile(file);
+    setLoading(true);
+    await uploadFile(file);
+    setLoading(false);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+    if (e.target) e.target.value = '';
+  };
+
+  const triggerFilePicker = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv,.xlsx,.xls';
+    input.onchange = (e: any) => {
+      const file = e.target.files?.[0];
+      if (file) processFile(file);
+    };
+    input.click();
   };
 
   const handleReset = () => {
@@ -108,9 +141,10 @@ export default function ImportDashboard() {
               onDrop={(e) => {
                 e.preventDefault();
                 setIsDragging(false);
-                handleImport();
+                const file = e.dataTransfer.files?.[0];
+                if (file) processFile(file);
               }}
-              onClick={handleImport}
+              onClick={triggerFilePicker}
             >
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                 <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-5 transition-all ${
