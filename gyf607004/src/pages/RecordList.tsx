@@ -53,7 +53,7 @@ export default function RecordList() {
     } else if (key === 'approve') {
       navigate('/approvals');
     } else if (key === 'import') {
-      navigate('/import');
+      navigate('/records/import');
     } else if (key === 'export') {
       handleExport();
     }
