@@ -1,0 +1,1 @@
+const fs = require("fs"); const path = require("path"); const B = (p) => path.join(__dirname, p); const W = (p, c) => { fs.mkdirSync(path.dirname(B(p)), { recursive: true }); fs.writeFileSync(B(p), c); };
