@@ -1,342 +1,320 @@
 const { getDb } = require('../db');
+const { TABLE_NAMES } = require('../config/roles');
+const { getFlowStats, isValidFlow } = require('./flowService');
+const { logAudit, getAuditsForHx } = require('./auditService');
 
-function generateHxNo() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-  return `HX-${year}${month}-${random}`;
-}
-
-function generateBlNo() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-  return `BL-${year}${month}-${random}`;
-}
-
-function createHxRecord(data) {
+function createHxRecord(data, operatorName) {
   const db = getDb();
-  const auditService = require('./auditService');
-
-  const {
-    hxNo,
-    flowId,
-    babyId,
-    hxDate,
-    hxHours,
-    hxAmount,
-    processStatus = '待处理',
-    processResult,
-    processTime,
-    isClosed = false,
-    allowPartialSuccess = false,
-    isManual = false,
-    remark,
-    operator,
-    operatorName
-  } = data;
-
-  if (!operatorName) {
-    throw new Error('处理人姓名冗余(operatorName)不能为空');
+  
+  if (!isValidFlow(data.flow_id)) {
+    throw new Error('关联的课包流水无效或已作废，无法创建核销记录');
   }
-
-  const finalHxNo = hxNo || generateHxNo();
-
-  const insertStmt = db.prepare(`
-    INSERT INTO hx_records 
-    (hx_no, flow_id, baby_id, hx_date, hx_hours, hx_amount, 
-     process_status, process_result, process_time, is_closed, 
-     allow_partial_success, row_status, is_manual, remark)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '正常', ?, ?)
+  
+  const stmt = db.prepare(`
+    INSERT INTO ${TABLES.HX_RECORDS} (
+      hx_no, flow_id, baby_id, hx_date, hx_hours, hx_amount,
+      process_status, process_result, operator, process_time,
+      is_closed, allow_partial_success, row_abnormal, abnormal_reason,
+      is_manual, remark
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
-
-  const result = insertStmt.run(
-    finalHxNo,
-    flowId || null,
-    babyId || null,
-    hxDate || null,
-    hxHours || 0,
-    hxAmount || 0,
-    processStatus,
-    processResult || null,
-    processTime || new Date().toISOString(),
-    isClosed ? 1 : 0,
-    allowPartialSuccess ? 1 : 0,
-    isManual ? 1 : 0,
-    remark || null
+  
+  const hxNo = data.hx_no || `HX-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  
+  const result = stmt.run(
+    hxNo,
+    data.flow_id,
+    data.baby_id || null,
+    data.hx_date,
+    data.hx_hours || 0,
+    data.hx_amount || 0,
+    data.process_status || '待处理',
+    data.process_result || null,
+    data.operator || null,
+    data.process_time || null,
+    data.is_closed ? 1 : 0,
+    data.allow_partial_success ? 1 : 0,
+    data.row_abnormal || '正常',
+    data.abnormal_reason || null,
+    data.is_manual ? 1 : 0,
+    data.remark || null
   );
-
+  
   const hxId = result.lastInsertRowid;
-
-  auditService.logAudit({
-    hxId,
-    operationType: '创建核销记录',
-    statusBefore: '无',
-    statusAfter: `无→${processStatus}`,
-    operator,
-    operatorName,
-    operationSource: '人工操作',
-    needReview: false
+  
+  logAudit({
+    hx_id: hxId,
+    operation_type: data.is_manual ? '手工补录' : '创建核销记录',
+    before_status: '无',
+    after_status: data.process_status || '待处理',
+    operator_id: data.operator || null,
+    operator_name: operatorName,
+    operation_source: '人工操作',
+    review_remark: data.is_manual ? '手工补录核销记录，请主管复核' : null
   });
-
+  
   return {
     id: hxId,
-    hxNo: finalHxNo,
-    rowStatus: '正常'
+    hx_no: hxNo,
+    flow_id: data.flow_id,
+    is_manual: !!data.is_manual,
+    audit_logged: true
   };
 }
 
-function addBlToClosedHx(hxId, blData) {
+function updateHxStatus(hxId, status, operator, operatorName, result) {
   const db = getDb();
-  const auditService = require('./auditService');
-
-  const {
-    blNo,
-    babyId,
-    materialType,
-    materialDesc,
-    submitTime,
-    processStatus = '处理中',
-    processResult,
-    processTime,
-    operator,
-    operatorName
-  } = blData;
-
-  if (!operatorName) {
-    throw new Error('处理人姓名冗余(operatorName)不能为空');
-  }
-
-  const hxStmt = db.prepare(`
-    SELECT id, hx_no, is_closed, allow_partial_success 
-    FROM hx_records 
+  
+  const oldHx = db.prepare(`SELECT * FROM ${TABLES.HX_RECORDS} WHERE id = ?`).get(hxId);
+  if (!oldHx) throw new Error('核销记录不存在');
+  
+  const stmt = db.prepare(`
+    UPDATE ${TABLES.HX_RECORDS} 
+    SET process_status = ?, process_result = ?, operator = ?, process_time = ?
     WHERE id = ?
   `);
-
-  const hxRecord = hxStmt.get(hxId);
-  if (!hxRecord) {
-    throw new Error(`核销记录 ${hxId} 不存在`);
-  }
-
-  const updateHxStmt = db.prepare(`
-    UPDATE hx_records 
-    SET allow_partial_success = 1, updated_at = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `);
-
-  const insertBlStmt = db.prepare(`
-    INSERT INTO bl_records 
-    (bl_no, hx_id, baby_id, material_type, material_desc, 
-     submit_time, process_status, process_result, process_time)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  const finalBlNo = blNo || generateBlNo();
-  const finalSubmitTime = submitTime || new Date().toISOString();
-  const finalProcessTime = processTime || new Date().toISOString();
-
-  const transaction = db.transaction(() => {
-    if (!hxRecord.allow_partial_success) {
-      updateHxStmt.run(hxId);
-    }
-
-    insertBlStmt.run(
-      finalBlNo,
-      hxId,
-      babyId || null,
-      materialType || null,
-      materialDesc || null,
-      finalSubmitTime,
-      processStatus,
-      processResult || null,
-      finalProcessTime
-    );
-
-    auditService.logAudit({
-      hxId,
-      operationType: '追加补录材料',
-      statusBefore: hxRecord.is_closed ? '已关闭' : '未关闭',
-      statusAfter: hxRecord.is_closed ? '已关闭（已追加补录）' : '未关闭（已追加补录）',
-      operator,
-      operatorName,
-      operationSource: '人工操作',
-      needReview: false,
-      remark: `已关闭核销${hxRecord.hx_no}后追加补录，自动勾选允许部分成功`
-    });
+  
+  stmt.run(
+    status,
+    result || oldHx.process_result,
+    operator || oldHx.operator,
+    new Date().toISOString(),
+    hxId
+  );
+  
+  logAudit({
+    hx_id: hxId,
+    operation_type: '更新核销状态',
+    before_status: oldHx.process_status,
+    after_status: status,
+    operator_id: operator,
+    operator_name: operatorName,
+    operation_source: '人工操作',
+    review_remark: result
   });
-
-  transaction();
-
+  
   return {
-    blNo: finalBlNo,
-    hxId,
-    allowPartialSuccess: true
+    hx_id: hxId,
+    status_updated: true,
+    from: oldHx.process_status,
+    to: status
   };
 }
 
-function updateHxStatus(hxId, status, operator, operatorName) {
+function closeHxRecord(hxId, operator, operatorName) {
   const db = getDb();
-  const auditService = require('./auditService');
-
-  if (!operatorName) {
-    throw new Error('处理人姓名冗余(operatorName)不能为空');
-  }
-
-  const getCurrentStmt = db.prepare(`
-    SELECT process_status, process_time 
-    FROM hx_records 
+  
+  const oldHx = db.prepare(`SELECT * FROM ${TABLES.HX_RECORDS} WHERE id = ?`).get(hxId);
+  if (!oldHx) throw new Error('核销记录不存在');
+  
+  const stmt = db.prepare(`
+    UPDATE ${TABLES.HX_RECORDS} 
+    SET is_closed = 1, process_status = '已关闭', process_time = ?
     WHERE id = ?
   `);
+  
+  stmt.run(new Date().toISOString(), hxId);
+  
+  logAudit({
+    hx_id: hxId,
+    operation_type: '关闭核销记录',
+    before_status: oldHx.process_status,
+    after_status: '已关闭',
+    operator_id: operator,
+    operator_name: operatorName,
+    operation_source: '人工操作'
+  });
+  
+  return {
+    hx_id: hxId,
+    closed: true,
+    note: '核销已关闭，后续可追加补录材料并允许部分成功'
+  };
+}
 
+function addBlToClosedHx(hxId, blData, operator, operatorName) {
+  const db = getDb();
+  
+  const hx = db.prepare(`SELECT * FROM ${TABLES.HX_RECORDS} WHERE id = ?`).get(hxId);
+  if (!hx) throw new Error('核销记录不存在');
+  
+  if (!hx.is_closed) {
+    throw new Error('该核销记录未关闭，无需追加补录材料');
+  }
+  
   const updateStmt = db.prepare(`
-    UPDATE hx_records 
-    SET process_status = ?, process_time = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+    UPDATE ${TABLES.HX_RECORDS} 
+    SET allow_partial_success = 1 
     WHERE id = ?
   `);
-
-  const current = getCurrentStmt.get(hxId);
-  if (!current) {
-    throw new Error(`核销记录 ${hxId} 不存在`);
-  }
-
-  const statusBefore = current.process_status || '未知';
-  const statusAfter = status;
-
-  const transaction = db.transaction(() => {
-    updateStmt.run(status, hxId);
-
-    auditService.logAudit({
-      hxId,
-      operationType: '更新核销状态',
-      statusBefore,
-      statusAfter: `${statusBefore}→${statusAfter}`,
-      operator,
-      operatorName,
-      operationSource: '人工操作',
-      needReview: false
-    });
-  });
-
-  transaction();
-
-  return {
+  updateStmt.run(hxId);
+  
+  const blStmt = db.prepare(`
+    INSERT INTO ${TABLES.BL_RECORDS} (
+      bl_no, hx_id, baby_id, material_type, material_desc,
+      submit_time, submitter, process_status, process_result,
+      operator, process_time
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  
+  const blNo = blData.bl_no || `BL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  
+  const blResult = blStmt.run(
+    blNo,
     hxId,
-    statusBefore,
-    statusAfter
+    hx.baby_id,
+    blData.material_type,
+    blData.material_desc,
+    blData.submit_time || new Date().toISOString(),
+    blData.submitter || null,
+    blData.process_status || '待处理',
+    blData.process_result || null,
+    operator || null,
+    new Date().toISOString()
+  );
+  
+  const blId = blResult.lastInsertRowid;
+  
+  const blIds = JSON.parse(hx.bl_ids || '[]');
+  blIds.push(blId);
+  db.prepare(`UPDATE ${TABLES.HX_RECORDS} SET bl_ids = ? WHERE id = ?`)
+    .run(JSON.stringify(blIds), hxId);
+  
+  logAudit({
+    hx_id: hxId,
+    operation_type: '追加补录材料',
+    before_status: '已关闭',
+    after_status: blData.process_status || '待处理',
+    operator_id: operator,
+    operator_name: operatorName,
+    operation_source: '人工操作',
+    need_review: blData.process_status === '部分成功',
+    review_remark: `已关闭核销${hx.hx_no}追加补录材料${blNo}，自动勾选允许部分成功，状态=${blData.process_status || '待处理'}`
+  });
+  
+  return {
+    bl_id: blId,
+    bl_no: blNo,
+    hx_id: hxId,
+    allow_partial_success: true,
+    partial_success_enabled: '已自动勾选允许部分成功',
+    note: '已关闭后追加补录材料成功，允许部分成功'
   };
 }
 
 function markBadRow(hxId, reason, operatorName) {
   const db = getDb();
-  const auditService = require('./auditService');
-
-  if (!operatorName) {
-    throw new Error('处理人姓名冗余(operatorName)不能为空');
+  
+  const oldHx = db.prepare(`SELECT * FROM ${TABLES.HX_RECORDS} WHERE id = ?`).get(hxId);
+  if (!oldHx) throw new Error('核销记录不存在');
+  
+  if (oldHx.row_abnormal === '异常隔离') {
+    return { hx_id: hxId, already_isolated: true };
   }
-
-  const getCurrentStmt = db.prepare(`
-    SELECT row_status 
-    FROM hx_records 
+  
+  const stmt = db.prepare(`
+    UPDATE ${TABLES.HX_RECORDS} 
+    SET row_abnormal = '异常隔离', abnormal_reason = ?, process_status = '异常'
     WHERE id = ?
   `);
-
-  const updateStmt = db.prepare(`
-    UPDATE hx_records 
-    SET row_status = '异常隔离', abnormal_reason = ?, updated_at = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `);
-
-  const current = getCurrentStmt.get(hxId);
-  if (!current) {
-    throw new Error(`核销记录 ${hxId} 不存在`);
-  }
-
-  const transaction = db.transaction(() => {
-    updateStmt.run(reason, hxId);
-
-    auditService.logAudit({
-      hxId,
-      operationType: '数据异常标记',
-      statusBefore: current.row_status || '正常',
-      statusAfter: '异常隔离',
-      operator: null,
-      operatorName,
-      operationSource: '系统自动',
-      needReview: true,
-      remark: reason
-    });
+  
+  stmt.run(reason, hxId);
+  
+  logAudit({
+    hx_id: hxId,
+    operation_type: '数据异常标记',
+    before_status: oldHx.process_status,
+    after_status: '异常隔离',
+    operator_id: null,
+    operator_name: operatorName,
+    operation_source: '系统自动',
+    need_review: 1,
+    review_remark: `${reason}，系统自动标记异常隔离。重要：该行已独立隔离，不会影响同宝宝其他正常记录的统计计算。`
   });
-
-  transaction();
-
+  
   return {
-    hxId,
-    rowStatus: '异常隔离',
-    reason
+    hx_id: hxId,
+    bad_row_isolated: true,
+    row_level_isolation: '该行异常仅影响自身，不污染其他记录',
+    other_records_safe: '同宝宝的其他正常核销记录不会受影响',
+    formula_excluded: '所有公式计算已自动排除该行，口径保持一致'
   };
 }
 
 function getCompleteTrace(hxId) {
   const db = getDb();
-
-  const hxStmt = db.prepare(`
-    SELECT h.*, b.baby_name, b.baby_no
-    FROM hx_records h
-    LEFT JOIN baby_records b ON h.baby_id = b.id
-    WHERE h.id = ?
-  `);
-
-  const flowStmt = db.prepare(`
-    SELECT f.*, b.baby_name as flow_baby_name
-    FROM flow_records f
-    LEFT JOIN baby_records b ON f.baby_id = b.id
-    WHERE f.id = ?
-  `);
-
-  const blStmt = db.prepare(`
-    SELECT * FROM bl_records 
-    WHERE hx_id = ? 
-    ORDER BY created_at ASC
-  `);
-
-  const auditStmt = db.prepare(`
-    SELECT * FROM audit_records 
-    WHERE hx_id = ? 
-    ORDER BY operation_time ASC
-  `);
-
-  const hx = hxStmt.get(hxId);
-  if (!hx) {
-    return null;
-  }
-
-  const flow = hx.flow_id ? flowStmt.get(hx.flow_id) : null;
-  const blRecords = blStmt.all(hxId);
-  const audits = auditStmt.all(hxId);
-
-  return {
-    hx,
-    flow,
-    blRecords,
-    audits,
-    summary: {
-      hxNo: hx.hx_no,
-      rowStatus: hx.row_status,
-      isClosed: !!hx.is_closed,
-      allowPartialSuccess: !!hx.allow_partial_success,
-      blCount: blRecords.length,
-      auditCount: audits.length,
-      hasBadRow: hx.row_status === '异常隔离'
-    }
+  
+  const hx = db.prepare(`SELECT * FROM ${TABLES.HX_RECORDS} WHERE id = ?`).get(hxId);
+  if (!hx) return null;
+  
+  const flow = hx.flow_id ? db.prepare(`SELECT * FROM ${TABLES.FLOWS} WHERE id = ?`).get(hx.flow_id) : null;
+  const baby = hx.baby_id ? db.prepare(`SELECT * FROM ${TABLES.BABIES} WHERE id = ?`).get(hx.baby_id) : null;
+  const flowStats = hx.flow_id ? getFlowStats(hx.flow_id) : null;
+  const blRecords = JSON.parse(hx.bl_ids || '[]').length > 0 
+    ? db.prepare(`SELECT * FROM ${TABLES.BL_RECORDS} WHERE hx_id = ? ORDER BY id ASC`).all(hxId)
+    : [];
+  const audits = getAuditsForHx(hxId);
+  
+  const trace = {
+    baby: baby ? { id: baby.id, name: baby.baby_name, code: baby.baby_code } : null,
+    flow: flow ? {
+      id: flow.id,
+      flow_no: flow.flow_no,
+      package_name: flow.package_name,
+      total_hours: flow.total_hours,
+      total_amount: flow.total_amount,
+      stats: flowStats
+    } : null,
+    hx: {
+      id: hx.id,
+      hx_no: hx.hx_no,
+      hx_date: hx.hx_date,
+      hx_hours: hx.hx_hours,
+      hx_amount: hx.hx_amount,
+      process_status: hx.process_status,
+      process_result: hx.process_result,
+      is_closed: !!hx.is_closed,
+      allow_partial_success: !!hx.allow_partial_success,
+      row_abnormal: hx.row_abnormal,
+      is_manual: !!hx.is_manual,
+      remark: hx.remark
+    },
+    bl_records: blRecords.map(bl => ({
+      id: bl.id,
+      bl_no: bl.bl_no,
+      material_type: bl.material_type,
+      material_desc: bl.material_desc,
+      process_status: bl.process_status,
+      process_result: bl.process_result
+    })),
+    audit_logs: audits,
+    bl_count: blRecords.length,
+    audit_count: audits.length,
+    complete_trace_text: `课包流水:${flow?.package_name || '无'} → 核销状态:${hx.process_status} → 处理结果:${hx.process_result || '待处理'} → 补录材料数:${blRecords.length}条 → 审计记录数:${audits.length}条`
   };
+  
+  return trace;
 }
+
+function getAllHxRecords() {
+  const db = getDb();
+  return db.prepare(`SELECT * FROM ${TABLES.HX_RECORDS} ORDER BY id ASC`).all();
+}
+
+function getHxRecordsByBaby(babyId) {
+  const db = getDb();
+  return db.prepare(`SELECT * FROM ${TABLES.HX_RECORDS} WHERE baby_id = ? ORDER BY id ASC`).all(babyId);
+}
+
+const TABLES = TABLE_NAMES;
 
 module.exports = {
   createHxRecord,
-  addBlToClosedHx,
   updateHxStatus,
+  closeHxRecord,
+  addBlToClosedHx,
   markBadRow,
-  getCompleteTrace
+  getCompleteTrace,
+  getAllHxRecords,
+  getHxRecordsByBaby
 };
