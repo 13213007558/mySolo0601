@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(20, 184, 166, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(249, 115, 22, 0.06), transparent 60%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  color: #0f172a;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl border border-ink-100 shadow-soft;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5
+           bg-brand-600 text-white font-medium
+           hover:bg-brand-700 active:bg-brand-800
+           transition-colors shadow-sm;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5
+           bg-white text-ink-900 font-medium border border-ink-200
+           hover:bg-ink-50 transition-colors;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5
+           bg-rose-50 text-rose-700 font-medium border border-rose-200
+           hover:bg-rose-100 transition-colors;
+  }
+  .input {
+    @apply w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5
+           text-sm text-ink-900 placeholder:text-ink-500
+           focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500;
+  }
+  .label {
+    @apply text-xs font-medium text-ink-500 mb-1.5 block;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium border;
+  }
+  .nav-item {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink-700
+           hover:bg-brand-50 hover:text-brand-700 transition-colors;
+  }
+  .nav-item-active {
+    @apply bg-brand-600 text-white hover:bg-brand-700 hover:text-white shadow-glow;
+  }
+  .page-title {
+    @apply text-2xl font-semibold text-ink-900 tracking-tight;
+  }
+  .section-title {
+    @apply text-base font-semibold text-ink-900;
+  }
+  .muted {
+    @apply text-sm text-ink-500;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
