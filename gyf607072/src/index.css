@@ -1,0 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #332e2a;
+  background-color: #fbf7f2;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fbf7f2 0%, #f5ede2 100%);
+}
+
+.font-display {
+  font-family: "Noto Serif SC", Georgia, serif;
+}
+
+@layer components {
+  .card-base {
+    @apply bg-white rounded-xl2 shadow-card transition-all duration-200;
+  }
+  .card-base:hover {
+    @apply shadow-card-hover -translate-y-0.5;
+  }
+  .btn-primary {
+    @apply px-4 py-2.5 bg-sage-500 text-white rounded-xl2 font-medium
+           hover:bg-sage-700 active:scale-95 transition-all duration-200
+           shadow-sm hover:shadow-md;
+  }
+  .btn-ghost {
+    @apply px-4 py-2.5 bg-cream-100 text-ink-800 rounded-xl2 font-medium
+           hover:bg-cream-200 active:scale-95 transition-all duration-200;
+  }
+  .btn-danger {
+    @apply px-4 py-2.5 bg-baby-300 text-white rounded-xl2 font-medium
+           hover:bg-baby-500 active:scale-95 transition-all duration-200;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d5cfc7;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b8b0a5;
+}
