@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Child {
+  id           Int          @id @default(autoincrement())
+  name         String
+  age          Int
+  guardianName String
+  phone        String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  milkRecords  MilkRecord[]
+  feedbacks    TherapyFeedback[]
+}
+
+model MilkRecord {
+  id             Int                @id @default(autoincrement())
+  childId        Int
+  child          Child              @relation(fields: [childId], references: [id])
+  recordDate     DateTime
+  amount         Int
+  source         String
+  status         String             @default("PENDING")
+  parentMessage  String?
+  paperNote      String?
+  reason         String?
+  handledBy      String?
+  handledAt      DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  histories      MilkRecordHistory[]
+  reviews        ReviewRecord[]
+  feedback       TherapyFeedback?
+}
+
+model MilkRecordHistory {
+  id          Int          @id @default(autoincrement())
+  recordId    Int
+  record      MilkRecord   @relation(fields: [recordId], references: [id])
+  oldStatus   String
+  newStatus   String
+  oldAmount   Int?
+  newAmount   Int?
+  oldReason   String?
+  newReason   String?
+  changeNote  String
+  operator    String
+  operatedAt  DateTime     @default(now())
+}
+
+model ReviewRecord {
+  id         Int        @id @default(autoincrement())
+  recordId   Int
+  record     MilkRecord @relation(fields: [recordId], references: [id])
+  reviewNote String
+  reviewer   String
+  reviewedAt DateTime   @default(now())
+}
+
+model TherapyFeedback {
+  id         Int        @id @default(autoincrement())
+  recordId   Int        @unique
+  record     MilkRecord @relation(fields: [recordId], references: [id])
+  childId    Int
+  child      Child      @relation(fields: [childId], references: [id])
+  content    String
+  therapist  String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model SuspiciousRecord {
+  id               Int          @id @default(autoincrement())
+  originalId       Int?
+  childId          Int
+  childName        String
+  recordDate       DateTime
+  amount           Int
+  source           String
+  parentMessage    String?
+  paperNote        String?
+  suspiciousReason String
+  detectedAt       DateTime     @default(now())
+  handled          Boolean      @default(false)
+  handledNote      String?
+  handledBy        String?
+  handledAt        DateTime?
+}
