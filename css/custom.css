@@ -1,0 +1,420 @@
+/* ==========================================================================
+   联邦学习隐私计算联邦 - 自定义样式
+   文化遗产数字化与数字藏品领域专用
+   ========================================================================== */
+
+/* Tailwind 配置扩展 */
+@layer base {
+  :root {
+    /* 主色调：文物青铜色 */
+    --color-bronze: #8B7355;
+    --color-bronze-light: #A68B6B;
+    --color-bronze-dark: #6B5344;
+    
+    /* 辅助色：科技蓝 */
+    --color-tech-blue: #0EA5E9;
+    --color-tech-blue-light: #38BDF8;
+    --color-tech-blue-dark: #0284C7;
+    
+    /* 安全红 */
+    --color-security-red: #DC2626;
+    --color-security-red-light: #EF4444;
+    --color-security-red-dark: #B91C1C;
+    
+    /* 成功绿 */
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    
+    /* 中性色 */
+    --color-bg-deep: #0F172A;
+    --color-bg-card: #1E293B;
+    --color-border: #334155;
+    --color-text-primary: #F8FAFC;
+    --color-text-secondary: #94A3B8;
+    --color-text-muted: #64748B;
+  }
+  
+  html {
+    font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+    background-color: var(--color-bg-deep);
+    color: var(--color-text-primary);
+  }
+  
+  body {
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  /* 标题使用衬线字体体现文化感 */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Noto Serif SC', serif;
+  }
+}
+
+@layer components {
+  /* 区块卡片容器 */
+  .block-card {
+    @apply bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden backdrop-blur-sm;
+    transition: all 0.3s ease;
+  }
+  
+  .block-card:hover {
+    @apply border-bronze/50;
+    box-shadow: 0 0 20px rgba(139, 115, 85, 0.15);
+  }
+  
+  /* 区块标题栏 */
+  .block-header {
+    @apply flex items-center justify-between px-4 py-3 border-b border-slate-700;
+    background: linear-gradient(135deg, rgba(139, 115, 85, 0.1) 0%, transparent 100%);
+  }
+  
+  /* 状态指示灯 */
+  .status-indicator {
+    @apply w-2 h-2 rounded-full;
+    animation: pulse 2s infinite;
+  }
+  
+  .status-indicator.healthy { @apply bg-emerald-500; }
+  .status-indicator.warning { @apply bg-amber-500; }
+  .status-indicator.critical { @apply bg-red-500; animation: pulse-fast 1s infinite; }
+  .status-indicator.offline { @apply bg-slate-500; animation: none; }
+  
+  /* 状态徽章 */
+  .status-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+  }
+  
+  .status-badge.success { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
+  .status-badge.warning { @apply bg-amber-500/20 text-amber-400 border border-amber-500/30; }
+  .status-badge.danger { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
+  .status-badge.info { @apply bg-sky-500/20 text-sky-400 border border-sky-500/30; }
+  .status-badge.pending { @apply bg-slate-500/20 text-slate-400 border border-slate-500/30; }
+  
+  /* 按钮样式 */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded text-sm font-medium transition-all duration-200;
+    @apply hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0;
+  }
+  
+  .btn-primary {
+    @apply bg-bronze text-white hover:bg-bronze-light;
+  }
+  
+  .btn-secondary {
+    @apply bg-slate-700 text-slate-200 hover:bg-slate-600 border border-slate-600;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-500;
+  }
+  
+  .btn-success {
+    @apply bg-emerald-600 text-white hover:bg-emerald-500;
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1 text-xs;
+  }
+  
+  .btn-icon {
+    @apply w-8 h-8 p-0 rounded;
+  }
+  
+  /* 数据表格 */
+  .data-table {
+    @apply w-full text-sm;
+  }
+  
+  .data-table th {
+    @apply px-4 py-3 text-left font-medium text-slate-400 border-b border-slate-700;
+  }
+  
+  .data-table td {
+    @apply px-4 py-3 border-b border-slate-700/50;
+  }
+  
+  .data-table tr:hover td {
+    @apply bg-slate-700/30;
+  }
+  
+  .data-table tr:nth-child(even) td {
+    @apply bg-slate-800/30;
+  }
+  
+  /* 进度条 */
+  .progress-bar {
+    @apply h-2 bg-slate-700 rounded-full overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full rounded-full transition-all duration-500;
+  }
+  
+  /* 卡片网格 */
+  .metric-card {
+    @apply bg-slate-800/30 border border-slate-700/50 rounded-lg p-4;
+  }
+  
+  /* 时间轴 */
+  .timeline-item {
+    @apply relative pl-6 pb-4 border-l border-slate-600;
+  }
+  
+  .timeline-item::before {
+    @apply absolute left-[-5px] top-1 w-2 h-2 rounded-full bg-sky-500;
+    content: '';
+  }
+  
+  .timeline-item.success::before { @apply bg-emerald-500; }
+  .timeline-item.warning::before { @apply bg-amber-500; }
+  .timeline-item.danger::before { @apply bg-red-500; }
+  .timeline-item.pending::before { @apply bg-slate-500; }
+  
+  /* 看板列 */
+  .kanban-column {
+    @apply bg-slate-800/30 rounded-lg p-3 min-h-[400px];
+  }
+  
+  .kanban-card {
+    @apply bg-slate-700/50 border border-slate-600/50 rounded-lg p-3 mb-3 cursor-pointer transition-all;
+    @apply hover:border-sky-500/50 hover:bg-slate-700/70;
+  }
+  
+  .kanban-card.dragging {
+    @apply opacity-50 rotate-1;
+  }
+  
+  /* 热力图单元格 */
+  .heatmap-cell {
+    @apply w-full aspect-square rounded transition-all cursor-pointer;
+    @apply hover:scale-105 hover:ring-2 hover:ring-white/30;
+  }
+  
+  /* 抽屉 */
+  .drawer {
+    @apply fixed top-0 right-0 h-full w-[480px] bg-slate-800 border-l border-slate-700 shadow-2xl;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-out;
+    z-index: 100;
+  }
+  
+  .drawer.open {
+    transform: translateX(0);
+  }
+  
+  .drawer-overlay {
+    @apply fixed inset-0 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300;
+    z-index: 99;
+  }
+  
+  .drawer-overlay.open {
+    @apply opacity-100 pointer-events-auto;
+  }
+  
+  /* Toast 通知 */
+  .toast {
+    @apply fixed bottom-4 right-4 bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 shadow-xl;
+    animation: slideIn 0.3s ease-out;
+    z-index: 200;
+  }
+  
+  .toast.success { @apply border-l-4 border-l-emerald-500; }
+  .toast.warning { @apply border-l-4 border-l-amber-500; }
+  .toast.error { @apply border-l-4 border-l-red-500; }
+  .toast.info { @apply border-l-4 border-l-sky-500; }
+  
+  /* 导航项 */
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 transition-all cursor-pointer;
+    @apply hover:bg-slate-700/50 hover:text-white;
+  }
+  
+  .nav-item.active {
+    @apply bg-bronze/20 text-white border-l-2 border-l-bronze;
+  }
+  
+  /* 滚动条美化 */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-800;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500;
+  }
+  
+  /* 数字滚动动画 */
+  .number-roll {
+    @apply inline-block transition-transform duration-300;
+  }
+  
+  /* 骨架屏加载 */
+  .skeleton {
+    @apply bg-slate-700 animate-pulse rounded;
+  }
+  
+  /* 闪烁告警 */
+  .alert-blink {
+    animation: blink 1s infinite;
+  }
+  
+  /* 节点连接线 */
+  .node-connection {
+    stroke: var(--color-tech-blue);
+    stroke-width: 1;
+    opacity: 0.5;
+  }
+  
+  .node-connection.active {
+    opacity: 1;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 4px var(--color-tech-blue));
+  }
+}
+
+@layer utilities {
+  .text-bronze { color: var(--color-bronze); }
+  .bg-bronze { background-color: var(--color-bronze); }
+  .border-bronze { border-color: var(--color-bronze); }
+  .bg-bronze-light { background-color: var(--color-bronze-light); }
+  .bg-bronze-dark { background-color: var(--color-bronze-dark); }
+  
+  .text-shadow-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
+  
+  .grid-hex {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+  }
+}
+
+/* ==========================================================================
+   动画定义
+   ========================================================================== */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes pulse-fast {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 区块入场动画（延迟依次出现） */
+.block-enter {
+  animation: fadeIn 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.block-enter:nth-child(1) { animation-delay: 0ms; }
+.block-enter:nth-child(2) { animation-delay: 100ms; }
+.block-enter:nth-child(3) { animation-delay: 200ms; }
+.block-enter:nth-child(4) { animation-delay: 300ms; }
+.block-enter:nth-child(5) { animation-delay: 400ms; }
+.block-enter:nth-child(6) { animation-delay: 500ms; }
+
+/* 状态变化闪烁 */
+.state-change {
+  animation: stateFlash 1s ease-out;
+}
+
+@keyframes stateFlash {
+  0% { background-color: rgba(14, 165, 233, 0.3); }
+  100% { background-color: transparent; }
+}
+
+/* 进度条流动效果 */
+.progress-animated {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.1) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.1) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+  animation: progressStripes 1s linear infinite;
+}
+
+@keyframes progressStripes {
+  from { background-position: 1rem 0; }
+  to { background-position: 0 0; }
+}
+
+/* 拓扑图节点脉冲 */
+.node-pulse {
+  animation: nodePulse 2s ease-out infinite;
+}
+
+@keyframes nodePulse {
+  0% {
+    r: 8;
+    opacity: 1;
+  }
+  100% {
+    r: 16;
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   响应式调整
+   ========================================================================== */
+
+@media (max-width: 1280px) {
+  .six-block-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .six-block-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .drawer {
+    width: 100%;
+  }
+}
