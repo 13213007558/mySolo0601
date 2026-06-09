@@ -1,0 +1,27 @@
+{
+  "name": "change-impact-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "设计变更影响对照页 - 管理设计变更对工序、成本和已施工区域的影响",
+  "scripts": {
+    "dev": "vite --port 5174",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "pinia": "^2.1.7",
+    "vue": "^3.3.11",
+    "vue-router": "^4.2.5",
+    "lucide-vue-next": "^0.294.0",
+    "xlsx": "^0.18.5",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "vite": "^5.0.0"
+  }
+}
