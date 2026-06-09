@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #1D2129;
+    color: #F2F3F5;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #2A2F3A;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #3D4250;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4D5260;
+  }
+}
+
+@layer components {
+  .font-mono-nums {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card-industrial {
+    @apply bg-industrial-card border border-industrial-border rounded-sm;
+  }
+
+  .btn-industrial {
+    @apply px-4 py-2 font-medium text-sm border-2 transition-all duration-150 active:translate-y-0.5;
+  }
+
+  .btn-primary {
+    @apply btn-industrial bg-primary border-primary text-white hover:bg-primary-dark hover:border-primary-dark;
+  }
+
+  .btn-danger {
+    @apply btn-industrial bg-alert-red border-alert-red text-white hover:bg-red-600 hover:border-red-600;
+  }
+
+  .btn-secondary {
+    @apply btn-industrial bg-transparent border-industrial-border text-industrial-text hover:bg-industrial-border/30;
+  }
+
+  .status-badge {
+    @apply px-2 py-0.5 text-xs font-medium rounded-sm border;
+  }
+
+  .alert-pulse {
+    animation: alertPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes alertPulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(245, 63, 63, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(245, 63, 63, 0);
+    }
+  }
+
+  .expandable-content {
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+  }
+
+  .expandable-content.collapsed {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  .expandable-content.expanded {
+    max-height: 2000px;
+    opacity: 1;
+  }
+}
