@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+@layer components {
+  .industrial-card {
+    @apply bg-white border border-industrial-gray-200 shadow-sm hover:shadow-md transition-all duration-200;
+  }
+  
+  .industrial-btn {
+    @apply px-4 py-2 font-medium border-2 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .industrial-btn-primary {
+    @apply industrial-btn bg-industrial-blue-500 border-industrial-blue-600 text-white hover:bg-industrial-blue-600 focus:ring-industrial-blue-500;
+  }
+  
+  .industrial-btn-secondary {
+    @apply industrial-btn bg-white border-industrial-gray-300 text-industrial-gray-700 hover:bg-industrial-gray-50 focus:ring-industrial-gray-400;
+  }
+  
+  .industrial-btn-warning {
+    @apply industrial-btn bg-industrial-orange-500 border-industrial-orange-600 text-white hover:bg-industrial-orange-600 focus:ring-industrial-orange-500;
+  }
+  
+  .industrial-btn-danger {
+    @apply industrial-btn bg-industrial-red-500 border-industrial-red-600 text-white hover:bg-industrial-red-600 focus:ring-industrial-red-500;
+  }
+  
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .status-normal {
+    @apply status-badge bg-industrial-green-100 text-industrial-green-600;
+  }
+  
+  .status-abnormal {
+    @apply status-badge bg-industrial-orange-100 text-industrial-orange-600 animate-breathe;
+  }
+  
+  .status-pending {
+    @apply status-badge bg-industrial-gray-100 text-industrial-gray-600;
+  }
+  
+  .table-header {
+    @apply bg-industrial-gray-50 text-industrial-gray-600 text-xs font-semibold uppercase tracking-wider;
+  }
+  
+  .table-row {
+    @apply border-b border-industrial-gray-200 hover:bg-industrial-blue-50/50 transition-colors;
+  }
+  
+  .table-row-alternate {
+    @apply bg-industrial-gray-50/30;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border-2 border-industrial-gray-300 focus:border-industrial-blue-500 focus:outline-none transition-colors;
+  }
+  
+  .panel-title {
+    @apply text-lg font-semibold text-industrial-gray-800 font-mono;
+  }
+}
+
+@keyframes numberRoll {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.number-roll {
+  animation: numberRoll 0.5s ease-out;
+}
