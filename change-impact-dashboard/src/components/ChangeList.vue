@@ -89,7 +89,7 @@
             <td class="px-4 py-3 text-right">
               <div class="flex items-center justify-end gap-1" @click.stop>
                 <button
-                  v-if="change.status === 'pending' && change.constructionStatus === 'constructed'"
+                  v-if="change.status === 'pending' && change.constructionStatus !== 'drawing' && !change.history?.some(h => h.action === 'revert')"
                   @click="store.change.openRevertModal(change.id)"
                   class="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                   title="撤回误判"

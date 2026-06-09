@@ -21,7 +21,7 @@ export const mockChanges = [
     scheduleImpact: 5,
     processImpact: '需要拆除已绑扎的钢筋，重新定位放线',
     responsiblePerson: 'zhang',
-    status: 'confirmed',
+    status: 'pending',
     attachments: [
       { name: '设计院变更函.pdf', type: 'pdf', size: '2.3MB' },
       { name: '现场照片_20260609.jpg', type: 'image', size: '4.1MB' }
@@ -45,8 +45,8 @@ export const mockChanges = [
         timestamp: '2026-06-09T15:20:00',
         operator: 'zhang',
         oldValue: { status: 'pending', responsiblePerson: null },
-        newValue: { status: 'confirmed', responsiblePerson: 'zhang' },
-        reason: '结构工程师确认变更影响，预计返工成本约8.5万'
+        newValue: { status: 'pending', responsiblePerson: 'zhang' },
+        reason: '分配给结构工程师张工负责评估，尚未最终确认'
       },
       {
         id: uuidv4(),

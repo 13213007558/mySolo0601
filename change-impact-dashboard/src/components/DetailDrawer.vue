@@ -217,7 +217,7 @@
                 </div>
                 <div class="mt-2 flex gap-2">
                   <button 
-                    v-if="change.constructionStatus === 'constructed' && change.status === 'pending'"
+                    v-if="change.constructionStatus !== 'drawing' && change.status === 'pending' && !change.history?.some(h => h.action === 'revert')"
                     @click="store.change.openRevertModal(change.id); store.change.closeDetail();"
                     class="btn-warning flex-1 text-sm"
                   >
