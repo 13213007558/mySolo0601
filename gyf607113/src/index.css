@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #e2e8f0;
+  background-color: #0F172A;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0F172A;
+  background-image:
+    linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.5);
+}
+
+@layer components {
+  .card-industrial {
+    @apply bg-industrial-900/80 border border-industrial-700/50 rounded-sm backdrop-blur-sm;
+    @apply hover:border-industrial-500/50 transition-all duration-300;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-industrial-600 text-white rounded-sm font-medium;
+    @apply hover:bg-industrial-500 active:bg-industrial-700 transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-industrial-400 focus:ring-offset-2 focus:ring-offset-industrial-900;
+  }
+
+  .btn-warning {
+    @apply px-4 py-2 bg-safety-warning text-white rounded-sm font-medium;
+    @apply hover:bg-orange-500 active:bg-orange-700 transition-all duration-200;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-red-600 text-white rounded-sm font-medium;
+    @apply hover:bg-red-500 active:bg-red-700 transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-industrial-800 text-industrial-200 border border-industrial-600 rounded-sm font-medium;
+    @apply hover:bg-industrial-700 hover:text-white transition-all duration-200;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium;
+    @apply border border-opacity-30;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-industrial-900 border border-industrial-600 rounded-sm text-white;
+    @apply focus:outline-none focus:border-industrial-400 focus:ring-1 focus:ring-industrial-400;
+    @apply placeholder-industrial-500;
+  }
+
+  .label-text {
+    @apply block text-sm font-medium text-industrial-300 mb-1;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold text-white mb-4 flex items-center gap-2;
+  }
+
+  .data-value {
+    @apply font-mono text-industrial-200;
+  }
+
+  .data-label {
+    @apply text-sm text-industrial-400;
+  }
+
+  .divider {
+    @apply h-px bg-industrial-700/50 my-4;
+  }
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
