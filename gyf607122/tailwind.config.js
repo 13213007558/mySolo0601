@@ -1,0 +1,100 @@
+/** @type {import('tailwindcss').Config} */
+
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    container: {
+      center: true,
+    },
+    extend: {
+      colors: {
+        primary: {
+          50: "#E8F3FF",
+          100: "#B9D8FF",
+          200: "#8ABDFF",
+          300: "#5BA2FF",
+          400: "#2C87FF",
+          500: "#165DFF",
+          600: "#0E42D2",
+          700: "#0A2BA0",
+          800: "#061A6E",
+          900: "#030D3C",
+        },
+        danger: {
+          50: "#FFECE8",
+          100: "#FCC9C0",
+          200: "#F99789",
+          300: "#F76551",
+          400: "#F53F3F",
+          500: "#CB2634",
+          600: "#9E1A2A",
+          700: "#710F1F",
+          800: "#440714",
+          900: "#1F0209",
+        },
+        warning: {
+          50: "#FFF7E8",
+          100: "#FFE7B8",
+          200: "#FFD588",
+          300: "#FFC358",
+          400: "#FFB42F",
+          500: "#FF7D00",
+          600: "#DB6A00",
+          700: "#B75800",
+          800: "#934600",
+          900: "#7A3900",
+        },
+        success: {
+          50: "#E8FFEA",
+          100: "#B8F2BF",
+          200: "#88E594",
+          300: "#58D869",
+          400: "#2FCF47",
+          500: "#00B42A",
+          600: "#009A23",
+          700: "#00801D",
+          800: "#006617",
+          900: "#005212",
+        },
+        dark: {
+          50: "#F7F8FA",
+          100: "#E5E6EB",
+          200: "#C9CDD4",
+          300: "#86909C",
+          400: "#4E5969",
+          500: "#272E3B",
+          600: "#2A2F3A",
+          700: "#1D2129",
+          800: "#171A21",
+          900: "#0F1115",
+        },
+      },
+      fontFamily: {
+        mono: ['"Roboto Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        sans: ['"Noto Sans SC"', 'system-ui', 'sans-serif'],
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'blink': 'blink 1.5s ease-in-out infinite',
+        'slide-up': 'slideUp 0.3s ease-out',
+        'fade-in': 'fadeIn 0.3s ease-out',
+      },
+      keyframes: {
+        blink: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.3' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
+    },
+  },
+  plugins: [],
+};
