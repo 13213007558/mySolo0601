@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #1D2129;
+  color: #E5E6EB;
+}
+
+@layer components {
+  .btn-industrial {
+    @apply px-4 py-2 border-2 border-industrial-300 rounded text-sm font-medium transition-all duration-200 hover:scale-[0.97] active:scale-95;
+  }
+  
+  .btn-primary {
+    @apply btn-industrial bg-primary-500 border-primary-500 text-white hover:bg-primary-600 hover:border-primary-600;
+  }
+  
+  .btn-warning {
+    @apply btn-industrial bg-warning-500 border-warning-500 text-white hover:bg-warning-600 hover:border-warning-600;
+  }
+  
+  .btn-success {
+    @apply btn-industrial bg-success-500 border-success-500 text-white hover:bg-success-600 hover:border-success-600;
+  }
+  
+  .btn-secondary {
+    @apply btn-industrial bg-industrial-400 border-industrial-300 text-white hover:bg-industrial-300;
+  }
+  
+  .card-industrial {
+    @apply bg-industrial-500 border border-industrial-400 rounded p-4;
+  }
+  
+  .table-industrial {
+    @apply w-full border-collapse;
+  }
+  
+  .table-industrial th {
+    @apply bg-industrial-600 text-industrial-100 px-4 py-3 text-left text-sm font-semibold border-b-2 border-industrial-400 font-mono;
+  }
+  
+  .table-industrial td {
+    @apply px-4 py-3 text-sm border-b border-industrial-400;
+  }
+  
+  .table-industrial tr:nth-child(even) {
+    @apply bg-industrial-600/50;
+  }
+  
+  .table-industrial tr:hover {
+    @apply bg-primary-500/10;
+  }
+  
+  .status-led {
+    @apply inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium;
+  }
+  
+  .status-led::before {
+    content: '';
+    @apply w-2 h-2 rounded-full;
+  }
+  
+  .status-pending {
+    @apply status-led bg-industrial-400 text-industrial-100;
+  }
+  
+  .status-pending::before {
+    @apply bg-industrial-200;
+  }
+  
+  .status-normal {
+    @apply status-led bg-success-500/20 text-success-100;
+  }
+  
+  .status-normal::before {
+    @apply bg-success-500;
+    box-shadow: 0 0 6px #00B42A;
+  }
+  
+  .status-anomaly {
+    @apply status-led bg-warning-500/20 text-warning-100;
+  }
+  
+  .status-anomaly::before {
+    @apply bg-warning-500 animate-pulse;
+    box-shadow: 0 0 8px #FF7D00;
+  }
+  
+  .input-industrial {
+    @apply w-full px-3 py-2 bg-industrial-600 border border-industrial-300 rounded text-sm text-industrial-100 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors;
+  }
+  
+  .scan-overlay {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scan-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #165DFF, transparent);
+    animation: scanLine 3s linear infinite;
+  }
+  
+  .watermark-locked {
+    position: relative;
+  }
+  
+  .watermark-locked::before {
+    content: '原始记录 · 不可修改';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-size: 2rem;
+    font-weight: 700;
+    color: rgba(134, 144, 156, 0.1);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .diff-highlight {
+    @apply bg-warning-500/30 text-warning-100;
+    animation: diffPulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes diffPulse {
+    0%, 100% { background-color: rgba(255, 125, 0, 0.2); }
+    50% { background-color: rgba(255, 125, 0, 0.4); }
+  }
+  
+  .tooltip-baihua {
+    @apply absolute z-50 px-3 py-2 bg-warning-500 text-white text-sm rounded shadow-lg max-w-xs;
+    @apply transform -translate-y-full -translate-x-1/2 left-1/2 mb-2;
+  }
+  
+  .tooltip-baihua::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #FF7D00;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1D2129;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #4E5969;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #86909C;
+  }
+}
