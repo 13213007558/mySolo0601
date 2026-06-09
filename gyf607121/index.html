@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>能源园区电表复核台 - 青岚光伏二区</title>
+    <meta name="description" content="青岚光伏二区电表数据复核工具，支持CSV/Excel导入、自动校验、问题记录管理、倍率配置、复核摘要导出" />
+    <meta name="theme-color" content="#0F1115" />
+    <script type="module">
+      if (import.meta.hot?.on) {
+        import.meta.hot.on('vite:error', (error) => {
+          if (error.err) {
+            console.error(
+              [error.err.message, error.err.frame].filter(Boolean).join('\n'),
+            )
+          }
+        })
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
