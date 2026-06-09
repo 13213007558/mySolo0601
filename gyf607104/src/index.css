@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(15, 52, 96, 0.2);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 52, 96, 0.4);
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg shadow-card border border-gray-100 transition-all duration-300;
+  }
+  
+  .card:hover {
+    @apply shadow-hover;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-500 text-white rounded font-medium transition-all duration-200 hover:bg-primary-600 hover:shadow-md active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-primary-500 border border-primary-500 rounded font-medium transition-all duration-200 hover:bg-primary-50 active:scale-95;
+  }
+  
+  .btn-gold {
+    @apply px-4 py-2 bg-accent-gold text-white rounded font-medium transition-all duration-200 hover:shadow-md active:scale-95;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .desensitized {
+    @apply bg-gray-200 text-gray-200 select-none cursor-not-allowed;
+    text-shadow: 0 0 8px rgba(0,0,0,0.1);
+  }
+  
+  .desensitized::selection {
+    background: transparent;
+  }
+  
+  .accordion-content {
+    @apply overflow-hidden transition-all duration-300 ease-out;
+  }
+  
+  .timeline-line {
+    @apply absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary-200 via-primary-300 to-primary-200;
+  }
+  
+  .timeline-dot {
+    @apply absolute left-4 w-3 h-3 rounded-full -translate-x-1/2 border-2 border-white;
+  }
+  
+  .supplemental-border {
+    @apply border-2 border-accent-gold;
+    box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.2);
+  }
+  
+  .supplemental-badge {
+    @apply bg-accent-gold/10 text-accent-gold border border-accent-gold/30;
+  }
+}
