@@ -1,0 +1,100 @@
+[
+  {
+    "id": "REC-201",
+    "areaLevel1": "A区",
+    "areaLevel2": "A3栋",
+    "areaLevel3": "地上四层",
+    "boxType": "一级配电箱",
+    "boxId": "A3-4F-001",
+    "riskLevel": "medium",
+    "isAnomaly": false,
+    "anomalyType": "",
+    "inspectionDate": "2026-06-07",
+    "inspector": "张明",
+    "location": "A3栋地上四层楼梯间",
+    "leakTests": [
+      { "id": "LT-201-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 29, "isNormal": true },
+      { "id": "LT-201-2", "ratedCurrent": 30, "testCurrent": 30, "actionTimeMs": 30, "isNormal": true }
+    ],
+    "qrPhotos": [
+      { "id": "QR-201-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electrical%20distribution%20box%20stairwell%20boundary%20condition&image_size=landscape_4_3", "qrCode": "A3-4F-001", "qrRecognized": true }
+    ],
+    "dispatchOrder": null,
+    "reviewOpinions": []
+  },
+  {
+    "id": "REC-202",
+    "areaLevel1": "B区",
+    "areaLevel2": "B3栋",
+    "areaLevel3": "地上一层",
+    "boxType": "二级配电箱",
+    "boxId": "B3-1F-001",
+    "riskLevel": "medium",
+    "isAnomaly": false,
+    "anomalyType": "",
+    "inspectionDate": "2026-06-07",
+    "inspector": "赵刚",
+    "location": "B3栋地上一层入口",
+    "leakTests": [
+      { "id": "LT-202-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 5, "isNormal": true }
+    ],
+    "qrPhotos": [
+      { "id": "QR-202-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=secondary%20power%20distribution%20box%20entrance&image_size=landscape_4_3", "qrCode": "B3-1F-001", "qrRecognized": true }
+    ],
+    "dispatchOrder": null,
+    "reviewOpinions": []
+  },
+  {
+    "id": "REC-203",
+    "areaLevel1": "C区",
+    "areaLevel2": "C1栋",
+    "areaLevel3": "地下车库",
+    "boxType": "开关箱",
+    "boxId": "C1-B1-002",
+    "riskLevel": "low",
+    "isAnomaly": false,
+    "anomalyType": "",
+    "inspectionDate": "2026-06-08",
+    "inspector": "李伟",
+    "location": "C1栋地下车库消防通道",
+    "leakTests": [
+      { "id": "LT-203-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 8, "isNormal": true }
+    ],
+    "qrPhotos": [],
+    "dispatchOrder": null,
+    "reviewOpinions": []
+  },
+  {
+    "id": "REC-204",
+    "areaLevel1": "A区",
+    "areaLevel2": "A2栋",
+    "areaLevel3": "地下车库",
+    "boxType": "三级配电箱",
+    "boxId": "A2-B1-006",
+    "riskLevel": "high",
+    "isAnomaly": true,
+    "anomalyType": "leak_out_of_range",
+    "inspectionDate": "2026-06-08",
+    "inspector": "张明",
+    "location": "A2栋地下车库配电间",
+    "leakTests": [
+      { "id": "LT-204-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 31, "isNormal": false },
+      { "id": "LT-204-2", "ratedCurrent": 30, "testCurrent": 30, "actionTimeMs": 33, "isNormal": false },
+      { "id": "LT-204-3", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 4, "isNormal": false }
+    ],
+    "qrPhotos": [
+      { "id": "QR-204-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hazardous%20electrical%20panel%20underground%20basement&image_size=landscape_4_3", "qrCode": "A2-B1-006", "qrRecognized": true }
+    ],
+    "dispatchOrder": {
+      "id": "DSP-204",
+      "status": "dispatched",
+      "assignee": "王强",
+      "createdAt": "2026-06-08",
+      "deadline": "2026-06-12",
+      "description": "漏保测试多项异常，需全面检查更换"
+    },
+    "reviewOpinions": [
+      { "id": "RV-204-1", "reviewer": "陈工", "content": "已派单处理中", "createdAt": "2026-06-09", "result": "pending" }
+    ]
+  }
+]
