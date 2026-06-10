@@ -13,7 +13,8 @@ import {
   Clock,
   FileWarning,
   Eye,
-  Filter
+  Filter,
+  Bug
 } from 'lucide-react';
 import type { AcceptanceRecord, StatusHistory, AcceptanceStatus } from '@/types';
 import { ACCEPTANCE_STATUS_LABELS, USER_ROLE_LABELS } from '@/types';
@@ -28,6 +29,7 @@ import { RoleSelector } from './components/RoleSelector';
 import { StatsPanel } from './components/StatsPanel';
 import { RecordForm } from './components/RecordForm';
 import { ErrorToast } from './components/ErrorToast';
+import { SelfCheckModal } from './components/SelfCheckModal';
 
 function App() {
   const loadData = useAcceptanceStore((state) => state.loadData);
@@ -45,6 +47,7 @@ function App() {
   const [showForm, setShowForm] = useState(false);
   const [editingRecord, setEditingRecord] = useState<AcceptanceRecord | undefined>(undefined);
   const [showHistory, setShowHistory] = useState(false);
+  const [showSelfCheck, setShowSelfCheck] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -187,6 +190,14 @@ function App() {
                 审计追踪
               </button>
               <button
+                onClick={() => setShowSelfCheck(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 bg-opacity-20 hover:bg-opacity-30 rounded-lg font-medium transition-colors"
+                title="前端自检"
+              >
+                <Bug className="w-5 h-5" />
+                自检
+              </button>
+              <button
                 onClick={handleClearData}
                 className="flex items-center gap-2 px-4 py-2 bg-red-500 bg-opacity-10 hover:bg-opacity-20 rounded-lg font-medium transition-colors"
                 title="清空所有数据"
@@ -261,6 +272,10 @@ function App() {
 
       {showForm && (
         <RecordForm record={editingRecord} onClose={handleCloseForm} />
+      )}
+
+      {showSelfCheck && (
+        <SelfCheckModal onClose={() => setShowSelfCheck(false)} />
       )}
 
       <ErrorToast />
