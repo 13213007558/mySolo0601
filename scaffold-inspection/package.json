@@ -1,0 +1,27 @@
+{
+  "name": "scaffold-inspection",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5182",
+    "build": "vite build",
+    "preview": "vite preview --port 5182"
+  },
+  "dependencies": {
+    "vue": "^3.4.27",
+    "pinia": "^2.1.7",
+    "idb": "^8.0.0",
+    "dayjs": "^1.11.11",
+    "lucide-vue-next": "^0.396.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "vite": "^5.3.1",
+    "tailwindcss": "^3.4.4",
+    "postcss": "^8.4.38",
+    "autoprefixer": "^10.4.19",
+    "typescript": "^5.4.5",
+    "vue-tsc": "^2.0.19",
+    "@types/node": "^20.14.0"
+  }
+}
