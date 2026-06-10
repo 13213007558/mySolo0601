@@ -18,8 +18,6 @@ export const RecordForm: React.FC<RecordFormProps> = ({ record, onClose }) => {
   const records = useAcceptanceStore((state) => state.records);
   const createRecord = useAcceptanceStore((state) => state.createRecord);
   const updateRecord = useAcceptanceStore((state) => state.updateRecord);
-  const addEvidence = useAcceptanceStore((state) => state.addEvidence);
-  const removeEvidence = useAcceptanceStore((state) => state.removeEvidence);
   const currentUser = useAcceptanceStore((state) => state.currentUser);
   const addError = useAcceptanceStore((state) => state.addError);
 
@@ -112,25 +110,6 @@ export const RecordForm: React.FC<RecordFormProps> = ({ record, onClose }) => {
     }
 
     if (result.success) {
-      if (isEditing && record) {
-        localEvidence.forEach((ev) => {
-          const existing = record.evidence.find((e) => e.id === ev.id);
-          if (!existing) {
-            addEvidence(record.id, {
-              type: ev.type,
-              name: ev.name,
-              dataUrl: ev.dataUrl,
-              uploadedBy: ev.uploadedBy
-            });
-          }
-        });
-        record.evidence.forEach((ev) => {
-          const stillExists = localEvidence.find((e) => e.id === ev.id);
-          if (!stillExists) {
-            removeEvidence(record.id, ev.id);
-          }
-        });
-      }
       onClose();
     } else if (result.errors) {
       result.errors.forEach((err) => addError(err));

@@ -186,15 +186,18 @@ export const useAcceptanceStore = create<AcceptanceStore>((set, get) => ({
       return { success: false, error: result.error };
     }
 
-    if (toStatus === 'SUBMITTED') {
+    if (toStatus === 'SUBMITTED' || toStatus === 'ARCHIVABLE') {
       const evidenceErrors = validateEvidence(result.record.evidence);
       if (evidenceErrors.length > 0) {
-        return { success: false, error: evidenceErrors.map((e) => e.message).join('；') };
+        return {
+          success: false,
+          error: evidenceErrors.map((e) => e.message).join('；')
+        };
       }
     }
 
     const duplicateErrors = validateDuplicateAxis(result.record, records);
-    if (duplicateErrors.length > 0 && toStatus !== 'DRAFT') {
+    if (duplicateErrors.length > 0 && toStatus !== 'DRAFT' && toStatus !== 'REJECTED' && toStatus !== 'PENDING_EVIDENCE') {
       return { success: false, error: duplicateErrors.map((e) => e.message).join('；') };
     }
 
@@ -220,7 +223,9 @@ export const useAcceptanceStore = create<AcceptanceStore>((set, get) => ({
     const { records, filter, currentUser } = get();
     let result = [...records];
 
-    if (filter.status.length > 0) {
+    if (currentUser?.role === 'DOCUMENT_CONTROLLER') {
+      result = result.filter((r) => r.status === 'ARCHIVABLE');
+    } else if (filter.status.length > 0) {
       result = result.filter((r) => filter.status.includes(r.status));
     }
 

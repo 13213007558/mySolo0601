@@ -34,6 +34,7 @@ function App() {
   const records = useAcceptanceStore((state) => state.records);
   const history = useAcceptanceStore((state) => state.history);
   const currentUser = useAcceptanceStore((state) => state.currentUser);
+  const filter = useAcceptanceStore((state) => state.filter);
   const getFilteredRecords = useAcceptanceStore((state) => state.getFilteredRecords);
   const loadSampleData = useAcceptanceStore((state) => state.loadSampleData);
   const importRecords = useAcceptanceStore((state) => state.importRecords);
