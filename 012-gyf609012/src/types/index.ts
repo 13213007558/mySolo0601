@@ -1,4 +1,4 @@
-export type IssueStatus = 'draft' | 'pending' | 'replied' | 'completed' | 'cancelled'
+export type IssueStatus = 'draft' | 'pending' | 'replied' | 'returned' | 'completed' | 'cancelled'
 
 export type IssuePriority = 'high' | 'medium' | 'low'
 
@@ -74,6 +74,7 @@ export const STATUS_LABELS: Record<IssueStatus, string> = {
   draft: '草稿',
   pending: '待处理',
   replied: '已回复',
+  returned: '退回待改',
   completed: '已完成',
   cancelled: '已取消',
 }
@@ -82,6 +83,7 @@ export const STATUS_COLORS: Record<IssueStatus, string> = {
   draft: 'bg-slate-400',
   pending: 'bg-warning-500',
   replied: 'bg-industrial-500',
+  returned: 'bg-fire-500',
   completed: 'bg-success-500',
   cancelled: 'bg-slate-500',
 }

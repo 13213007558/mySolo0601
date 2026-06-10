@@ -8,6 +8,7 @@ import type {
   DesignReply,
   StatusRecord,
   IssuePriority,
+  AttachmentType,
 } from '@/types'
 import {
   loadIssuesFromStorage,
@@ -17,7 +18,7 @@ import {
   formatDate,
 } from '@/utils/storage'
 import { mockIssues } from '@/utils/mockData'
-import { DEFAULT_FILTERS } from '@/types'
+import { DEFAULT_FILTERS, STATUS_LABELS, CATEGORY_LABELS, SYSTEM_LABELS, ATTACHMENT_TYPE_LABELS } from '@/types'
 
 export const useIssueStore = defineStore('issue', () => {
   const issues = ref<CollisionIssue[]>([])
@@ -115,7 +116,7 @@ export const useIssueStore = defineStore('issue', () => {
     selectedIssueId.value = id
   }
 
-  function addIssue(issueData: Partial<CollisionIssue>): CollisionIssue {
+  function addIssue(issueData: any): CollisionIssue {
     const now = new Date().toISOString()
     const newIssue: CollisionIssue = {
       id: `ISSUE-${String(issues.value.length + 1).padStart(3, '0')}`,
@@ -132,8 +133,33 @@ export const useIssueStore = defineStore('issue', () => {
       status: issueData.status || 'draft',
       priority: issueData.priority || 'medium',
       description: issueData.description || '',
-      attachments: issueData.attachments || [],
-      designReplies: issueData.designReplies || [],
+      attachments: (issueData.attachments || []).map((att, idx) => ({
+        id: generateId(),
+        name: att.name,
+        type: att.type,
+        url: att.url,
+        uploadedBy: att.uploadedBy || currentUser.value,
+        uploadedAt: now,
+        version: (issueData.attachments || []).filter(a => a.type === att.type).slice(0, idx + 1).length,
+        remark: att.remark || '',
+      })),
+      designReplies: (issueData.designReplies || []).map((reply) => ({
+        id: reply.id || generateId(),
+        content: reply.content,
+        repliedBy: reply.repliedBy,
+        repliedAt: reply.repliedAt || now,
+        isLatest: true,
+        attachments: (reply.attachments || []).map((att, idx) => ({
+          id: generateId(),
+          name: att.name,
+          type: att.type,
+          url: att.url,
+          uploadedBy: att.uploadedBy || reply.repliedBy,
+          uploadedAt: now,
+          version: idx + 1,
+          remark: att.remark || '',
+        })),
+      })),
       statusHistory: [
         {
           id: generateId(),
@@ -188,34 +214,132 @@ export const useIssueStore = defineStore('issue', () => {
   function addAttachment(issueId: string, attachment: Omit<Attachment, 'id' | 'uploadedAt' | 'version'>) {
     const issue = issues.value.find((i) => i.id === issueId)
     if (issue) {
-      const sameTypeCount = issue.attachments.filter((a) => a.type === attachment.type).length
+      const sameTypeVersions = issue.attachments
+        .filter((a) => a.type === attachment.type)
+        .map((a) => a.version)
+      const maxVersion = sameTypeVersions.length > 0 ? Math.max(...sameTypeVersions) : 0
       const newAttachment: Attachment = {
         ...attachment,
         id: generateId(),
         uploadedAt: new Date().toISOString(),
-        version: sameTypeCount + 1,
+        version: maxVersion + 1,
       }
       issue.attachments.push(newAttachment)
       issue.updatedAt = new Date().toISOString()
+
+      const record: StatusRecord = {
+        id: generateId(),
+        fromStatus: issue.status,
+        toStatus: issue.status,
+        operator: currentUser.value,
+        operateTime: new Date().toISOString(),
+        remark: `新增附件：${newAttachment.name}（${newAttachment.type}, v${newAttachment.version}）`,
+      }
+      issue.statusHistory.push(record)
       saveIssues()
     }
   }
 
-  function addDesignReply(issueId: string, reply: Omit<DesignReply, 'id' | 'repliedAt' | 'isLatest'>) {
+  function addAttachmentToReply(
+    issueId: string,
+    replyId: string,
+    attachment: Omit<Attachment, 'id' | 'uploadedAt' | 'version'>
+  ) {
+    const issue = issues.value.find((i) => i.id === issueId)
+    if (issue) {
+      const reply = issue.designReplies.find((r) => r.id === replyId)
+      if (reply) {
+        const sameTypeVersions = reply.attachments
+          .filter((a) => a.type === attachment.type)
+          .map((a) => a.version)
+        const maxVersion = sameTypeVersions.length > 0 ? Math.max(...sameTypeVersions) : 0
+        const newAttachment: Attachment = {
+          ...attachment,
+          id: generateId(),
+          uploadedAt: new Date().toISOString(),
+          version: maxVersion + 1,
+        }
+        reply.attachments.push(newAttachment)
+        issue.updatedAt = new Date().toISOString()
+
+        const record: StatusRecord = {
+          id: generateId(),
+          fromStatus: issue.status,
+          toStatus: issue.status,
+          operator: currentUser.value,
+          operateTime: new Date().toISOString(),
+          remark: `设计回复新增附件：${newAttachment.name}（${newAttachment.type}, v${newAttachment.version}）`,
+        }
+        issue.statusHistory.push(record)
+        saveIssues()
+      }
+    }
+  }
+
+  function returnForRevision(id: string, remark: string = '') {
+    const issue = issues.value.find((i) => i.id === id)
+    if (issue && (issue.status === 'replied' || issue.status === 'pending')) {
+      changeStatus(id, 'returned', remark || '设计审查不通过，退回待改')
+    }
+  }
+
+  function submitIssue(id: string, remark: string = '') {
+    const issue = issues.value.find((i) => i.id === id)
+    if (issue && (issue.status === 'draft' || issue.status === 'returned')) {
+      changeStatus(id, 'pending', remark || '提交待处理')
+    }
+  }
+
+  function confirmCompleted(id: string, remark: string = '') {
+    const issue = issues.value.find((i) => i.id === id)
+    if (issue && (issue.status === 'replied' || issue.status === 'returned')) {
+      changeStatus(id, 'completed', remark || '现场确认整改完成')
+    }
+  }
+
+  function reopenIssue(id: string, remark: string = '') {
+    const issue = issues.value.find((i) => i.id === id)
+    if (issue && (issue.status === 'completed' || issue.status === 'cancelled')) {
+      changeStatus(id, 'pending', remark || '重新打开问题')
+    }
+  }
+
+  function cancelIssue(id: string, remark: string = '') {
+    const issue = issues.value.find((i) => i.id === id)
+    if (issue && issue.status !== 'completed' && issue.status !== 'cancelled') {
+      changeStatus(id, 'cancelled', remark || '问题取消')
+    }
+  }
+
+  function addDesignReply(issueId: string, reply: Omit<DesignReply, 'id' | 'repliedAt' | 'isLatest' | 'attachments'> & { attachments?: Omit<Attachment, 'id' | 'uploadedAt' | 'version'>[] }) {
     const issue = issues.value.find((i) => i.id === issueId)
     if (issue) {
       issue.designReplies.forEach((r) => (r.isLatest = false))
 
-      const newReply: DesignReply = {
-        ...reply,
+      const now = new Date().toISOString()
+      const processedAttachments: Attachment[] = (reply.attachments || []).map((att, idx) => ({
         id: generateId(),
-        repliedAt: new Date().toISOString(),
+        name: att.name,
+        type: att.type,
+        url: att.url,
+        uploadedBy: att.uploadedBy || reply.repliedBy,
+        uploadedAt: now,
+        version: idx + 1,
+        remark: att.remark || '',
+      }))
+
+      const newReply: DesignReply = {
+        content: reply.content,
+        repliedBy: reply.repliedBy,
+        attachments: processedAttachments,
+        id: generateId(),
+        repliedAt: now,
         isLatest: true,
       }
       issue.designReplies.push(newReply)
-      issue.updatedAt = new Date().toISOString()
+      issue.updatedAt = now
 
-      if (issue.status === 'pending') {
+      if (issue.status === 'pending' || issue.status === 'returned') {
         changeStatus(issueId, 'replied', '设计回复已更新')
       } else {
         saveIssues()
@@ -256,13 +380,13 @@ export const useIssueStore = defineStore('issue', () => {
       content += `【问题 ${index + 1}】${issue.id} - ${issue.title}\n`
       content += '-'.repeat(40) + '\n'
       content += `楼层：${issue.floor}\n`
-      content += `系统：${issue.system}\n`
-      content += `碰撞类型：${issue.category}\n`
+      content += `系统：${SYSTEM_LABELS[issue.system]}\n`
+      content += `碰撞类型：${CATEGORY_LABELS[issue.category]}\n`
       content += `位置：${issue.location}\n`
       content += `标高：${issue.elevation} ${issue.elevationUnit}\n`
       content += `责任专业：${issue.responsibleDept}\n`
       content += `责任人：${issue.assignee}\n`
-      content += `状态：${issue.status}\n`
+      content += `状态：${STATUS_LABELS[issue.status]}\n`
       content += `优先级：${issue.priority}\n`
       content += `问题描述：${issue.description}\n`
 
@@ -271,13 +395,28 @@ export const useIssueStore = defineStore('issue', () => {
         issue.designReplies.forEach((reply, idx) => {
           content += `  回复 ${idx + 1}（${formatDate(reply.repliedAt)} - ${reply.repliedBy}）：\n`
           content += `    ${reply.content}\n`
+          if (reply.attachments.length > 0) {
+            content += `    回复附件：\n`
+            reply.attachments.forEach((att) => {
+              content += `      - ${att.name}（${ATTACHMENT_TYPE_LABELS[att.type]}, v${att.version}）\n`
+            })
+          }
         })
       }
 
       if (issue.attachments.length > 0) {
         content += `\n附件（共${issue.attachments.length}个）：\n`
         issue.attachments.forEach((att) => {
-          content += `  - ${att.name}（${att.type}, v${att.version}, ${att.uploadedBy}）\n`
+          content += `  - ${att.name}（${ATTACHMENT_TYPE_LABELS[att.type]}, v${att.version}, ${att.uploadedBy}）\n`
+        })
+      }
+
+      if (issue.statusHistory.length > 1) {
+        content += `\n状态变更历史（共${issue.statusHistory.length}条）：\n`
+        issue.statusHistory.forEach((rec, idx) => {
+          const from = rec.fromStatus ? STATUS_LABELS[rec.fromStatus] : '无'
+          const to = STATUS_LABELS[rec.toStatus]
+          content += `  ${idx + 1}. ${formatDate(rec.operateTime)} ${rec.operator}：${from} → ${to}${rec.remark ? ' — ' + rec.remark : ''}\n`
         })
       }
 
@@ -317,8 +456,14 @@ export const useIssueStore = defineStore('issue', () => {
     updateIssue,
     changeStatus,
     addAttachment,
+    addAttachmentToReply,
     addDesignReply,
     updateAssignee,
+    submitIssue,
+    returnForRevision,
+    confirmCompleted,
+    reopenIssue,
+    cancelIssue,
     exportMeetingMinutes,
     downloadMinutes,
     resetToMockData,

@@ -15,6 +15,7 @@ const statusColors: Record<string, string> = {
   draft: '#94a3b8',
   pending: '#f59e0b',
   replied: '#3b82f6',
+  returned: '#ef4444',
   completed: '#22c55e',
   cancelled: '#64748b',
 }

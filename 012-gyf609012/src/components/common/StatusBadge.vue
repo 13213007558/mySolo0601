@@ -13,6 +13,7 @@ const statusBgClasses: Record<IssueStatus, string> = {
   draft: 'bg-slate-100 text-slate-700 border-slate-200',
   pending: 'bg-warning-50 text-warning-700 border-warning-200',
   replied: 'bg-industrial-50 text-industrial-700 border-industrial-200',
+  returned: 'bg-fire-50 text-fire-700 border-fire-200',
   completed: 'bg-success-50 text-success-700 border-success-200',
   cancelled: 'bg-slate-100 text-slate-500 border-slate-200',
 }
