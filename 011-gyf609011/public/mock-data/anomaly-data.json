@@ -1,0 +1,108 @@
+[
+  {
+    "id": "REC-101",
+    "areaLevel1": "A区",
+    "areaLevel2": "A1栋",
+    "areaLevel3": "地上三层",
+    "boxType": "一级配电箱",
+    "boxId": "A1-3F-001",
+    "riskLevel": "high",
+    "isAnomaly": true,
+    "anomalyType": "leak_out_of_range",
+    "inspectionDate": "2026-06-05",
+    "inspector": "李伟",
+    "location": "A1栋地上三层施工区",
+    "leakTests": [
+      { "id": "LT-101-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 35, "isNormal": false },
+      { "id": "LT-101-2", "ratedCurrent": 30, "testCurrent": 30, "actionTimeMs": 38, "isNormal": false }
+    ],
+    "qrPhotos": [
+      { "id": "QR-101-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=damaged%20electrical%20box%20construction%20hazard&image_size=landscape_4_3", "qrCode": "A1-3F-001", "qrRecognized": true }
+    ],
+    "dispatchOrder": {
+      "id": "DSP-101",
+      "status": "dispatched",
+      "assignee": "王强",
+      "createdAt": "2026-06-05",
+      "deadline": "2026-06-08",
+      "description": "漏保动作时间超出30ms，需紧急更换漏保"
+    },
+    "reviewOpinions": []
+  },
+  {
+    "id": "REC-102",
+    "areaLevel1": "B区",
+    "areaLevel2": "B1栋",
+    "areaLevel3": "地上二层",
+    "boxType": "二级配电箱",
+    "boxId": "B1-2F-002",
+    "riskLevel": "high",
+    "isAnomaly": true,
+    "anomalyType": "qr_failed",
+    "inspectionDate": "2026-06-05",
+    "inspector": "赵刚",
+    "location": "B1栋地上二层南侧",
+    "leakTests": [
+      { "id": "LT-102-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 16, "isNormal": true }
+    ],
+    "qrPhotos": [
+      { "id": "QR-102-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=blurred%20QR%20code%20on%20electrical%20equipment&image_size=landscape_4_3", "qrCode": "", "qrRecognized": false }
+    ],
+    "dispatchOrder": null,
+    "reviewOpinions": []
+  },
+  {
+    "id": "REC-103",
+    "areaLevel1": "A区",
+    "areaLevel2": "A1栋",
+    "areaLevel3": "地上一层",
+    "boxType": "开关箱",
+    "boxId": "A1-1F-001",
+    "riskLevel": "medium",
+    "isAnomaly": true,
+    "anomalyType": "duplicate_box",
+    "inspectionDate": "2026-06-06",
+    "inspector": "张明",
+    "location": "A1栋地上一层西侧",
+    "leakTests": [
+      { "id": "LT-103-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 20, "isNormal": true }
+    ],
+    "qrPhotos": [
+      { "id": "QR-103-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electrical%20switch%20box%20duplicate%20label&image_size=landscape_4_3", "qrCode": "A1-1F-001", "qrRecognized": true }
+    ],
+    "dispatchOrder": null,
+    "reviewOpinions": []
+  },
+  {
+    "id": "REC-104",
+    "areaLevel1": "C区",
+    "areaLevel2": "C2栋",
+    "areaLevel3": "地上一层",
+    "boxType": "三级配电箱",
+    "boxId": "C2-1F-004",
+    "riskLevel": "high",
+    "isAnomaly": true,
+    "anomalyType": "leak_out_of_range",
+    "inspectionDate": "2026-06-06",
+    "inspector": "李伟",
+    "location": "C2栋地上一层设备区",
+    "leakTests": [
+      { "id": "LT-104-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 3, "isNormal": false },
+      { "id": "LT-104-2", "ratedCurrent": 30, "testCurrent": 30, "actionTimeMs": 4, "isNormal": false }
+    ],
+    "qrPhotos": [
+      { "id": "QR-104-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electrical%20sub%20panel%20faulty%20circuit%20breaker&image_size=landscape_4_3", "qrCode": "C2-1F-004", "qrRecognized": true }
+    ],
+    "dispatchOrder": {
+      "id": "DSP-104",
+      "status": "rectified",
+      "assignee": "刘工",
+      "createdAt": "2026-06-06",
+      "deadline": "2026-06-09",
+      "description": "漏保动作时间<5ms，疑似漏保失灵，需更换"
+    },
+    "reviewOpinions": [
+      { "id": "RV-104-1", "reviewer": "陈工", "content": "已更换漏保，待复查确认", "createdAt": "2026-06-08", "result": "pending" }
+    ]
+  }
+]

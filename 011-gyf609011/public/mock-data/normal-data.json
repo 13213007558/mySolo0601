@@ -1,0 +1,135 @@
+[
+  {
+    "id": "REC-001",
+    "areaLevel1": "A区",
+    "areaLevel2": "A1栋",
+    "areaLevel3": "地上一层",
+    "boxType": "一级配电箱",
+    "boxId": "A1-1F-001",
+    "riskLevel": "low",
+    "isAnomaly": false,
+    "anomalyType": "",
+    "inspectionDate": "2026-06-01",
+    "inspector": "张明",
+    "location": "A1栋地上一层东侧走廊",
+    "leakTests": [
+      { "id": "LT-001-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 18, "isNormal": true },
+      { "id": "LT-001-2", "ratedCurrent": 30, "testCurrent": 30, "actionTimeMs": 22, "isNormal": true }
+    ],
+    "qrPhotos": [
+      { "id": "QR-001-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electrical%20distribution%20box%20with%20QR%20code%20label%20industrial%20setting&image_size=landscape_4_3", "qrCode": "A1-1F-001", "qrRecognized": true }
+    ],
+    "dispatchOrder": null,
+    "reviewOpinions": []
+  },
+  {
+    "id": "REC-002",
+    "areaLevel1": "A区",
+    "areaLevel2": "A2栋",
+    "areaLevel3": "地上二层",
+    "boxType": "二级配电箱",
+    "boxId": "A2-2F-003",
+    "riskLevel": "medium",
+    "isAnomaly": false,
+    "anomalyType": "",
+    "inspectionDate": "2026-06-02",
+    "inspector": "李伟",
+    "location": "A2栋地上二层施工区域",
+    "leakTests": [
+      { "id": "LT-002-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 25, "isNormal": true },
+      { "id": "LT-002-2", "ratedCurrent": 30, "testCurrent": 30, "actionTimeMs": 28, "isNormal": true }
+    ],
+    "qrPhotos": [
+      { "id": "QR-002-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=temporary%20power%20distribution%20box%20construction%20site&image_size=landscape_4_3", "qrCode": "A2-2F-003", "qrRecognized": true }
+    ],
+    "dispatchOrder": {
+      "id": "DSP-002",
+      "status": "dispatched",
+      "assignee": "王强",
+      "createdAt": "2026-06-03",
+      "deadline": "2026-06-10",
+      "description": "漏保动作时间偏长，需检查线路"
+    },
+    "reviewOpinions": []
+  },
+  {
+    "id": "REC-003",
+    "areaLevel1": "B区",
+    "areaLevel2": "B1栋",
+    "areaLevel3": "地下车库",
+    "boxType": "开关箱",
+    "boxId": "B1-B1-005",
+    "riskLevel": "low",
+    "isAnomaly": false,
+    "anomalyType": "",
+    "inspectionDate": "2026-06-03",
+    "inspector": "赵刚",
+    "location": "B1栋地下车库入口处",
+    "leakTests": [
+      { "id": "LT-003-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 12, "isNormal": true }
+    ],
+    "qrPhotos": [
+      { "id": "QR-003-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=switch%20box%20electrical%20panel%20underground%20garage&image_size=landscape_4_3", "qrCode": "B1-B1-005", "qrRecognized": true }
+    ],
+    "dispatchOrder": null,
+    "reviewOpinions": []
+  },
+  {
+    "id": "REC-004",
+    "areaLevel1": "B区",
+    "areaLevel2": "B2栋",
+    "areaLevel3": "地上三层",
+    "boxType": "三级配电箱",
+    "boxId": "B2-3F-002",
+    "riskLevel": "low",
+    "isAnomaly": false,
+    "anomalyType": "",
+    "inspectionDate": "2026-06-03",
+    "inspector": "张明",
+    "location": "B2栋地上三层西侧办公区",
+    "leakTests": [
+      { "id": "LT-004-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 10, "isNormal": true },
+      { "id": "LT-004-2", "ratedCurrent": 30, "testCurrent": 30, "actionTimeMs": 15, "isNormal": true }
+    ],
+    "qrPhotos": [
+      { "id": "QR-004-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electrical%20sub%20distribution%20box%20office%20building&image_size=landscape_4_3", "qrCode": "B2-3F-002", "qrRecognized": true }
+    ],
+    "dispatchOrder": null,
+    "reviewOpinions": [
+      { "id": "RV-004-1", "reviewer": "陈工", "content": "设备运行正常，漏保测试合格", "createdAt": "2026-06-04", "result": "pass" }
+    ]
+  },
+  {
+    "id": "REC-005",
+    "areaLevel1": "C区",
+    "areaLevel2": "C1栋",
+    "areaLevel3": "地上一层",
+    "boxType": "一级配电箱",
+    "boxId": "C1-1F-001",
+    "riskLevel": "medium",
+    "isAnomaly": false,
+    "anomalyType": "",
+    "inspectionDate": "2026-06-04",
+    "inspector": "李伟",
+    "location": "C1栋地上一层主配电间",
+    "leakTests": [
+      { "id": "LT-005-1", "ratedCurrent": 30, "testCurrent": 15, "actionTimeMs": 26, "isNormal": true },
+      { "id": "LT-005-2", "ratedCurrent": 30, "testCurrent": 30, "actionTimeMs": 27, "isNormal": true }
+    ],
+    "qrPhotos": [
+      { "id": "QR-005-1", "photoUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=main%20power%20distribution%20panel%20industrial&image_size=landscape_4_3", "qrCode": "C1-1F-001", "qrRecognized": true }
+    ],
+    "dispatchOrder": {
+      "id": "DSP-005",
+      "status": "reviewed",
+      "assignee": "刘工",
+      "createdAt": "2026-06-04",
+      "deadline": "2026-06-11",
+      "description": "漏保动作时间接近上限，需关注"
+    },
+    "reviewOpinions": [
+      { "id": "RV-005-1", "reviewer": "陈工", "content": "已检查线路，清洁接线端子", "createdAt": "2026-06-06", "result": "pass" },
+      { "id": "RV-005-2", "reviewer": "赵工", "content": "复查合格，漏保动作时间恢复正常", "createdAt": "2026-06-08", "result": "pass" }
+    ]
+  }
+]
