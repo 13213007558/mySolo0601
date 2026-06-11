@@ -1,10 +1,11 @@
-import { useReducer, useEffect, useMemo, useRef, useState } from "react";
+import { useReducer, useEffect, useMemo, useRef, useState, useCallback } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { useActionData, useLoaderData, useNavigation, useRevalidator } from "@remix-run/react";
 import { USERS, DIVE_PLANS, HISTORICAL_PROFILES } from "~/data/mockData";
 import { getSession, commitSession, destroySession } from "~/data/session.server";
-import type { User, DivePlan, HistoricalProfile, DiveAlert } from "~/data/types";
+import { getSharedDiveState, setSharedDiveState, resetSharedDiveState } from "~/data/sharedState.server";
+import type { User, DivePlan, HistoricalProfile, DiveAlert, Role } from "~/data/types";
 import LoginPanel from "~/components/LoginPanel";
 import PlanSelector from "~/components/PlanSelector";
 import TopBar from "~/components/TopBar";
@@ -20,7 +21,6 @@ import { generateDivePdf } from "~/utils/pdfGenerator";
 import { generateTokenId } from "~/utils/format";
 import { diveReducer } from "~/hooks/useDiveReducer";
 import type { DiveAction, DiveState, DecompressionStep } from "~/data/types";
-import type { Role } from "~/data/types";
 
 export const meta: MetaFunction = () => {
   return [
@@ -35,7 +35,7 @@ interface LoaderData {
   plans: DivePlan[];
   historicalProfiles: HistoricalProfile[];
   mode: "login" | "selectPlan" | "underway";
-  initialDiveState?: {
+  sharedDiveState: {
     planId: string | null;
     steps: DecompressionStep[] | null;
     currentStepId: string | null;
@@ -44,6 +44,19 @@ interface LoaderData {
     surfacedAt: number | null;
     emergencyReason: string | null;
     diveMode: string | null;
+  };
+}
+
+function serializeSharedState(state: DiveState): LoaderData["sharedDiveState"] {
+  return {
+    planId: state.plan?.id ?? null,
+    steps: state.plan?.steps ?? null,
+    currentStepId: state.currentStepId,
+    alerts: state.alerts,
+    tokenId: state.tokenId ?? null,
+    surfacedAt: state.surfacedAt ?? null,
+    emergencyReason: state.emergencyReason ?? null,
+    diveMode: state.mode,
   };
 }
 
@@ -58,27 +71,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
       plans: DIVE_PLANS,
       historicalProfiles: HISTORICAL_PROFILES,
       mode: "login",
+      sharedDiveState: serializeSharedState(getSharedDiveState()),
     });
   }
 
   const user = USERS.find(u => u.id === userId) ?? null;
-  const stateKey = `dive_state_${userId}`;
-  const rawState = session.get(stateKey);
-  let initialDiveState: LoaderData["initialDiveState"] = {
-    planId: null, steps: null, currentStepId: null, alerts: [],
-    tokenId: null, surfacedAt: null, emergencyReason: null, diveMode: null,
-  };
-  if (rawState && typeof rawState === "object") {
-    initialDiveState = rawState as LoaderData["initialDiveState"];
-  }
+  const shared = getSharedDiveState();
 
   return json<LoaderData>({
     authenticated: true,
     user,
     plans: DIVE_PLANS,
     historicalProfiles: HISTORICAL_PROFILES,
-    mode: initialDiveState?.planId ? "underway" : "selectPlan",
-    initialDiveState,
+    mode: shared.plan && shared.mode !== "login" ? "underway" : "selectPlan",
+    sharedDiveState: serializeSharedState(shared),
   });
 }
 
@@ -86,8 +92,6 @@ interface ActionData {
   ok: boolean;
   error?: string;
   redirectTo?: string;
-  setCookie?: string;
-  diveStatePatch?: Partial<LoaderData["initialDiveState"]>;
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -105,7 +109,6 @@ export async function action({ request }: ActionFunctionArgs) {
       return json<ActionData>({ ok: false, error: "工号或密码错误" }, { status: 401 });
     }
     if (selectedRole && user.role !== selectedRole && !(selectedRole === "diver" && user.role === "admin")) {
-      // 允许 admin 选择任意角色方式登录
       if (user.role !== "admin") {
         return json<ActionData>(
           { ok: false, error: `该账号为 ${user.role} 账号，请选择正确角色` },
@@ -125,10 +128,32 @@ export async function action({ request }: ActionFunctionArgs) {
     });
   }
 
-  // 以下操作需要登录
   const userId = session.get("userId") as string | undefined;
   if (!userId) {
     return json<ActionData>({ ok: false, error: "未登录" }, { status: 401 });
+  }
+  const user = USERS.find(u => u.id === userId);
+  if (!user) {
+    return json<ActionData>({ ok: false, error: "用户不存在" }, { status: 401 });
+  }
+
+  if (intent === "syncState") {
+    const stateRaw = form.get("stateJson") as string;
+    try {
+      const parsed = JSON.parse(stateRaw) as DiveState;
+      setSharedDiveState(parsed);
+      return json<ActionData>({ ok: true });
+    } catch (e: any) {
+      return json<ActionData>({ ok: false, error: "状态同步失败：" + e?.message }, { status: 400 });
+    }
+  }
+
+  if (intent === "resetDive") {
+    if (user.role !== "instructor" && user.role !== "admin") {
+      return json<ActionData>({ ok: false, error: "无权限" }, { status: 403 });
+    }
+    resetSharedDiveState();
+    return json<ActionData>({ ok: true });
   }
 
   if (intent === "export") {
@@ -153,46 +178,166 @@ export async function action({ request }: ActionFunctionArgs) {
   return json<ActionData>({ ok: true });
 }
 
+const BROADCAST_CHANNEL = "dive-checkstation-sync";
+const SHARED_STORAGE_KEY = "dive_checkstation_shared_v1";
+
 export default function Index() {
   const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const nav = useNavigation();
+  const revalidator = useRevalidator();
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  // dive state (客户端状态机)
-  const initFromLoader = (): DiveState => {
+  const initFromShared = (): DiveState => {
     if (!loaderData.authenticated || !loaderData.user) {
       return { mode: "login", currentStepId: null, plan: null, alerts: [] };
     }
-    const init = loaderData.initialDiveState;
-    if (init && init.planId && init.steps) {
-      const plan = loaderData.plans.find(p => p.id === init.planId) ?? null;
+    const s = loaderData.sharedDiveState;
+    if (s.planId && s.steps) {
+      const plan = loaderData.plans.find(p => p.id === s.planId) ?? null;
       if (plan) {
-        const mergedPlan: DivePlan = { ...plan, steps: init.steps };
-        const mode = (init.diveMode === "emergency" ? "emergency" : init.surfacedAt ? "completed" : "underway") as DiveState["mode"];
+        const mergedPlan: DivePlan = { ...plan, steps: s.steps };
+        const mode = (
+          s.diveMode === "emergency" ? "emergency"
+          : s.diveMode === "completed" ? "completed"
+          : s.diveMode === "underway" ? "underway"
+          : s.surfacedAt ? "completed"
+          : "underway"
+        ) as DiveState["mode"];
         return {
           mode,
-          currentStepId: init.currentStepId,
+          currentStepId: s.currentStepId,
           plan: mergedPlan,
-          alerts: init.alerts ?? [],
-          tokenId: init.tokenId ?? undefined,
-          surfacedAt: init.surfacedAt ?? undefined,
-          emergencyReason: init.emergencyReason ?? undefined,
+          alerts: s.alerts ?? [],
+          tokenId: s.tokenId ?? undefined,
+          surfacedAt: s.surfacedAt ?? undefined,
+          emergencyReason: s.emergencyReason ?? undefined,
         };
       }
     }
     return { mode: "selectPlan", currentStepId: null, plan: null, alerts: [] };
   };
 
-  const [diveState, rawDispatch] = useReducer(diveReducer, undefined, initFromLoader) as unknown as [DiveState, (a: DiveAction) => void];
+  const [diveState, rawDispatch] = useReducer(diveReducer, undefined, initFromShared) as unknown as [DiveState, (a: DiveAction) => void];
   const { beep } = useAlertSound();
   const [gps, setGps] = useState<{ lat?: number; lng?: number }>({});
   const [muted, setMuted] = useState(false);
   const [exporting, setExporting] = useState(false);
   const alertFiredRef = useRef<Set<string>>(new Set());
   const deviationWarnedRef = useRef<Set<string>>(new Set());
+  const syncTimerRef = useRef<number | null>(null);
+  const lastSyncedStateRef = useRef<string>("");
+  const bcRef = useRef<BroadcastChannel | null>(null);
+  const isExternalUpdateRef = useRef(false);
 
-  // GPS 周期更新
+  const persistAndBroadcast = useCallback((state: DiveState) => {
+    const json = JSON.stringify(state);
+    if (json === lastSyncedStateRef.current) return;
+    lastSyncedStateRef.current = json;
+
+    try {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(SHARED_STORAGE_KEY, json);
+        window.localStorage.setItem(SHARED_STORAGE_KEY + "_ts", String(Date.now()));
+      }
+    } catch (_) {}
+
+    try {
+      if (bcRef.current) {
+        bcRef.current.postMessage({ type: "state_update", state: json, ts: Date.now() });
+      }
+    } catch (_) {}
+
+    if (syncTimerRef.current) {
+      window.clearTimeout(syncTimerRef.current);
+    }
+    syncTimerRef.current = window.setTimeout(async () => {
+      try {
+        const form = new FormData();
+        form.append("intent", "syncState");
+        form.append("stateJson", json);
+        await fetch("/?index", { method: "POST", body: form });
+      } catch (_) {}
+    }, 150);
+  }, []);
+
+  const dispatch: (a: DiveAction) => void = useCallback((action) => {
+    isExternalUpdateRef.current = false;
+    rawDispatch(action);
+  }, []);
+
+  useEffect(() => {
+    if (diveState.mode === "login") return;
+    persistAndBroadcast(diveState);
+  }, [diveState, persistAndBroadcast]);
+
+  useEffect(() => {
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        bcRef.current = new BroadcastChannel(BROADCAST_CHANNEL);
+        bcRef.current.onmessage = (ev) => {
+          if (ev.data?.type === "state_update" && ev.data?.state) {
+            try {
+              const incoming: DiveState = JSON.parse(ev.data.state);
+              isExternalUpdateRef.current = true;
+              rawDispatch({ type: "RESET" } as DiveAction);
+              if (incoming.mode === "selectPlan" || incoming.mode === "login") {
+                rawDispatch({ type: "RESET" } as DiveAction);
+              } else if (incoming.plan) {
+                rawDispatch({ type: "START_DIVE", plan: incoming.plan } as DiveAction);
+                incoming.alerts.forEach(a => {
+                  rawDispatch({ type: "TRIGGER_ALERT", stepId: a.stepId, message: a.message } as DiveAction);
+                  if (a.acknowledged) {
+                    rawDispatch({ type: "ACK_ALERT", alertId: a.id } as DiveAction);
+                  }
+                });
+                if (incoming.mode === "emergency" && incoming.emergencyReason) {
+                  rawDispatch({ type: "EMERGENCY_ASCENT", reason: incoming.emergencyReason } as DiveAction);
+                }
+                if (incoming.mode === "completed" && incoming.tokenId && incoming.surfacedAt) {
+                  rawDispatch({ type: "CONFIRM_SURFACE", time: incoming.surfacedAt, tokenId: incoming.tokenId } as DiveAction);
+                }
+              }
+            } catch (_) {}
+          }
+        };
+      }
+    } catch (_) {}
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === SHARED_STORAGE_KEY && e.newValue) {
+        try {
+          const incoming: DiveState = JSON.parse(e.newValue);
+          isExternalUpdateRef.current = true;
+          if (incoming.mode === "selectPlan" || incoming.mode === "login") {
+            rawDispatch({ type: "RESET" } as DiveAction);
+          } else if (incoming.plan) {
+            rawDispatch({ type: "START_DIVE", plan: incoming.plan } as DiveAction);
+            incoming.alerts.forEach(a => {
+              rawDispatch({ type: "TRIGGER_ALERT", stepId: a.stepId, message: a.message } as DiveAction);
+              if (a.acknowledged) {
+                rawDispatch({ type: "ACK_ALERT", alertId: a.id } as DiveAction);
+              }
+            });
+            if (incoming.mode === "emergency" && incoming.emergencyReason) {
+              rawDispatch({ type: "EMERGENCY_ASCENT", reason: incoming.emergencyReason } as DiveAction);
+            }
+            if (incoming.mode === "completed" && incoming.tokenId && incoming.surfacedAt) {
+              rawDispatch({ type: "CONFIRM_SURFACE", time: incoming.surfacedAt, tokenId: incoming.tokenId } as DiveAction);
+            }
+          }
+        } catch (_) {}
+      }
+    };
+    try { window.addEventListener("storage", onStorage); } catch (_) {}
+
+    return () => {
+      try { bcRef.current?.close(); } catch (_) {}
+      try { window.removeEventListener("storage", onStorage); } catch (_) {}
+      if (syncTimerRef.current) window.clearTimeout(syncTimerRef.current);
+    };
+  }, []);
+
   useEffect(() => {
     if (loaderData.mode === "login") return;
     let cancelled = false;
@@ -205,7 +350,6 @@ export default function Index() {
     return () => { cancelled = true; clearInterval(id); };
   }, [loaderData.mode]);
 
-  // 登录错误
   useEffect(() => {
     if (actionData && !actionData.ok && actionData.error && loaderData.mode === "login") {
       setLoginError(actionData.error);
@@ -214,7 +358,6 @@ export default function Index() {
     }
   }, [actionData, loaderData.mode]);
 
-  // 持续偏离检测 & 告警触发
   useEffect(() => {
     if (!diveState.plan) return;
     const id = setInterval(() => {
@@ -231,7 +374,7 @@ export default function Index() {
             rawDispatch({
               type: "TRIGGER_ALERT",
               stepId: s.id,
-              message: `深度 ${s.plannedDepth}m 停留偏离计划超 3 分钟（超时 ${dev - 180 + 180}s），请立即上浮`,
+              message: `深度 ${s.plannedDepth}m 停留偏离计划超 3 分钟，请立即上浮`,
             } as DiveAction);
             if (!muted) beep("alert");
           } else if (dev > 30 && !deviationWarnedRef.current.has(s.id)) {
@@ -244,7 +387,6 @@ export default function Index() {
     return () => clearInterval(id);
   }, [diveState.plan, muted, beep]);
 
-  // 新告警声音
   useEffect(() => {
     if (diveState.alerts.length > 0 && !muted) {
       const last = diveState.alerts[diveState.alerts.length - 1];
@@ -262,19 +404,24 @@ export default function Index() {
     return signed >= 1 && (loaderData.user?.role === "instructor" || loaderData.user?.role === "admin");
   }, [diveState, loaderData.user]);
 
-  // ===== 业务动作 =====
   const handleCheckin = async (stepId: string) => {
     if (!diveState.plan || !loaderData.user) return;
+    if (loaderData.user.role !== "diver") return;
+    const step = diveState.plan.steps.find(s => s.id === stepId);
+    if (!step || step.assignedDiverId !== loaderData.user.id) return;
     const { lat, lng } = gps.lat !== undefined ? gps : await getCurrentGps();
     const now = Date.now();
-    rawDispatch({ type: "CHECKIN", stepId, time: now, lat, lng } as DiveAction);
-    rawDispatch({ type: "START_COUNTING", stepId } as DiveAction);
+    dispatch({ type: "CHECKIN", stepId, time: now, lat, lng } as DiveAction);
+    dispatch({ type: "START_COUNTING", stepId } as DiveAction);
     beep("ok");
   };
 
   const handleDiverSign = (stepId: string, signature: string) => {
-    if (!loaderData.user) return;
-    rawDispatch({
+    if (!loaderData.user || loaderData.user.role !== "diver") return;
+    if (!diveState.plan) return;
+    const step = diveState.plan.steps.find(s => s.id === stepId);
+    if (!step || step.assignedDiverId !== loaderData.user.id) return;
+    dispatch({
       type: "DIVER_SIGN",
       stepId,
       signature,
@@ -285,8 +432,9 @@ export default function Index() {
   };
 
   const handleInstructorSign = (stepId: string, signature: string) => {
-    if (!loaderData.user || loaderData.user.role !== "instructor" && loaderData.user.role !== "admin") return;
-    rawDispatch({
+    if (!loaderData.user) return;
+    if (loaderData.user.role !== "instructor" && loaderData.user.role !== "admin") return;
+    dispatch({
       type: "INSTRUCTOR_SIGN",
       stepId,
       signature,
@@ -304,23 +452,24 @@ export default function Index() {
       steps: plan.steps.map(s => ({ ...s, status: (s.index === 0 ? "unlocked" : "locked") as DecompressionStep["status"] })),
       plannedStartTime: Date.now(),
     };
-    rawDispatch({ type: "START_DIVE", plan: fresh } as DiveAction);
+    dispatch({ type: "START_DIVE", plan: fresh } as DiveAction);
     beep("ok");
   };
 
   const handleEmergency = (reason: string) => {
-    rawDispatch({ type: "EMERGENCY_ASCENT", reason } as DiveAction);
+    dispatch({ type: "EMERGENCY_ASCENT", reason } as DiveAction);
   };
 
   const handleConfirmSurface = () => {
     if (!loaderData.user) return;
+    if (loaderData.user.role !== "instructor" && loaderData.user.role !== "admin") return;
     const tokenId = generateTokenId();
-    rawDispatch({ type: "CONFIRM_SURFACE", time: Date.now(), tokenId } as DiveAction);
+    dispatch({ type: "CONFIRM_SURFACE", time: Date.now(), tokenId } as DiveAction);
     beep("ok");
   };
 
   const handleAckAlert = (id: string) => {
-    rawDispatch({ type: "ACK_ALERT", alertId: id } as DiveAction);
+    dispatch({ type: "ACK_ALERT", alertId: id } as DiveAction);
   };
 
   const handleExport = async () => {
@@ -350,7 +499,6 @@ export default function Index() {
     }
   };
 
-  // ===== 渲染 =====
   if (diveState.mode === "login" || !loaderData.authenticated || !loaderData.user) {
     return <LoginPanel error={loginError} />;
   }
@@ -366,9 +514,9 @@ export default function Index() {
     );
   }
 
-  // 主作业界面
   const user = loaderData.user;
   const plan = diveState.plan;
+  const isSupportRole = user.role === "support";
   const relevantHistory = loaderData.historicalProfiles.filter(hp => hp.siteName === plan.siteName);
   const hasActiveAlerts = diveState.alerts.some(a => !a.acknowledged) || diveState.mode === "emergency";
 
@@ -393,7 +541,6 @@ export default function Index() {
 
       <main className="max-w-7xl mx-auto p-3 md:p-6">
         <div className="grid lg:grid-cols-[1fr_380px] gap-4 md:gap-6">
-          {/* 左侧：阶梯表 + Profile */}
           <section className="space-y-4 md:space-y-6 min-w-0">
             <div>
               <div className="flex items-end justify-between mb-3">
@@ -407,6 +554,7 @@ export default function Index() {
                   </h2>
                   <p className="text-xs text-slate-400 mt-1 pl-3">
                     自上而下按深度逐级完成 · 未签完当前阶 <strong className="text-indicator-amber">无法解锁</strong> 下一阶 · 未完成所有阶梯 <strong className="text-indicator-red">禁止签发可出水令牌</strong>
+                    {isSupportRole && <span className="ml-2 text-indicator-cyan">（支援席只读模式）</span>}
                   </p>
                 </div>
                 <div className="hidden md:flex items-center gap-3 text-xs reading-mono">
@@ -422,6 +570,7 @@ export default function Index() {
                 currentUser={user}
                 users={USERS}
                 isEmergency={diveState.mode === "emergency"}
+                isSupport={isSupportRole}
                 onCheckin={handleCheckin}
                 onDiverSign={handleDiverSign}
                 onInstructorSign={handleInstructorSign}
@@ -435,7 +584,6 @@ export default function Index() {
             />
           </section>
 
-          {/* 右侧：支援面板 */}
           <aside className="lg:sticky lg:top-24 space-y-4 md:space-y-6 self-start">
             <SupportPanel state={diveState} />
           </aside>
@@ -445,7 +593,7 @@ export default function Index() {
       <EmergencyButton
         disabled={
           diveState.mode === "completed" ||
-          (user.role !== "instructor" && user.role !== "diver" && user.role !== "admin") ||
+          isSupportRole ||
           nav.state !== "idle"
         }
         onConfirm={handleEmergency}
