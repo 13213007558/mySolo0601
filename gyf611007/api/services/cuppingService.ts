@@ -73,6 +73,7 @@ export function tryInvalidateSample(sampleId: number): {
   maxReached: boolean;
   shouldDowngradeBatch: boolean;
   batchId: number | null;
+  batchReEvalCount: number;
 } {
   const sample = repo.getSampleById(sampleId);
   if (!sample) {
@@ -82,17 +83,15 @@ export function tryInvalidateSample(sampleId: number): {
       maxReached: false,
       shouldDowngradeBatch: false,
       batchId: null,
+      batchReEvalCount: 0,
     };
   }
 
   const newCount = repo.invalidateSample(sampleId);
+  const batchReEvalCount = repo.incrementBatchReEvalCount(sample.batch_id);
   const maxReached = newCount >= MAX_INVALIDATE_COUNT;
 
-  const samples = repo.getSamplesByBatchId(sample.batch_id);
-  const allMaxed = samples.every((s) => s.invalidate_count >= MAX_INVALIDATE_COUNT);
-  const anyScored = samples.some((s) => s.status === "scored");
-
-  const shouldDowngradeBatch = maxReached && !anyScored && allMaxed;
+  const shouldDowngradeBatch = maxReached;
 
   if (shouldDowngradeBatch) {
     repo.downgradeBatch(sample.batch_id);
@@ -104,6 +103,7 @@ export function tryInvalidateSample(sampleId: number): {
     maxReached,
     shouldDowngradeBatch,
     batchId: sample.batch_id,
+    batchReEvalCount,
   };
 }
 
@@ -155,6 +155,20 @@ export function generateCertificateContent(batchId: number): string {
   };
 
   return JSON.stringify(content, null, 2);
+}
+
+export function autoCreateCertificateDraft(batchId: number): {
+  created: boolean;
+  certificateId: number | null;
+} {
+  const existing = repo.getCertificateByBatchId(batchId);
+  if (existing) {
+    return { created: false, certificateId: existing.id };
+  }
+
+  const contentJson = generateCertificateContent(batchId);
+  const cert = repo.createCertificate(batchId, contentJson);
+  return { created: true, certificateId: cert.id };
 }
 
 export function getNextSampleToEvaluate(batchId: number): Sample | null {

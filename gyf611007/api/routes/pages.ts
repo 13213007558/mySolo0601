@@ -299,7 +299,7 @@ router.post(
 
     const allScored = service.checkIfAllSamplesScored(batchId);
     if (allScored) {
-      service.generateCertificateContent(batchId);
+      service.autoCreateCertificateDraft(batchId);
     }
 
     const updatedSample = repo.getSampleById(sampleId)!;

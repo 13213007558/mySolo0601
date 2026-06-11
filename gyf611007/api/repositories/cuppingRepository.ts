@@ -40,6 +40,14 @@ export function downgradeBatch(id: number): void {
   db.prepare("UPDATE batches SET status = 'downgraded' WHERE id = ?").run(id);
 }
 
+export function incrementBatchReEvalCount(id: number): number {
+  const batch = getBatchById(id);
+  if (!batch) return 0;
+  const newCount = (batch.re_eval_count || 0) + 1;
+  db.prepare("UPDATE batches SET re_eval_count = ? WHERE id = ?").run(newCount, id);
+  return newCount;
+}
+
 export function getSamplesByBatchId(batchId: number): Sample[] {
   return db
     .prepare("SELECT * FROM samples WHERE batch_id = ? ORDER BY order_index ASC")
