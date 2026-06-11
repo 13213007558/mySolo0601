@@ -234,28 +234,40 @@ export const useGradingStore = create<GradingState & GradingActions>(
       const required = currentSlice.requiredAnnotations;
       if (required.length === 0) return 100;
 
-      let completed = 0;
+      let completedRequired = 0;
       required.forEach((type) => {
-        const hasType = annotations.some((a) => a.type === type);
-        if (hasType) completed++;
+        const count = annotations.filter((a) => a.type === type).length;
+        if (count >= 1) completedRequired++;
       });
 
-      const coverage = Math.min(annotations.length / required.length / 2, 1) * 30;
-      const typeCoverage = (completed / required.length) * 70;
+      const requiredCoverage = (completedRequired / required.length) * 80;
 
-      return Math.round(Math.min(typeCoverage + coverage, 100));
+      const optionalTypes: AnnotationType[] = ["inclusion"];
+      let optionalBonus = 0;
+      optionalTypes.forEach((type) => {
+        if (!required.includes(type)) {
+          const count = annotations.filter((a) => a.type === type).length;
+          if (count >= 1) optionalBonus += 10;
+        }
+      });
+
+      const totalRequired = required.reduce(
+        (sum, t) => sum + annotations.filter((a) => a.type === t).length,
+        0
+      );
+      const densityBonus = totalRequired >= required.length * 2 ? 10 : totalRequired >= required.length * 1.5 ? 5 : 0;
+
+      return Math.round(Math.min(requiredCoverage + optionalBonus + densityBonus, 100));
     },
 
     isProgressComplete: () => {
-      const progress = get().calculateProgress();
       const { annotations, currentSlice } = get();
-      if (progress < 100) return false;
+      const required = currentSlice.requiredAnnotations;
 
-      const hasAllTypes = currentSlice.requiredAnnotations.every((type) =>
+      const hasAllRequired = required.every((type) =>
         annotations.some((a) => a.type === type)
       );
-      const minAnnotations = currentSlice.requiredAnnotations.length * 1;
-      return hasAllTypes && annotations.length >= minAnnotations;
+      return hasAllRequired;
     },
 
     saveVersion: (comment) => {

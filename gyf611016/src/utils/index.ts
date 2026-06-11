@@ -74,7 +74,7 @@ export function getMockSlices(): JadeSlice[] {
       origin: "新疆和田地区",
       category: "软玉（和田玉）",
       weight: 28.6,
-      requiredAnnotations: ["crack", "impurity", "inclusion"],
+      requiredAnnotations: ["crack", "impurity"],
     },
     {
       id: "slice_002",
@@ -88,7 +88,7 @@ export function getMockSlices(): JadeSlice[] {
       origin: "缅甸帕敢",
       category: "硬玉（翡翠）",
       weight: 18.3,
-      requiredAnnotations: ["crack", "impurity", "inclusion"],
+      requiredAnnotations: ["crack", "impurity"],
     },
     {
       id: "slice_003",
@@ -102,7 +102,7 @@ export function getMockSlices(): JadeSlice[] {
       origin: "河南南阳",
       category: "独山玉",
       weight: 45.2,
-      requiredAnnotations: ["crack", "impurity", "inclusion"],
+      requiredAnnotations: ["crack", "impurity"],
     },
   ];
 }
