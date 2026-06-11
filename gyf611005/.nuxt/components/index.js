@@ -1,12 +1,12 @@
-export const WeighingCsvExportButton = () => import('../../components/weighing/CsvExportButton.vue' /* webpackChunkName: "components/weighing-csv-export-button" */).then(c => wrapFunctional(c.default || c))
-export const WeighingDeviationGauge = () => import('../../components/weighing/DeviationGauge.vue' /* webpackChunkName: "components/weighing-deviation-gauge" */).then(c => wrapFunctional(c.default || c))
-export const WeighingDualComparePanel = () => import('../../components/weighing/DualComparePanel.vue' /* webpackChunkName: "components/weighing-dual-compare-panel" */).then(c => wrapFunctional(c.default || c))
-export const WeighingHumidityTrendChart = () => import('../../components/weighing/HumidityTrendChart.vue' /* webpackChunkName: "components/weighing-humidity-trend-chart" */).then(c => wrapFunctional(c.default || c))
-export const WeighingPhotoCapture = () => import('../../components/weighing/PhotoCapture.vue' /* webpackChunkName: "components/weighing-photo-capture" */).then(c => wrapFunctional(c.default || c))
-export const WeighingProbeStatusCard = () => import('../../components/weighing/ProbeStatusCard.vue' /* webpackChunkName: "components/weighing-probe-status-card" */).then(c => wrapFunctional(c.default || c))
-export const WeighingCard = () => import('../../components/weighing/WeighingCard.vue' /* webpackChunkName: "components/weighing-card" */).then(c => wrapFunctional(c.default || c))
-export const WeighingTrendChart = () => import('../../components/weighing/WeighingTrendChart.vue' /* webpackChunkName: "components/weighing-trend-chart" */).then(c => wrapFunctional(c.default || c))
-export const WeighingWheelNumberPicker = () => import('../../components/weighing/WheelNumberPicker.vue' /* webpackChunkName: "components/weighing-wheel-number-picker" */).then(c => wrapFunctional(c.default || c))
+export { default as WeighingCsvExportButton } from '../../components/weighing/CsvExportButton.vue'
+export { default as WeighingDeviationGauge } from '../../components/weighing/DeviationGauge.vue'
+export { default as WeighingDualComparePanel } from '../../components/weighing/DualComparePanel.vue'
+export { default as WeighingHumidityTrendChart } from '../../components/weighing/HumidityTrendChart.vue'
+export { default as WeighingPhotoCapture } from '../../components/weighing/PhotoCapture.vue'
+export { default as WeighingProbeStatusCard } from '../../components/weighing/ProbeStatusCard.vue'
+export { default as WeighingCard } from '../../components/weighing/WeighingCard.vue'
+export { default as WeighingTrendChart } from '../../components/weighing/WeighingTrendChart.vue'
+export { default as WeighingWheelNumberPicker } from '../../components/weighing/WheelNumberPicker.vue'
 
 // nuxt/nuxt.js#8607
 function wrapFunctional(options) {

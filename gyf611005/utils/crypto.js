@@ -62,7 +62,8 @@ export function generateHashedRecord(record, previousHash) {
   return Object.assign({}, record, {
     data_hash: dataHash,
     previous_hash: previousHash || null,
-    hash_timestamp: recordToHash.timestamp
+    hash_timestamp: recordToHash.timestamp,
+    nonce: recordToHash.nonce
   })
 }
 
@@ -91,11 +92,10 @@ export function verifyHashChain(records) {
     }
     recordToVerify.timestamp = record.hash_timestamp
     
-    if (!record.nonce) {
-      recordToVerify.nonce = 0
-    } else {
-      recordToVerify.nonce = record.nonce
+    if (typeof record.nonce === 'undefined' || record.nonce === null) {
+      return { valid: false, invalidIndex: i }
     }
+    recordToVerify.nonce = record.nonce
     
     var calculatedHash = generateDataHash(recordToVerify)
     
@@ -171,9 +171,12 @@ export function verifyRecordHash(record) {
     delete recordCopy.previous_hash
     delete recordCopy.hash_timestamp
     recordCopy.timestamp = record.hash_timestamp
-    if (record.nonce) {
-      recordCopy.nonce = record.nonce
+    
+    if (typeof record.nonce === 'undefined' || record.nonce === null) {
+      return false
     }
+    recordCopy.nonce = record.nonce
+    
     var calculated = generateDataHash(recordCopy)
     return calculated === record.data_hash
   } catch (e) {
