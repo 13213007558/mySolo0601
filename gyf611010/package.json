@@ -1,0 +1,26 @@
+{
+  "name": "cheese-wheel-temp-probe",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lit": "^3.1.0",
+    "@shoelace-style/shoelace": "^2.15.0",
+    "@lit-labs/context": "^0.5.0",
+    "idb": "^8.0.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
+    "qrcode": "^1.5.3"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5",
+    "typescript": "~5.4.0",
+    "vite": "^5.2.0"
+  }
+}
