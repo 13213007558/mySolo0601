@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { css } from '../../styled-system/css'
 import { PageHeader, PageContent } from '@/components/layout/AppLayout'
 import { Card, CardHeader, CardTitle, CardBody, CardFooter } from '@/components/ui/Card'
@@ -18,7 +18,8 @@ import {
   AlertCircle,
   Settings2,
   ChevronDown,
-  FolderUp
+  FolderUp,
+  Lock
 } from 'lucide-react'
 
 export function UploadPage() {
@@ -28,18 +29,31 @@ export function UploadPage() {
     currentLightingPresetId, 
     setCurrentLightingPresetId,
     addImage,
-    setCurrentPage
+    setCurrentPage,
+    getBatchLightingPreset,
+    images
   } = useAppStore()
   
   const [selectedBatchId, setSelectedBatchId] = useState(batches[0]?.id || '')
   const [previewImages, setPreviewImages] = useState<{ file: File; url: string; id: string }[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [showPresetDropdown, setShowPresetDropdown] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
 
-  const selectedPreset = lightingPresets.find(p => p.id === currentLightingPresetId)
+  const batchPreset = getBatchLightingPreset(selectedBatchId)
+  const presetLocked = batchPreset !== null && batchPreset !== currentLightingPresetId
+  const selectedPreset = lightingPresets.find(p => p.id === (batchPreset || currentLightingPresetId))
   const selectedBatch = batches.find(b => b.id === selectedBatchId)
+
+  useEffect(() => {
+    if (batchPreset && batchPreset !== currentLightingPresetId) {
+      setCurrentLightingPresetId(batchPreset)
+    }
+  }, [selectedBatchId, batchPreset, currentLightingPresetId, setCurrentLightingPresetId])
+
+  const currentBatchHasImages = images.some(img => img.batchId === selectedBatchId)
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (!files) return
@@ -85,6 +99,13 @@ export function UploadPage() {
   const handleUpload = () => {
     if (!selectedBatchId || previewImages.length === 0) return
 
+    if (batchPreset && currentLightingPresetId !== batchPreset) {
+      setUploadError(`该批次已绑定「${lightingPresets.find(p => p.id === batchPreset)?.name}」，须使用同一光照预设上传`)
+      return
+    }
+
+    setUploadError(null)
+
     previewImages.forEach((img, index) => {
       const newImage: OysterImage = {
         id: `img-${Date.now()}-${index}`,
@@ -92,7 +113,7 @@ export function UploadPage() {
         name: img.file.name,
         batchId: selectedBatchId,
         uploadTime: new Date().toISOString().replace('T', ' ').substring(0, 19),
-        lightingPreset: currentLightingPresetId,
+        lightingPreset: batchPreset || currentLightingPresetId,
         status: 'pending',
       }
       addImage(newImage)
@@ -306,6 +327,24 @@ export function UploadPage() {
                     </button>
                   </div>
                 </CardBody>
+                {uploadError && (
+                  <div className={css({
+                    mx: '5',
+                    mb: '4',
+                    p: '3',
+                    borderRadius: 'lg',
+                    bg: 'danger/10',
+                    border: '1px solid',
+                    borderColor: 'danger/20',
+                    display: 'flex',
+                    gap: '2',
+                  })}>
+                    <AlertCircle size={16} className={css({ color: 'danger', flexShrink: 0, mt: '1px' })} />
+                    <p className={css({ fontSize: 'xs', color: 'danger', m: 0, lineHeight: '1.5', fontWeight: '500' })}>
+                      {uploadError}
+                    </p>
+                  </div>
+                )}
                 <CardFooter>
                   <Button variant="secondary" onClick={() => setPreviewImages([])}>
                     取消
@@ -367,7 +406,15 @@ export function UploadPage() {
 
             <Card variant="default" padding="md">
               <CardHeader>
-                <CardTitle>光照预设</CardTitle>
+                <div className={css({ display: 'flex', justifyContent: 'space-between', alignItems: 'center' })}>
+                  <CardTitle>光照预设</CardTitle>
+                  {currentBatchHasImages && (
+                    <Badge variant="info">
+                      <Lock size={10} />
+                      批次已锁定
+                    </Badge>
+                  )}
+                </div>
               </CardHeader>
               <CardBody>
                 <div className={css({ mb: '4' })}>
@@ -377,15 +424,17 @@ export function UploadPage() {
                       p: '3',
                       borderRadius: 'lg',
                       border: '1px solid',
-                      borderColor: 'border',
-                      bg: 'surface',
-                      cursor: 'pointer',
+                      borderColor: currentBatchHasImages ? 'primary/40' : 'border',
+                      bg: currentBatchHasImages ? 'primary/5' : 'surface',
+                      cursor: currentBatchHasImages ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      _hover: { borderColor: 'primary' },
+                      _hover: { 
+                        borderColor: currentBatchHasImages ? 'primary/40' : 'primary' 
+                      },
                     })}
-                    onClick={() => setShowPresetDropdown(!showPresetDropdown)}
+                    onClick={() => !currentBatchHasImages && setShowPresetDropdown(!showPresetDropdown)}
                   >
                     <div className={css({ display: 'flex', alignItems: 'center', gap: '3' })}>
                       <div className={css({
@@ -406,14 +455,18 @@ export function UploadPage() {
                         </p>
                       </div>
                     </div>
-                    <ChevronDown size={18} className={css({ 
-                      color: 'text.muted',
-                      transform: showPresetDropdown ? 'rotate(180deg)' : 'none',
-                      transition: 'transform 0.2s',
-                    })} />
+                    {currentBatchHasImages ? (
+                      <Lock size={18} className={css({ color: 'primary' })} />
+                    ) : (
+                      <ChevronDown size={18} className={css({ 
+                        color: 'text.muted',
+                        transform: showPresetDropdown ? 'rotate(180deg)' : 'none',
+                        transition: 'transform 0.2s',
+                      })} />
+                    )}
                   </div>
                   
-                  {showPresetDropdown && (
+                  {!currentBatchHasImages && showPresetDropdown && (
                     <div className={css({
                       mt: '2',
                       borderRadius: 'lg',

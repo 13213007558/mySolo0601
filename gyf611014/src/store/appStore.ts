@@ -10,8 +10,10 @@ interface AppState {
   selectedImageId: string | null
   setSelectedImageId: (id: string | null) => void
   updateImageStatus: (id: string, status: OysterImage['status']) => void
-  confirmImageRings: (id: string, ringCount: number) => void
+  confirmImageRings: (id: string, ringCount: number, growthRings?: GrowthRing[]) => void
+  markImageAbnormal: (id: string, reason: string) => void
   addImage: (image: OysterImage) => void
+  getBatchLightingPreset: (batchId: string) => string | null
   
   batches: Batch[]
   selectedBatchId: string | null
@@ -52,21 +54,105 @@ export const useAppStore = create<AppState>((set) => ({
   updateImageStatus: (id, status) => set((state) => ({
     images: state.images.map(img => img.id === id ? { ...img, status } : img)
   })),
-  confirmImageRings: (id, ringCount) => set((state) => ({
-    images: state.images.map(img => 
-      img.id === id 
-        ? { ...img, ringCount, status: 'confirmed' as const } 
+  confirmImageRings: (id, ringCount, growthRings) => set((state) => {
+    const currentImage = state.images.find(img => img.id === id)
+    if (!currentImage) return {}
+
+    const batchId = currentImage.batchId
+
+    const baselineId = currentImage.baselineImageId || 
+      state.images.find(img => 
+        img.batchId === batchId && 
+        img.id !== id && 
+        img.status === 'confirmed'
+      )?.id || null
+
+    let growthRate: number | undefined
+    if (growthRings && growthRings.length > 0 && baselineId) {
+      const baselineImage = state.images.find(img => img.id === baselineId)
+      if (baselineImage) {
+        const currentAvgRadius = growthRings.reduce((sum, r) => sum + r.radius, 0) / growthRings.length
+        const baselineRingCount = baselineImage.ringCount || currentImage.aiRingCount || 12
+        const baselineAvgRadius = (25 + (baselineRingCount - 1) * 16) / 2
+        const rawRate = ((currentAvgRadius - baselineAvgRadius) / baselineAvgRadius) * 100
+        growthRate = Math.round(Math.max(0, rawRate) * 100) / 100
+      }
+    } else if (growthRings && growthRings.length > 0) {
+      const currentAvgRadius = growthRings.reduce((sum, r) => sum + r.radius, 0) / growthRings.length
+      const normalized = (currentAvgRadius / 130) * 2.5
+      growthRate = Math.round(normalized * 100) / 100
+    }
+
+    const updatedImages = state.images.map(img =>
+      img.id === id
+        ? { ...img, ringCount, growthRate, status: 'confirmed' as const, baselineImageId: baselineId || img.baselineImageId }
         : img
-    ),
-    batches: state.batches.map(batch => {
-      const batchImages = state.images.filter(img => img.batchId === batch.id)
-      const confirmedImages = batchImages.filter(img => img.status === 'confirmed' || img.id === id)
+    )
+
+    const batchImages = updatedImages.filter(img => img.batchId === batchId)
+    const confirmedImages = batchImages.filter(img => img.status === 'confirmed')
+    
+    const totalRingCount = confirmedImages.reduce((sum, img) => sum + (img.ringCount || 0), 0)
+    const avgRingCount = confirmedImages.length > 0 
+      ? Math.round((totalRingCount / confirmedImages.length) * 10) / 10 
+      : undefined
+
+    const totalGrowthRate = confirmedImages.reduce((sum, img) => sum + (img.growthRate || 0), 0)
+    const avgGrowthRate = confirmedImages.length > 0
+      ? Math.round((totalGrowthRate / confirmedImages.length) * 100) / 100
+      : undefined
+
+    const allConfirmed = batchImages.length > 0 && confirmedImages.length === batchImages.length
+
+    const updatedBatches = state.batches.map(batch => {
+      if (batch.id !== batchId) return batch
       return {
         ...batch,
         confirmedCount: confirmedImages.length,
+        averageRingCount: avgRingCount,
+        averageGrowthRate: avgGrowthRate,
+        status: (allConfirmed ? 'completed' : batch.status) as 'active' | 'completed',
       }
     })
-  })),
+
+    return {
+      images: updatedImages,
+      batches: updatedBatches,
+    }
+  }),
+  markImageAbnormal: (id, reason) => set((state) => {
+    const image = state.images.find(img => img.id === id)
+    if (!image) return {}
+
+    const newOrder: Omit<InspectionOrder, 'id' | 'createTime'> = {
+      imageId: id,
+      batchId: image.batchId,
+      reason,
+      status: 'pending',
+    }
+
+    const orderId = `inspect-${Date.now()}`
+    const orderCreateTime = new Date().toISOString().replace('T', ' ').substring(0, 19)
+
+    return {
+      images: state.images.map(img =>
+        img.id === id
+          ? { ...img, isAbnormal: true, abnormalReason: reason, status: 'reviewing' as const }
+          : img
+      ),
+      inspectionOrders: [
+        { ...newOrder, id: orderId, createTime: orderCreateTime },
+        ...state.inspectionOrders,
+      ],
+    }
+  }),
+  getBatchLightingPreset: (batchId) => {
+    const state = useAppStore.getState()
+    const batch = state.batches.find(b => b.id === batchId)
+    if (batch?.lightingPreset) return batch.lightingPreset
+    const firstImage = state.images.find(img => img.batchId === batchId)
+    return firstImage?.lightingPreset || null
+  },
   addImage: (image) => set((state) => ({
     images: [image, ...state.images]
   })),

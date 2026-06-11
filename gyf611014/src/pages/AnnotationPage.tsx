@@ -23,10 +23,20 @@ import {
   Sparkles,
   RefreshCw,
   Eye,
-  EyeOff
+  EyeOff,
+  Flag,
+  X
 } from 'lucide-react'
 
 type ToolType = 'select' | 'add' | 'delete'
+
+const ABNORMAL_REASONS = [
+  { id: 'irregular_shape', label: '壳形不规则', desc: '壳形畸变，生长纹分布不均' },
+  { id: 'disordered_rings', label: '生长纹紊乱', desc: '生长纹断裂、重叠或缺失' },
+  { id: 'abnormal_growth', label: '生长率异常', desc: '环比增长率偏离正常范围' },
+  { id: 'suspected_disease', label: '疑似病害', desc: '壳面有腐蚀、变色或附着物' },
+  { id: 'sampling_error', label: '采样错误', desc: '样本破损、光照不足或图像模糊' },
+]
 
 export function AnnotationPage() {
   const { 
@@ -38,6 +48,7 @@ export function AnnotationPage() {
     removeGrowthRing,
     addGrowthRing,
     confirmImageRings,
+    markImageAbnormal,
     aiProcessing,
     setAiProcessing,
     isConfirmed,
@@ -55,6 +66,8 @@ export function AnnotationPage() {
   const [dragStartRing, setDragStartRing] = useState<GrowthRing | null>(null)
   const [showRings, setShowRings] = useState(true)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [showAbnormalDialog, setShowAbnormalDialog] = useState(false)
+  const [selectedAbnormalReason, setSelectedAbnormalReason] = useState<string>('')
   
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -316,7 +329,7 @@ export function AnnotationPage() {
 
   const submitConfirmation = () => {
     if (currentImage) {
-      confirmImageRings(currentImage.id, growthRings.length)
+      confirmImageRings(currentImage.id, growthRings.length, growthRings)
       setIsConfirmed(true)
       setShowConfirmDialog(false)
       
@@ -327,6 +340,23 @@ export function AnnotationPage() {
           setCurrentPage('batches')
         }
       }, 800)
+    }
+  }
+
+  const handleMarkAbnormal = () => {
+    if (!selectedAbnormalReason || !currentImage) return
+    const reason = ABNORMAL_REASONS.find(r => r.id === selectedAbnormalReason)
+    if (reason) {
+      markImageAbnormal(currentImage.id, `${reason.label}：${reason.desc}`)
+      setShowAbnormalDialog(false)
+      setSelectedAbnormalReason('')
+      setTimeout(() => {
+        if (currentImageIndex < pendingImages.length - 1) {
+          setCurrentImageIndex(prev => prev + 1)
+        } else {
+          setCurrentPage('inspection')
+        }
+      }, 500)
     }
   }
 
@@ -828,6 +858,15 @@ export function AnnotationPage() {
             <Button variant="outline" size="sm" onClick={() => setCurrentPage('batches')}>
               查看批次
             </Button>
+            <Button 
+              variant="danger" 
+              size="sm" 
+              leftIcon={<Flag size={14} />}
+              onClick={() => setShowAbnormalDialog(true)}
+              disabled={isConfirmed}
+            >
+              标记异常
+            </Button>
           </div>
         </div>
       </PageContent>
@@ -888,6 +927,139 @@ export function AnnotationPage() {
               <Button onClick={submitConfirmation}>
                 <CheckCircle2 size={16} />
                 确认提交
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAbnormalDialog && (
+        <div className={css({
+          position: 'fixed',
+          inset: 0,
+          bg: 'black/50',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50,
+        })}>
+          <div className={css({
+            width: '480px',
+            bg: 'white',
+            borderRadius: 'xl',
+            boxShadow: 'xl',
+            overflow: 'hidden',
+          })}>
+            <div className={css({
+              p: '6',
+              pb: '4',
+              borderBottom: '1px solid',
+              borderColor: 'border',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+            })}>
+              <div>
+                <div className={css({
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: 'full',
+                  bg: 'danger/10',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'danger',
+                  mb: '4',
+                })}>
+                  <Flag size={24} />
+                </div>
+                <h3 className={css({ fontSize: 'lg', fontWeight: '600', color: 'text.primary', m: 0, mb: '2' })}>
+                  标记异常样本
+                </h3>
+                <p className={css({ fontSize: 'sm', color: 'text.secondary', m: 0, lineHeight: '1.6' })}>
+                  选择异常原因，将自动推送送检工单并标记该样本为待检状态。
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowAbnormalDialog(false)
+                  setSelectedAbnormalReason('')
+                }}
+                className={css({
+                  p: '1.5',
+                  borderRadius: 'md',
+                  bg: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'text.muted',
+                  _hover: { bg: 'surface-hover' },
+                })}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className={css({ p: '5', maxHeight: '320px', overflowY: 'auto' })}>
+              <div className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
+                {ABNORMAL_REASONS.map((reason) => {
+                  const isSelected = selectedAbnormalReason === reason.id
+                  return (
+                    <div
+                      key={reason.id}
+                      onClick={() => setSelectedAbnormalReason(reason.id)}
+                      className={css({
+                        p: '3.5',
+                        borderRadius: 'lg',
+                        border: '2px solid',
+                        borderColor: isSelected ? 'danger' : 'border',
+                        bg: isSelected ? 'danger/5' : 'surface',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                        _hover: {
+                          borderColor: isSelected ? 'danger' : 'border-strong',
+                        },
+                      })}
+                    >
+                      <div className={css({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '1' })}>
+                        <span className={css({ fontSize: 'sm', fontWeight: '500', color: 'text.primary' })}>
+                          {reason.label}
+                        </span>
+                        {isSelected && (
+                          <Badge variant="danger">已选择</Badge>
+                        )}
+                      </div>
+                      <p className={css({ fontSize: 'xs', color: 'text.muted', m: 0, lineHeight: '1.5' })}>
+                        {reason.desc}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <div className={css({
+              p: '5',
+              bg: 'surface-muted',
+              borderTop: '1px solid',
+              borderColor: 'border',
+              display: 'flex',
+              gap: '3',
+              justifyContent: 'flex-end',
+            })}>
+              <Button 
+                variant="secondary" 
+                onClick={() => {
+                  setShowAbnormalDialog(false)
+                  setSelectedAbnormalReason('')
+                }}
+              >
+                取消
+              </Button>
+              <Button 
+                variant="danger"
+                onClick={handleMarkAbnormal}
+                disabled={!selectedAbnormalReason}
+              >
+                <Flag size={16} />
+                确认标记并推送工单
               </Button>
             </div>
           </div>

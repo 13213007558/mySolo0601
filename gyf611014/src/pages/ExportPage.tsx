@@ -25,7 +25,7 @@ import {
 type ExportFormat = 'excel' | 'pdf' | 'csv'
 
 export function ExportPage() {
-  const { batches, images } = useAppStore()
+  const { batches, images, lightingPresets } = useAppStore()
   const [selectedBatchIds, setSelectedBatchIds] = useState<string[]>([])
   const [exportFormat, setExportFormat] = useState<ExportFormat>('excel')
   const [searchQuery, setSearchQuery] = useState('')
@@ -66,7 +66,241 @@ export function ExportPage() {
   ]
 
   const handleExport = () => {
-    alert(`正在导出 ${selectedBatchIds.length} 个批次的数据...\n格式: ${exportFormat.toUpperCase()}`)
+    if (selectedBatchIds.length === 0) return
+
+    const exportBatchData = selectedBatchIds.map(batchId => {
+      const batch = batches.find(b => b.id === batchId)
+      const batchImages = images.filter(img => img.batchId === batchId && img.status === 'confirmed')
+      return {
+        batch,
+        images: batchImages,
+      }
+    })
+
+    const now = new Date().toISOString().replace(/[:T]/g, '-').substring(0, 19)
+    const filename = `牡蛎养殖补贴申报_${now}`
+
+    if (exportFormat === 'csv') {
+      const headers = [
+        '批次编号', '批次名称', '养殖场', '品种', '起始日期',
+        '样本编号', '样本名称', '上传时间', '光照预设',
+        '壳环计数', '增长率(%)', '基线影像ID', '是否异常',
+      ]
+      const rows: string[] = [headers.join(',')]
+
+      exportBatchData.forEach(({ batch, images: imgs }) => {
+        if (imgs.length === 0) {
+          rows.push([
+            batch?.id || '',
+            batch?.name || '',
+            batch?.farm || '',
+            batch?.breed || '',
+            batch?.startDate || '',
+            '', '', '', '', '', '', '', '',
+          ].map(v => `"${v}"`).join(','))
+        } else {
+          imgs.forEach(img => {
+            rows.push([
+              batch?.id || '',
+              batch?.name || '',
+              batch?.farm || '',
+              batch?.breed || '',
+              batch?.startDate || '',
+              img.id,
+              img.name,
+              img.uploadTime,
+              img.lightingPreset,
+              img.ringCount || '',
+              img.growthRate?.toFixed(2) || '',
+              img.baselineImageId || '',
+              img.isAbnormal ? '是' : '否',
+            ].map(v => `"${v}"`).join(','))
+          })
+        }
+      })
+
+      const csvContent = '\ufeff' + rows.join('\n')
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      triggerDownload(blob, `${filename}.csv`)
+
+    } else if (exportFormat === 'excel') {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>'
+      xml += '<?mso-application progid="Excel.Sheet"?>'
+      xml += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" '
+      xml += 'xmlns:o="urn:schemas-microsoft-com:office:office" '
+      xml += 'xmlns:x="urn:schemas-microsoft-com:office:excel" '
+      xml += 'xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">'
+      xml += '<Worksheet ss:Name="补贴申报数据">'
+      xml += '<Table>'
+
+      const headers = ['批次编号','批次名称','养殖场','品种','起始日期','样本编号','样本名称','上传时间','光照预设','壳环计数','增长率(%)','基线影像ID','是否异常']
+      xml += '<Row>' + headers.map(h => `<Cell><Data ss:Type="String">${h}</Data></Cell>`).join('') + '</Row>'
+
+      exportBatchData.forEach(({ batch, images: imgs }) => {
+        if (imgs.length === 0) return
+        imgs.forEach(img => {
+          const cells = [
+            batch?.id || '', batch?.name || '', batch?.farm || '', batch?.breed || '', batch?.startDate || '',
+            img.id, img.name, img.uploadTime, img.lightingPreset,
+            String(img.ringCount || ''), img.growthRate?.toFixed(2) || '',
+            img.baselineImageId || '', img.isAbnormal ? '是' : '否'
+          ]
+          xml += '<Row>' + cells.map(c => `<Cell><Data ss:Type="String">${c}</Data></Cell>`).join('') + '</Row>'
+        })
+      })
+
+      xml += '</Table></Worksheet>'
+
+      xml += '<Worksheet ss:Name="汇总">'
+      xml += '<Table>'
+      const sumHeaders = ['批次名称','养殖场','确认样本数','平均环数','平均增长率(mm)','预计补贴(元)','完成状态']
+      xml += '<Row>' + sumHeaders.map(h => `<Cell><Data ss:Type="String">${h}</Data></Cell>`).join('') + '</Row>'
+      exportBatchData.forEach(({ batch }) => {
+        const b = batch!
+        const eligible = b.confirmedCount > 0
+        const cells = [
+          b.name, b.farm, String(b.confirmedCount),
+          b.averageRingCount?.toString() || '-',
+          b.averageGrowthRate?.toString() || '-',
+          String(b.confirmedCount * 50),
+          eligible ? (b.status === 'completed' ? '已完成' : '部分完成') : '未完成'
+        ]
+        xml += '<Row>' + cells.map(c => `<Cell><Data ss:Type="String">${c}</Data></Cell>`).join('') + '</Row>'
+      })
+      xml += '</Table></Worksheet>'
+      xml += '</Workbook>'
+
+      const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8;' })
+      triggerDownload(blob, `${filename}.xls`)
+
+    } else {
+      let html = `<!DOCTYPE html><html><head><meta charset="UTF-8">`
+      html += `<title>牡蛎养殖补贴申报</title>`
+      html += `<style>
+        body { font-family: 'SimSun', serif; padding: 40px; color: #1a1a1a; }
+        h1 { text-align: center; font-size: 24px; margin-bottom: 8px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 32px; font-size: 14px; }
+        .stamp-box { border: 3px double #d97706; padding: 8px 16px; display: inline-block; color: #d97706; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+        th, td { border: 1px solid #ccc; padding: 10px 8px; text-align: left; }
+        th { background: #f1f5f9; font-weight: 600; }
+        .summary { margin-top: 40px; }
+        .meta { display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px; color: #555; }
+        .footer-signature { margin-top: 60px; display: flex; justify-content: space-between; font-size: 14px; }
+        .sign-block { width: 250px; }
+        .sign-line { border-bottom: 1px solid #333; height: 40px; display: flex; align-items: flex-end; padding-bottom: 4px; }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+      </style></head><body>`
+
+      html += `<div class="header-bar">
+        <div class="stamp-box">协会合规 · 补贴专用</div>
+        <div>导出时间：${new Date().toLocaleString('zh-CN')}</div>
+      </div>`
+      html += `<h1>牡蛎养殖壳环计数补贴申报表</h1>`
+      html += `<p class="subtitle">依据《牡蛎养殖协会壳环计数替代人工估龄管理规定》生成</p>`
+
+      html += `<h3>一、申报批次汇总</h3>`
+      html += `<table><thead><tr>`
+      const sumCols = ['序号','批次名称','养殖场','品种','起始日期','确认样本数','平均环数','平均增长率(mm)','预计补贴(元)','完成状态']
+      html += sumCols.map(c => `<th>${c}</th>`).join('')
+      html += `</tr></thead><tbody>`
+      exportBatchData.forEach(({ batch }, idx) => {
+        const b = batch!
+        const eligible = b.confirmedCount > 0
+        html += `<tr>
+          <td>${idx + 1}</td>
+          <td>${b.name}</td>
+          <td>${b.farm}</td>
+          <td>${b.breed}</td>
+          <td>${b.startDate}</td>
+          <td style="text-align:center;">${b.confirmedCount}/${b.totalCount}</td>
+          <td style="text-align:center;">${b.averageRingCount || '-'}</td>
+          <td style="text-align:center;">${b.averageGrowthRate || '-'}</td>
+          <td style="text-align:center; font-weight:bold;">¥${b.confirmedCount * 50}</td>
+          <td>${eligible ? (b.status === 'completed' ? '✅ 已完成' : '⏳ 部分完成') : '⚠️ 未完成'}</td>
+        </tr>`
+      })
+      const totalSubsidy = exportBatchData.reduce((s, d) => s + (d.batch?.confirmedCount || 0) * 50, 0)
+      const totalSamples = exportBatchData.reduce((s, d) => s + (d.batch?.confirmedCount || 0), 0)
+      html += `<tr style="font-weight:bold; background:#fef3c7;">
+        <td colspan="5" style="text-align:right;">合计</td>
+        <td style="text-align:center;">${totalSamples}</td>
+        <td colspan="2"></td>
+        <td style="text-align:center; color:#d97706;">¥${totalSubsidy.toLocaleString()}</td>
+        <td></td>
+      </tr>`
+      html += `</tbody></table>`
+
+      html += `<h3 class="summary">二、明细数据</h3>`
+      exportBatchData.forEach(({ batch, images: imgs }) => {
+        const b = batch!
+        html += `<h4 style="margin-top:24px; margin-bottom:8px;">批次：${b.name}（${b.farm}）</h4>`
+        if (imgs.length === 0) {
+          html += `<p style="color:#94a3b8; font-size:13px;">该批次暂无已确认样本数据</p>`
+          return
+        }
+        html += `<table><thead><tr>`
+        const detailCols = ['样本编号','图片名称','上传时间','光照预设','壳环计数','增长率(%)','基线影像ID','异常标记']
+        html += detailCols.map(c => `<th>${c}</th>`).join('')
+        html += `</tr></thead><tbody>`
+        imgs.forEach(img => {
+          html += `<tr>
+            <td>${img.id}</td>
+            <td>${img.name}</td>
+            <td>${img.uploadTime}</td>
+            <td>${lightingPresets.find(p => p.id === img.lightingPreset)?.name || img.lightingPreset}</td>
+            <td style="text-align:center;">${img.ringCount}</td>
+            <td style="text-align:center;">${img.growthRate?.toFixed(2) || '-'}</td>
+            <td>${img.baselineImageId || '-'}</td>
+            <td style="text-align:center;">${img.isAbnormal ? '🔴 ' + (img.abnormalReason || '异常') : '✅ 正常'}</td>
+          </tr>`
+        })
+        html += `</tbody></table>`
+      })
+
+      html += `<div class="footer-signature">
+        <div class="sign-block">
+          <div class="sign-line">操作员签字：</div>
+          <div style="margin-top:8px; font-size:12px; color:#888;">日期：___________</div>
+        </div>
+        <div class="sign-block">
+          <div class="sign-line">技术负责人：</div>
+          <div style="margin-top:8px; font-size:12px; color:#888;">日期：___________</div>
+        </div>
+        <div class="sign-block">
+          <div class="sign-line" style="justify-content:center;">（协会盖章处）</div>
+          <div style="margin-top:8px; font-size:12px; color:#888; text-align:center;">日期：___________</div>
+        </div>
+      </div>`
+
+      html += `</body></html>`
+
+      const blob = new Blob([html], { type: 'application/pdf;charset=utf-8;' })
+      triggerDownload(blob, `${filename}.html`, true)
+    }
+  }
+
+  const triggerDownload = (blob: Blob, filename: string, openInNewTab = false) => {
+    const url = URL.createObjectURL(blob)
+    if (openInNewTab) {
+      const w = window.open(url, '_blank')
+      if (!w) {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      }
+    } else {
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 5000)
   }
 
   return (
