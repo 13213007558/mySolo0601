@@ -1,0 +1,44 @@
+[
+  {
+    "name": "history",
+    "path": "/history",
+    "component": "/Users/guo/pro/solo/workspaces/gyf611005/pages/history/index.vue",
+    "chunkName": "pages/history/index"
+  },
+  {
+    "name": "login",
+    "path": "/login",
+    "component": "/Users/guo/pro/solo/workspaces/gyf611005/pages/login.vue",
+    "chunkName": "pages/login"
+  },
+  {
+    "name": "review",
+    "path": "/review",
+    "component": "/Users/guo/pro/solo/workspaces/gyf611005/pages/review/index.vue",
+    "chunkName": "pages/review/index"
+  },
+  {
+    "name": "seal",
+    "path": "/seal",
+    "component": "/Users/guo/pro/solo/workspaces/gyf611005/pages/seal/index.vue",
+    "chunkName": "pages/seal/index"
+  },
+  {
+    "name": "weighing",
+    "path": "/weighing",
+    "component": "/Users/guo/pro/solo/workspaces/gyf611005/pages/weighing/index.vue",
+    "chunkName": "pages/weighing/index"
+  },
+  {
+    "name": "workorder",
+    "path": "/workorder",
+    "component": "/Users/guo/pro/solo/workspaces/gyf611005/pages/workorder/index.vue",
+    "chunkName": "pages/workorder/index"
+  },
+  {
+    "name": "index",
+    "path": "/",
+    "component": "/Users/guo/pro/solo/workspaces/gyf611005/pages/index.vue",
+    "chunkName": "pages/index"
+  }
+]

@@ -1,0 +1,48 @@
+{
+  "name": "shanben-felt-weighing-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "善本毛毡称重台 - 省图书馆善本库房高精度纸张湿度测量系统",
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore ."
+  },
+  "dependencies": {
+    "nuxt": "^2.17.3",
+    "vue": "^2.7.14",
+    "vue-router": "^3.6.5",
+    "vuex": "^3.6.2",
+    "element-ui": "^2.15.14",
+    "chart.js": "^2.9.4",
+    "vue-chartjs": "^3.5.1",
+    "dayjs": "^1.11.10",
+    "papaparse": "^5.4.1",
+    "idb": "^6.1.5",
+    "js-sha256": "^0.10.1"
+  },
+  "devDependencies": {
+    "@nuxtjs/style-resources": "^1.2.1",
+    "sass": "^1.69.5",
+    "sass-loader": "^10.4.1",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.7.1",
+    "eslint-loader": "^4.0.2",
+    "@babel/preset-env": "^7.23.5",
+    "@babel/plugin-transform-runtime": "^7.23.4",
+    "core-js": "^3.34.0",
+    "regenerator-runtime": "^0.14.1"
+  },
+  "engines": {
+    "node": ">=14.0.0 <=18.17.0"
+  },
+  "browserslist": [
+    "IE 11",
+    "last 2 Chrome versions",
+    "last 2 Safari versions",
+    "iOS >= 12",
+    "Android >= 8"
+  ]
+}

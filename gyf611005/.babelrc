@@ -1,0 +1,22 @@
+{
+  "presets": [
+    ["@babel/preset-env", {
+      "targets": {
+        "ie": "11",
+        "chrome": "80",
+        "safari": "13"
+      },
+      "useBuiltIns": "usage",
+      "corejs": 3
+    }]
+  ],
+  "plugins": [
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-syntax-dynamic-import"
+  ],
+  "env": {
+    "test": {
+      "presets": [["@babel/preset-env", { "targets": { "node": "current" } }]]
+    }
+  }
+}

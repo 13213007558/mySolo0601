@@ -1,0 +1,29 @@
+{
+  "WeighingCsvExportButton": {
+    "description": "Auto imported from components/weighing/CsvExportButton.vue"
+  },
+  "WeighingDeviationGauge": {
+    "description": "Auto imported from components/weighing/DeviationGauge.vue"
+  },
+  "WeighingDualComparePanel": {
+    "description": "Auto imported from components/weighing/DualComparePanel.vue"
+  },
+  "WeighingHumidityTrendChart": {
+    "description": "Auto imported from components/weighing/HumidityTrendChart.vue"
+  },
+  "WeighingPhotoCapture": {
+    "description": "Auto imported from components/weighing/PhotoCapture.vue"
+  },
+  "WeighingProbeStatusCard": {
+    "description": "Auto imported from components/weighing/ProbeStatusCard.vue"
+  },
+  "WeighingCard": {
+    "description": "Auto imported from components/weighing/WeighingCard.vue"
+  },
+  "WeighingTrendChart": {
+    "description": "Auto imported from components/weighing/WeighingTrendChart.vue"
+  },
+  "WeighingWheelNumberPicker": {
+    "description": "Auto imported from components/weighing/WheelNumberPicker.vue"
+  }
+}

@@ -1,0 +1,98 @@
+// ========== Mixins ==========
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin card($radius: $radius-lg) {
+  background: $color-surface;
+  border-radius: $radius;
+  box-shadow: $shadow-md;
+}
+
+@mixin touch-button($size: $touch-primary-size) {
+  min-width: $size;
+  min-height: $size;
+  border-radius: $radius-md;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all $transition-fast;
+  -webkit-tap-highlight-color: transparent;
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin deviation-color($value, $threshold: 0.3) {
+  @if $value <= $threshold * 0.6 {
+    color: $deviation-safe;
+  } @else if $value <= $threshold {
+    color: $deviation-warning;
+  } @else {
+    color: $deviation-danger;
+  }
+}
+
+@mixin status-dot($color) {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: $color;
+  display: inline-block;
+  
+  &.online {
+    animation: pulse-success 2s infinite;
+  }
+  
+  &.offline {
+    background: $color-text-muted;
+  }
+}
+
+@mixin input-disabled {
+  background: $color-bg-dark;
+  color: $color-text-muted;
+  cursor: not-allowed;
+}
+
+// 响应式断点
+@mixin desktop {
+  @media (min-width: 1200px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 768px) and (max-width: 1199px) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: 767px) {
+    @content;
+  }
+}

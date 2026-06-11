@@ -1,0 +1,315 @@
+// ========== 全局样式 ==========
+
+@import 'variables';
+@import 'mixins';
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: $font-family-body;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  background: $color-bg;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#__nuxt, #__layout {
+  height: 100%;
+}
+
+.app-container {
+  min-height: 100%;
+  background: $color-bg;
+}
+
+// 标题字体
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-display;
+  color: $color-text-primary;
+  margin: 0;
+}
+
+h1 { font-size: $font-size-2xl; font-weight: 600; }
+h2 { font-size: $font-size-xl; font-weight: 600; }
+h3 { font-size: $font-size-lg; font-weight: 600; }
+
+// 等宽数字显示（称重值、偏差）
+.mono-number {
+  font-family: $font-family-mono;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+// 称重显示屏
+.weighing-display {
+  font-family: $font-family-mono;
+  font-size: $font-size-weighing-display;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  color: $color-primary;
+}
+
+.weighing-display.small {
+  font-size: $font-size-2xl;
+}
+
+.weighing-display.danger {
+  color: $color-danger;
+  animation: pulse-danger 1.5s infinite;
+}
+
+.weighing-display.success {
+  color: $color-success;
+}
+
+// 标签样式
+.el-tag {
+  font-family: $font-family-body;
+  border-radius: $radius-sm;
+  padding: 2px 10px;
+}
+
+.el-tag--success {
+  background: rgba(61, 107, 79, 0.1);
+  color: $color-success;
+  border-color: rgba(61, 107, 79, 0.3);
+}
+
+.el-tag--danger {
+  background: rgba(179, 58, 58, 0.1);
+  color: $color-danger;
+  border-color: rgba(179, 58, 58, 0.3);
+}
+
+.el-tag--warning {
+  background: rgba(199, 139, 42, 0.1);
+  color: $color-warning;
+  border-color: rgba(199, 139, 42, 0.3);
+}
+
+.el-tag--info {
+  background: rgba(44, 95, 124, 0.1);
+  color: $color-info;
+  border-color: rgba(44, 95, 124, 0.3);
+}
+
+// 按钮覆盖
+.el-button {
+  border-radius: $radius-md;
+  font-family: $font-family-body;
+  transition: all $transition-fast;
+}
+
+.el-button--primary {
+  background: $color-primary;
+  border-color: $color-primary;
+  
+  &:hover {
+    background: $color-primary-light;
+    border-color: $color-primary-light;
+  }
+  
+  &:active {
+    background: $color-primary-dark;
+    border-color: $color-primary-dark;
+  }
+}
+
+.el-button--success {
+  background: $color-success;
+  border-color: $color-success;
+  
+  &:hover {
+    background: $color-success-light;
+    border-color: $color-success-light;
+  }
+}
+
+.el-button--danger {
+  background: $color-danger;
+  border-color: $color-danger;
+  
+  &:hover {
+    background: $color-danger-light;
+    border-color: $color-danger-light;
+  }
+}
+
+// 大按钮（戴棉手套操作）
+.btn-large {
+  @include touch-button(72px);
+  font-size: $font-size-lg;
+  font-weight: 600;
+}
+
+.btn-primary-large {
+  @extend .btn-large;
+  background: $color-primary;
+  color: #fff;
+  border: none;
+  
+  &:hover {
+    background: $color-primary-light;
+  }
+}
+
+.btn-number {
+  @include touch-button;
+  background: $color-surface;
+  color: $color-text-primary;
+  border: 2px solid $color-bg-dark;
+  font-size: $font-size-xl;
+  font-weight: 600;
+  
+  &:hover {
+    border-color: $color-primary;
+    background: rgba(74, 55, 40, 0.05);
+  }
+  
+  &:active {
+    background: $color-primary;
+    color: #fff;
+    transform: scale(0.95);
+  }
+}
+
+// 卡片样式
+.page-card {
+  @include card;
+  padding: $space-xl;
+  margin-bottom: $space-lg;
+}
+
+// 流程步骤线
+.process-line {
+  position: relative;
+  padding-left: 40px;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: $color-bg-dark;
+  }
+  
+  .step {
+    position: relative;
+    padding-bottom: $space-lg;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: -34px;
+      top: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: $color-surface;
+      border: 3px solid $color-primary;
+      z-index: 1;
+    }
+    
+    &.completed::before {
+      background: $color-success;
+      border-color: $color-success;
+    }
+    
+    &.active::before {
+      background: $color-primary;
+      animation: pulse-success 2s infinite;
+    }
+    
+    &.error::before {
+      background: $color-danger;
+      border-color: $color-danger;
+      animation: pulse-danger 1.5s infinite;
+    }
+  }
+}
+
+// 异常闪烁
+.blink-danger {
+  animation: blink 1s infinite;
+  color: $color-danger;
+}
+
+// 表格样式
+.el-table {
+  background: $color-surface;
+  border-radius: $radius-md;
+  overflow: hidden;
+  
+  th {
+    background: $color-bg !important;
+    color: $color-text-primary !important;
+    font-weight: 600;
+    font-family: $font-family-display;
+  }
+}
+
+// 表单样式
+.el-form-item__label {
+  font-family: $font-family-display;
+  color: $color-text-primary;
+  font-weight: 500;
+}
+
+.el-input__inner {
+  border-radius: $radius-md;
+  border-color: $color-bg-dark;
+  
+  &:focus {
+    border-color: $color-primary;
+  }
+}
+
+// 滚动条美化
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $color-bg;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $color-primary-light;
+  border-radius: 4px;
+  
+  &:hover {
+    background: $color-primary;
+  }
+}
+
+// IE 兼容
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .weighing-display {
+    font-size: 48px;
+  }
+}
+
+// 打印样式
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .page-card {
+    box-shadow: none;
+    border: 1px solid $color-bg-dark;
+    page-break-inside: avoid;
+  }
+}
