@@ -1,0 +1,78 @@
+{
+  "build_id": "64f4e45d9ce091cfa6bae50796220a3e5b14ef43",
+  "files": {
+    "island-rechecktasklist.js": [
+      "chunk-LKF2RUJI.js",
+      "chunk-IUPFAGWG.js",
+      "chunk-J3IAKXSU.js"
+    ],
+    "island-swabmap.js": [
+      "chunk-OSVSRYOC.js",
+      "chunk-B4ZYIUCW.js",
+      "chunk-LKF2RUJI.js",
+      "chunk-IUPFAGWG.js",
+      "chunk-J3IAKXSU.js"
+    ],
+    "island-userroleswitch.js": [
+      "chunk-LKF2RUJI.js",
+      "chunk-IUPFAGWG.js",
+      "chunk-J3IAKXSU.js"
+    ],
+    "main.js": [
+      "chunk-D4CPDDRE.js",
+      "chunk-J3IAKXSU.js"
+    ],
+    "deserializer.js": [],
+    "signals.js": [
+      "chunk-D4CPDDRE.js",
+      "chunk-IUPFAGWG.js",
+      "chunk-J3IAKXSU.js"
+    ],
+    "chunk-D4CPDDRE.js": [],
+    "island-batchmanager.js": [
+      "chunk-LKF2RUJI.js",
+      "chunk-IUPFAGWG.js",
+      "chunk-J3IAKXSU.js"
+    ],
+    "island-componentdetail.js": [
+      "chunk-OSVSRYOC.js",
+      "chunk-B4ZYIUCW.js",
+      "chunk-LKF2RUJI.js",
+      "chunk-IUPFAGWG.js",
+      "chunk-J3IAKXSU.js"
+    ],
+    "chunk-OSVSRYOC.js": [
+      "chunk-B4ZYIUCW.js",
+      "chunk-LKF2RUJI.js",
+      "chunk-IUPFAGWG.js"
+    ],
+    "island-componentlist.js": [
+      "chunk-LKF2RUJI.js",
+      "chunk-IUPFAGWG.js",
+      "chunk-J3IAKXSU.js"
+    ],
+    "island-moisturemodal.js": [
+      "chunk-B4ZYIUCW.js",
+      "chunk-LKF2RUJI.js",
+      "chunk-IUPFAGWG.js",
+      "chunk-J3IAKXSU.js"
+    ],
+    "chunk-B4ZYIUCW.js": [
+      "chunk-LKF2RUJI.js",
+      "chunk-IUPFAGWG.js"
+    ],
+    "island-offlinequeuebanner.js": [
+      "chunk-LKF2RUJI.js",
+      "chunk-IUPFAGWG.js",
+      "chunk-J3IAKXSU.js"
+    ],
+    "chunk-LKF2RUJI.js": [
+      "chunk-J3IAKXSU.js"
+    ],
+    "chunk-IUPFAGWG.js": [
+      "chunk-J3IAKXSU.js"
+    ],
+    "chunk-J3IAKXSU.js": [],
+    "metafile.json": []
+  }
+}
