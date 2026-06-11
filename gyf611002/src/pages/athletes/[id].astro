@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ATHLETES } from '../../data/athletes';
+import { INITIAL_CHECKS } from '../../data/checks';
+import { WEAR_META } from '../../types';
+import { diffAngle, DIFF_THRESHOLD, wearBadgeColor } from '../../utils/station';
+
+export function getStaticPaths() {
+  return ATHLETES.map(a => ({ params: { id: a.id }, props: { athlete: a } }));
+}
+
+const { id } = Astro.params;
+const a = ATHLETES.find(x => x.id === id)!;
+const history = INITIAL_CHECKS.filter(c => c.athleteId === a.id)
+  .sort((x, y) => +new Date(y.checkedAt) - +new Date(x.checkedAt));
+const activeSus = a.suspension.find(s => s.status === 'active');
+---
+<BaseLayout title={`档案 · ${a.name}`}>
+  <div class="p-6 space-y-5 max-w-6xl mx-auto">
+    <a href="/athletes" class="text-ice-300 text-xs hover:underline">← 返回冰刀档案列表</a>
+
+    <div class="ice-card rounded-sm p-6">
+      <div class="flex items-start gap-5">
+        <div class="text-5xl">{a.flag}</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="font-display text-2xl text-frost tracking-widest">{a.name}</h1>
+            {activeSus && (
+              <span class="status-chip bg-rose-500/30 text-rose-200 border border-rose-400/60 !px-3 !py-1">🚫 正在禁赛期</span>
+            )}
+          </div>
+          <div class="mt-2 grid grid-cols-4 gap-4 font-mono text-sm">
+            <div><span class="text-ice-400 text-xs">国家</span><div class="text-frost">{a.country}</div></div>
+            <div><span class="text-ice-400 text-xs">ISU ID</span><div class="text-frost">{a.isuId}</div></div>
+            <div><span class="text-ice-400 text-xs">冰刀 QR</span><div class="text-ice-100">{a.bladeQr}</div></div>
+            <div><span class="text-ice-400 text-xs">检录次数</span><div class="text-frost">{history.length}</div></div>
+          </div>
+        </div>
+        <div class="grid place-items-center w-28 h-28 rounded-sm border-2 border-dashed border-ice-400/50 bg-ice-900/30 font-mono text-[10px] text-ice-300 text-center p-2 break-all">
+          QR模拟<br/>{a.bladeQr}
+        </div>
+      </div>
+    </div>
+
+    {a.suspension.length > 0 && (
+      <div class="ice-card rounded-sm p-5 border-rose-500/40">
+        <h2 class="font-display text-sm text-rose-200 tracking-widest mb-3">禁赛史 · SUSPENSION HISTORY</h2>
+        <div class="space-y-2">
+          {a.suspension.map(s => (
+            <div class={`flex items-center gap-4 p-3 rounded-sm border ${s.status === 'active' ? 'bg-rose-500/10 border-rose-400/50' : 'bg-ice-900/40 border-ice-700/60'}`}>
+              <span class={`status-chip border ${s.status === 'active' ? 'bg-rose-500/25 text-rose-300 border-rose-400/50' : 'bg-ice-500/15 text-ice-200 border-ice-400/30'}`}>
+                {s.status === 'active' ? '进行中' : '已结束'}
+              </span>
+              <div class="font-mono text-xs text-ice-200">{s.startDate} ~ {s.endDate || '至今'}</div>
+              <div class="text-sm text-frost">{s.reason}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="ice-card rounded-sm overflow-hidden">
+      <div class="px-5 py-3 border-b border-ice-700/60 bg-ice-950/40 flex items-center gap-3">
+        <h2 class="font-display text-sm text-frost tracking-widest">历次刃角检录 · 差值自动对比</h2>
+      </div>
+      <table class="check-table">
+        <thead>
+          <tr>
+            <th>时间</th>
+            <th>场次</th>
+            <th>左刃 °</th>
+            <th>右刃 °</th>
+            <th>对比上一次 Δ</th>
+            <th>磨损</th>
+            <th>标签</th>
+          </tr>
+        </thead>
+        <tbody>
+          {history.map((c, i) => {
+            const next = history[i + 1];
+            const dL = next ? diffAngle(c.angleLeft, next.angleLeft) : null;
+            const dR = next ? diffAngle(c.angleRight, next.angleRight) : null;
+            const over = (dL ?? 0) > DIFF_THRESHOLD || (dR ?? 0) > DIFF_THRESHOLD;
+            const wb = wearBadgeColor(c.wear);
+            return (
+              <tr class={over ? 'row-overlimit' : ''}>
+                <td class="font-mono text-ice-200 text-xs whitespace-nowrap">{new Date(c.checkedAt).toLocaleString('zh-CN', { hour12: false })}</td>
+                <td class="text-ice-100">{c.sessionId}</td>
+                <td class="font-mono">{c.angleLeft.toFixed(1)}</td>
+                <td class="font-mono">{c.angleRight.toFixed(1)}</td>
+                <td class="font-mono">
+                  {dL !== null ? (
+                    <span class="flex items-center gap-2">
+                      <span class={`status-chip border ${over ? 'bg-rose-500/25 text-rose-300 border-rose-400/50' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'}`}>L {dL.toFixed(1)}°</span>
+                      <span class={`status-chip border ${over ? 'bg-rose-500/25 text-rose-300 border-rose-400/50' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'}`}>R {dR!.toFixed(1)}°</span>
+                    </span>
+                  ) : <span class="text-ice-500">— 基准</span>}
+                </td>
+                <td><span class={`status-chip border ${wb.bg} ${wb.border} ${wb.text}`}>{WEAR_META[c.wear].label}</span></td>
+                <td>
+                  {c.postponeTag && (
+                    <span class="status-chip bg-amber-500/20 text-amber-300 border border-amber-400/50">暂缓参赛</span>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</BaseLayout>

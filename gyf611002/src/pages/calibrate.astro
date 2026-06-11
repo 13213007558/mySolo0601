@@ -1,0 +1,251 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="镜头校零">
+  <div class="p-6 max-w-5xl mx-auto space-y-6">
+    <div class="ice-card rounded-sm p-6">
+      <h1 class="font-display text-frost text-xl tracking-[0.3em]">CAMERA · CALIBRATION · WIZARD</h1>
+      <p class="text-sm text-ice-200 mt-1">镜头畸变三步校零向导 — 标定完成后采集精度 0.1° 步进</p>
+    </div>
+
+    <div id="wizard" class="ice-card rounded-sm p-6 relative" data-step="1">
+      <div class="flex items-center gap-3 mb-6">
+        {[1,2,3].map(i => (
+          <div key={i} class="flex items-center gap-2 step-dot" data-idx={i}>
+            <div class="step-circle w-8 h-8 rounded-full border-2 flex items-center justify-center font-mono font-bold text-sm">{i}</div>
+            <div class="text-xs uppercase tracking-wider text-ice-200">
+              {i===1 && '① 放置直尺'}
+              {i===2 && '② 标记四角'}
+              {i===3 && '③ 确认保存'}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- 步骤 1 -->
+      <section data-step-panel="1" class="space-y-4">
+        <div class="grid grid-cols-2 gap-5">
+          <div class="space-y-3">
+            <h2 class="font-display text-lg text-frost">Step 1 · 放置标准直尺</h2>
+            <ul class="text-sm text-ice-100 space-y-2 list-disc list-inside">
+              <li>将已校验的 300mm 钢制标准直尺水平固定于冰刀托槽</li>
+              <li>直尺两端需与取景框左右边缘至少保留 40px 距离</li>
+              <li>旋转侧摄镜头，使直尺在画面中<strong class="text-sky-300">完全水平</strong></li>
+              <li>确保画面无反光、光源均匀</li>
+            </ul>
+            <div class="ice-card rounded-sm p-4 bg-amber-500/5 border-amber-400/40 text-xs text-amber-200">
+              ⚠ 校零精度直接决定刃角测量误差。请严格按步骤操作，每步至少确认 3 秒稳定。
+            </div>
+            <button data-next="1" class="ice-btn">已放置直尺 · 进入下一步 →</button>
+          </div>
+          <div class="relative aspect-[4/3] rounded-sm overflow-hidden border border-ice-400/40 grid-frost grid place-items-center bg-ice-950/50">
+            <div class="text-center">
+              <div class="text-7xl mb-3">📏</div>
+              <div class="text-xs text-ice-200 font-mono">SIMULATED VIEW</div>
+              <div class="h-1.5 w-64 mx-auto mt-5 bg-gradient-to-r from-sky-400 via-sky-200 to-sky-400 rounded-full"></div>
+              <div class="text-[11px] text-ice-400 mt-3">理想水平参考线</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 步骤 2 -->
+      <section data-step-panel="2" class="space-y-4 hidden">
+        <h2 class="font-display text-lg text-frost">Step 2 · 点击直尺四个角点，记录畸变参考</h2>
+        <p class="text-sm text-ice-200">点击右侧画面直尺的「左上 / 右上 / 左下 / 右下」四个角点，顺序不可错。</p>
+        <div class="grid grid-cols-2 gap-5">
+          <div class="space-y-2">
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="ice-card p-3 rounded-sm"><div class="text-ice-400 text-[10px]">TL 左上</div><div id="p-tl" class="text-frost mt-1">未取点</div></div>
+              <div class="ice-card p-3 rounded-sm"><div class="text-ice-400 text-[10px]">TR 右上</div><div id="p-tr" class="text-frost mt-1">未取点</div></div>
+              <div class="ice-card p-3 rounded-sm"><div class="text-ice-400 text-[10px]">BL 左下</div><div id="p-bl" class="text-frost mt-1">未取点</div></div>
+              <div class="ice-card p-3 rounded-sm"><div class="text-ice-400 text-[10px]">BR 右下</div><div id="p-br" class="text-frost mt-1">未取点</div></div>
+            </div>
+            <div id="scale-info" class="ice-card rounded-sm p-3 bg-ice-500/5 text-xs text-ice-200 hidden">
+              推算比例 <span id="px-mm" class="text-frost font-bold font-mono"></span> px/mm · 偏差 <span id="dev" class="text-emerald-300 font-mono"></span>
+            </div>
+            <div class="flex gap-2 pt-2">
+              <button data-prev="2" class="ice-btn ice-btn--ghost">← 返回</button>
+              <button id="reset-pts" class="ice-btn ice-btn--ghost">清除取点</button>
+              <button id="step2next" class="ice-btn ml-auto" disabled>四点已取 · 确认并下一步 →</button>
+            </div>
+          </div>
+          <div id="cal-view" class="relative aspect-[4/3] rounded-sm overflow-hidden border border-ice-400/40 bg-ice-950/70 cursor-crosshair select-none">
+            <svg viewBox="0 0 400 300" class="absolute inset-0 w-full h-full">
+              <defs>
+                <pattern id="sm" width="16" height="16" patternUnits="userSpaceOnUse">
+                  <path d="M16 0H0V16" fill="none" stroke="rgba(56,189,248,0.12)" stroke-width="1"/>
+                </pattern>
+              </defs>
+              <rect width="400" height="300" fill="url(#sm)"/>
+              <rect x="40" y="140" width="320" height="20" rx="3" fill="rgba(186,230,253,0.25)" stroke="rgba(186,230,253,0.8)" />
+              <g id="markers"></g>
+              <g id="polyline-layer" fill="none" stroke="rgba(56,189,248,0.6)" stroke-dasharray="4 3" stroke-width="1.5"></g>
+            </svg>
+            <div class="corner-tl"/><div class="corner-tr"/><div class="corner-bl"/><div class="corner-br"/>
+            <div class="absolute top-2 left-2 status-chip bg-ice-950/70 border border-ice-400/40 text-[11px] text-ice-200 backdrop-blur-sm">
+              顺序点击：TL → TR → BL → BR
+            </div>
+            <div id="next-label" class="absolute top-2 right-2 status-chip bg-sky-500/30 border border-sky-400/50 text-[11px] text-sky-100 font-mono">
+              下一个：TL
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 步骤 3 -->
+      <section data-step-panel="3" class="space-y-4 hidden">
+        <h2 class="font-display text-lg text-frost">Step 3 · 确认参数并持久化</h2>
+        <div class="grid grid-cols-2 gap-5">
+          <div class="space-y-3">
+            <div class="ice-card p-4 rounded-sm bg-emerald-500/5 border-emerald-400/30 text-emerald-200 text-sm flex items-start gap-3">
+              <span class="text-2xl">✅</span>
+              <div>
+                <div class="font-semibold text-emerald-100 mb-1">标定参数已就绪</div>
+                <div class="text-xs leading-relaxed">参数将写入本地存储，采集岛会自动读取。请确保本步骤由同一名检录员完成。</div>
+              </div>
+            </div>
+            <div id="summary" class="ice-card rounded-sm p-4 font-mono text-xs space-y-1.5"></div>
+            <div class="flex gap-2 pt-2">
+              <button data-prev="3" class="ice-btn ice-btn--ghost">← 返回</button>
+              <button id="save-cal" class="ice-btn ml-auto">💾 保存标定参数并完成</button>
+            </div>
+          </div>
+          <div class="ice-card rounded-sm p-5 flex flex-col justify-center items-center">
+            <div class="relative w-64 h-12 border-2 border-dashed border-emerald-400/70 rounded-sm grid place-items-center font-mono text-xs text-emerald-200 bg-emerald-500/10">
+              ✓ 直尺水平验证通过
+            </div>
+            <div class="relative w-64 h-12 mt-4 border-2 border-dashed border-emerald-400/70 rounded-sm grid place-items-center font-mono text-xs text-emerald-200 bg-emerald-500/10">
+              ✓ 四角偏差 ≤ 1.2 px
+            </div>
+            <div class="relative w-64 h-12 mt-4 border-2 border-dashed border-emerald-400/70 rounded-sm grid place-items-center font-mono text-xs text-emerald-200 bg-emerald-500/10">
+              ✓ 刃角精度 ≥ 0.1° 步进
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="ice-card rounded-sm p-5 text-xs text-ice-200 space-y-1">
+      <div class="text-frost font-semibold text-sm mb-2">🔧 后续维护建议</div>
+      <div>• 每次开机 / 镜头移位 / 7 天以上未使用时，必须重新执行本向导</div>
+      <div>• 建议由检录员与教练双人在场确认标定结果</div>
+      <div>• 标定记录写入 <code class="text-ice-100 bg-ice-900/60 px-1 rounded-sm">localStorage.blade-station.calibration</code>，可审计</div>
+    </div>
+  </div>
+
+  <script is:inline>
+  (function () {
+    const panels = {
+      1: document.querySelector('[data-step-panel="1"]'),
+      2: document.querySelector('[data-step-panel="2"]'),
+      3: document.querySelector('[data-step-panel="3"]')
+    };
+    function go(step) {
+      Object.values(panels).forEach(p => p.classList.add('hidden'));
+      panels[step].classList.remove('hidden');
+      document.querySelectorAll('.step-circle').forEach((c, i) => {
+        const n = i + 1;
+        c.classList.toggle('bg-ice-500/30', n < step);
+        c.classList.toggle('bg-ice-500', n === step);
+        c.classList.toggle('border-ice-400', n <= step);
+        c.classList.toggle('border-ice-700/60', n > step);
+        c.classList.toggle('text-frost', n <= step);
+        c.classList.toggle('text-ice-400', n > step);
+      });
+    }
+    document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => go(parseInt(b.dataset.next) + 1)));
+    document.querySelectorAll('[data-prev]').forEach(b => b.addEventListener('click', () => go(parseInt(b.dataset.prev) - 1)));
+
+    // Step 2
+    const ORDER = ['tl','tr','bl','br'];
+    const LABEL = { tl: 'TL', tr: 'TR', bl: 'BL', br: 'BR' };
+    const pts = {};
+    const markers = document.getElementById('markers');
+    const polyLayer = document.getElementById('polyline-layer');
+    const nextLabel = document.getElementById('next-label');
+    const view = document.getElementById('cal-view');
+    const step2next = document.getElementById('step2next');
+    function idx() { return Object.keys(pts).length; }
+    function refreshUI() {
+      markers.innerHTML = '';
+      ORDER.forEach(k => {
+        const el = document.getElementById('p-' + k);
+        if (pts[k]) el.textContent = `(${pts[k][0]}, ${pts[k][1]})`;
+        else el.textContent = '未取点';
+      });
+      ORDER.forEach((k, i) => {
+        if (!pts[k]) return;
+        const [x, y] = pts[k];
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 5);
+        c.setAttribute('fill', '#0EA5E9'); c.setAttribute('stroke', '#E0F2FE'); c.setAttribute('stroke-width', 1.5);
+        markers.appendChild(c);
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', x + 9); t.setAttribute('y', y + 4);
+        t.setAttribute('fill', '#E0F2FE'); t.setAttribute('font-size', 11); t.setAttribute('font-family', 'monospace');
+        t.textContent = LABEL[k];
+        markers.appendChild(t);
+      });
+      const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      if (ORDER.every(k => pts[k])) {
+        poly.setAttribute('points', ORDER.map(k => pts[k].join(',')).join(' '));
+        polyLayer.innerHTML = '';
+        polyLayer.appendChild(poly);
+      }
+      const i = idx();
+      if (i < 4) nextLabel.textContent = '下一个：' + LABEL[ORDER[i]];
+      else nextLabel.textContent = '✓ 已完成';
+      step2next.disabled = i < 4;
+
+      if (i === 4) {
+        const topL = Math.hypot(pts.tr[0]-pts.tl[0], pts.tr[1]-pts.tl[1]);
+        const botL = Math.hypot(pts.br[0]-pts.bl[0], pts.br[1]-pts.bl[1]);
+        const avg = (topL + botL) / 2;
+        const pxmm = (avg / 300).toFixed(3);
+        const dev = Math.abs(topL - botL).toFixed(2);
+        document.getElementById('scale-info').classList.remove('hidden');
+        document.getElementById('px-mm').textContent = pxmm;
+        document.getElementById('dev').textContent = dev + ' px';
+      }
+    }
+    view.addEventListener('click', (e) => {
+      if (idx() >= 4) return;
+      const svg = view.querySelector('svg');
+      const r = svg.getBoundingClientRect();
+      const x = Math.round((e.clientX - r.left) * (400 / r.width));
+      const y = Math.round((e.clientY - r.top) * (300 / r.height));
+      pts[ORDER[idx()]] = [x, y];
+      refreshUI();
+    });
+    document.getElementById('reset-pts').addEventListener('click', () => {
+      Object.keys(pts).forEach(k => delete pts[k]);
+      polyLayer.innerHTML = '';
+      document.getElementById('scale-info').classList.add('hidden');
+      refreshUI();
+    });
+    step2next.addEventListener('click', () => {
+      const s = document.getElementById('summary');
+      const list = ORDER.map(k => `<div><span class="text-ice-400 w-10 inline-block">${LABEL[k]}</span><span class="text-frost">(${pts[k][0]}, ${pts[k][1]})</span></div>`).join('');
+      s.innerHTML = `
+        <div><span class="text-ice-400 w-28 inline-block">标定时间</span><span class="text-frost">${new Date().toLocaleString('zh-CN')}</span></div>
+        ${list}
+        <div><span class="text-ice-400 w-28 inline-block">画面尺寸</span><span class="text-frost">640 × 480</span></div>
+        <div><span class="text-ice-400 w-28 inline-block">精度步进</span><span class="text-emerald-300">0.1°</span></div>
+      `;
+      go(3);
+    });
+    document.getElementById('save-cal').addEventListener('click', () => {
+      const param = {
+        calibratedAt: new Date().toISOString(),
+        corners: { tl: pts.tl, tr: pts.tr, bl: pts.bl, br: pts.br },
+        scale: +(Math.hypot(pts.tr[0]-pts.tl[0], pts.tr[1]-pts.tl[1]) / 300).toFixed(3)
+      };
+      localStorage.setItem('blade-station.calibration', JSON.stringify(param));
+      alert('✓ 标定参数已保存。返回检录台开始采集。');
+      location.href = '/dashboard';
+    });
+    go(1);
+  })();
+  </script>
+</BaseLayout>

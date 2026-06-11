@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ATHLETES } from '../../data/athletes';
+import { INITIAL_CHECKS } from '../../data/checks';
+import { WEAR_META } from '../../types';
+import { diffAngle, DIFF_THRESHOLD, wearBadgeColor } from '../../utils/station';
+import WearThumb from '../../components/WearThumb.tsx';
+
+function historyOf(id: string) {
+  return INITIAL_CHECKS.filter(c => c.athleteId === id)
+    .sort((a, b) => +new Date(b.checkedAt) - +new Date(a.checkedAt));
+}
+function diffBadge(d: number) {
+  return d > DIFF_THRESHOLD
+    ? 'bg-rose-500/25 text-rose-300 border border-rose-400/50'
+    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40';
+}
+---
+<BaseLayout title="冰刀档案">
+  <div class="p-6 space-y-5">
+    <div class="ice-card rounded-sm p-5 flex items-center gap-5">
+      <div>
+        <h1 class="font-display text-frost text-xl tracking-[0.3em]">SKATE · ARCHIVE</h1>
+        <p class="text-sm text-ice-200 mt-1">冰刀档案 · 历次检录对比 · 禁赛史 · QR 溯源</p>
+      </div>
+      <div class="ml-auto flex items-center gap-2">
+        <input id="search-qr" class="ice-input w-80" placeholder="按冰刀 QR / 运动员名 / ISU ID 搜索…" />
+      </div>
+    </div>
+
+    <div id="athlete-grid" class="grid grid-cols-3 gap-5">
+      {ATHLETES.map(a => {
+        const h = historyOf(a.id);
+        const lastTwo = h.slice(0, 2);
+        const dL = lastTwo.length === 2 ? diffAngle(lastTwo[0].angleLeft, lastTwo[1].angleLeft) : 0;
+        const dR = lastTwo.length === 2 ? diffAngle(lastTwo[0].angleRight, lastTwo[1].angleRight) : 0;
+        const lastW = lastTwo[0]?.wear || 'normal';
+        const activeSus = a.suspension.find(s => s.status === 'active');
+        const wb = wearBadgeColor(lastW);
+        return (
+          <article class="ice-card rounded-sm p-4 searchable hover:border-ice-400/60 transition"
+                   data-keys={`${a.bladeQr} ${a.name} ${a.isuId} ${a.country}`.toLowerCase()}>
+            <div class="flex items-start gap-3">
+              <div class="text-3xl">{a.flag}</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <a href={`/athletes/${a.id}`} class="text-frost font-semibold hover:underline text-sm">{a.name}</a>
+                  {activeSus && (
+                    <span class="status-chip bg-rose-500/25 text-rose-300 border border-rose-400/50">🚫 禁赛中</span>
+                  )}
+                </div>
+                <div class="font-mono text-[11px] text-ice-300 mt-0.5 truncate">QR <b class="text-ice-100">{a.bladeQr}</b> · {a.isuId}</div>
+              </div>
+              <WearThumb level={lastW} size={36} />
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="ice-card p-2.5 rounded-sm">
+                <div class="text-[10px] uppercase tracking-wider text-ice-300">历次检录</div>
+                <div class="text-frost text-lg font-bold mt-0.5">{h.length}</div>
+              </div>
+              <div class="ice-card p-2.5 rounded-sm">
+                <div class="text-[10px] uppercase tracking-wider text-ice-300">磨损状态</div>
+                <div class={`status-chip mt-1 border ${wb.bg} ${wb.border} ${wb.text}`}>{WEAR_META[lastW].label}</div>
+              </div>
+            </div>
+
+            {lastTwo.length === 2 && (
+              <div class="mt-4 pt-4 border-t border-ice-700/50">
+                <div class="text-[10px] uppercase tracking-wider text-ice-200 mb-2">最近两次差值 Δ</div>
+                <div class="grid grid-cols-2 gap-2">
+                  <span class={`status-chip border ${diffBadge(dL)} font-mono`}>L Δ {dL.toFixed(1)}°</span>
+                  <span class={`status-chip border ${diffBadge(dR)} font-mono`}>R Δ {dR.toFixed(1)}°</span>
+                </div>
+              </div>
+            )}
+
+            <a href={`/athletes/${a.id}`} class="mt-4 ice-btn w-full justify-center !py-2 text-xs">
+              查看完整档案 →
+            </a>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+
+  <script is:inline>
+  (function(){
+    const input = document.getElementById('search-qr');
+    const cards = document.querySelectorAll('.searchable');
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      cards.forEach(el => {
+        el.style.display = (!q || el.dataset.keys.includes(q)) ? '' : 'none';
+      });
+    });
+  })();
+  </script>
+</BaseLayout>

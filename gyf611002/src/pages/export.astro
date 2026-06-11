@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ATHLETES } from '../data/athletes';
+import { INITIAL_CHECKS, CURRENT_SESSION_ID } from '../data/checks';
+import { SESSIONS } from '../data/sessions';
+import { WEAR_META } from '../types';
+import { wearBadgeColor } from '../utils/station';
+const session = SESSIONS[0];
+const rows = ATHLETES.map(a => {
+  const c = INITIAL_CHECKS.find(x => x.athleteId === a.id && x.sessionId === CURRENT_SESSION_ID) || null;
+  return { a, c, done: !!c };
+});
+const doneCount = rows.filter(r => r.done).length;
+---
+<BaseLayout title="ISU 导出">
+  <div class="p-6 max-w-6xl mx-auto space-y-5">
+    <div class="ice-card rounded-sm p-5 flex items-center gap-5">
+      <div>
+        <h1 class="font-display text-frost text-xl tracking-[0.3em]">ISU · ROSTER · EXPORT</h1>
+        <p class="text-sm text-ice-200 mt-1">批量勾选已检录运动员，导出 ISU 标准 PDF 检录表</p>
+      </div>
+      <div class="ml-auto text-right">
+        <div class="text-xs uppercase tracking-widest text-ice-300 mb-1">检录进度</div>
+        <div class="font-mono text-2xl font-bold text-ice-100">{doneCount} <span class="text-ice-400 text-base">/ {rows.length}</span></div>
+      </div>
+    </div>
+
+    <div class="ice-card rounded-sm p-4 flex items-center gap-3">
+      <label class="flex items-center gap-2 text-sm">
+        <input id="sel-all" type="checkbox" class="accent-sky-400" /> 全选已检录
+      </label>
+      <div class="ml-auto flex items-center gap-2">
+        <span id="sel-count" class="text-sm text-ice-200 font-mono">已选 0 人</span>
+        <button id="btn-pdf" class="ice-btn">📄 导出选中为 ISU PDF</button>
+      </div>
+    </div>
+
+    <div class="ice-card rounded-sm overflow-hidden">
+      <table class="check-table">
+        <thead>
+          <tr>
+            <th style="width:36px"><input id="sel-top" type="checkbox" class="accent-sky-400" /></th>
+            <th>#</th>
+            <th>运动员</th>
+            <th>ISU ID</th>
+            <th>冰刀 QR</th>
+            <th>左刃</th>
+            <th>右刃</th>
+            <th>磨损</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody id="export-body">
+          {rows.map((r, i) => {
+            const wb = r.c ? wearBadgeColor(r.c.wear) : null;
+            return (
+              <tr data-id={r.a.id} class={!r.c ? 'opacity-50' : ''}>
+                <td>
+                  <input type="checkbox" class="row-chk accent-sky-400" disabled={!r.c} data-name={r.a.name} data-isu={r.a.isuId}
+                    data-country={r.a.country}
+                    data-l={r.c?.angleLeft.toFixed(1) || ''} data-r={r.c?.angleRight.toFixed(1) || ''}
+                    data-wear={r.c ? WEAR_META[r.c.wear].label : ''}
+                    data-status={(r.c?.postponeTag ? '暂缓参赛 ' : '') + (r.c ? '通过' : '未检录')} />
+                </td>
+                <td class="text-xs text-ice-300">{String(i+1).padStart(2,'0')}</td>
+                <td><span class="mr-2">{r.a.flag}</span><span class="text-frost text-sm">{r.a.name}</span></td>
+                <td class="font-mono text-ice-200">{r.a.isuId}</td>
+                <td class="font-mono text-ice-200">{r.a.bladeQr}</td>
+                <td class="font-mono">{r.c ? r.c.angleLeft.toFixed(1) + '°' : '—'}</td>
+                <td class="font-mono">{r.c ? r.c.angleRight.toFixed(1) + '°' : '—'}</td>
+                <td>{wb && <span class={`status-chip border ${wb.bg} ${wb.border} ${wb.text}`}>{WEAR_META[r.c!.wear].label}</span>}</td>
+                <td>
+                  {r.c
+                    ? (r.c.postponeTag
+                       ? <span class="status-chip bg-amber-500/20 text-amber-300 border border-amber-400/50">暂缓参赛</span>
+                       : <span class="status-chip bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">✅ 通过</span>)
+                    : <span class="status-chip bg-ice-500/10 text-ice-300 border border-ice-400/30">待检录</span>}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script is:inline define:vars={{event: session.eventName, sessionName: session.sessionName, startTime: session.startTime}}>
+  (function () {
+    const allTop = document.getElementById('sel-top');
+    const allBtn = document.getElementById('sel-all');
+    const countEl = document.getElementById('sel-count');
+    const chks = document.querySelectorAll('.row-chk');
+    function upd() {
+      const n = [...chks].filter(c => c.checked).length;
+      countEl.textContent = `已选 ${n} 人`;
+    }
+    function setChecked(v) { chks.forEach(c => { if (!c.disabled) c.checked = v; }); upd(); }
+    allTop.addEventListener('change', e => setChecked(e.target.checked));
+    allBtn.addEventListener('change', e => setChecked(e.target.checked));
+    chks.forEach(c => c.addEventListener('change', upd));
+    upd();
+
+    document.getElementById('btn-pdf').addEventListener('click', async () => {
+      const picked = [...chks].filter(c => c.checked);
+      if (picked.length === 0) { alert('请先勾选要导出的运动员'); return; }
+      const { default: jsPDF } = await import('jspdf');
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+      doc.text('ISU OFFICIAL BLADE EDGE CHECK-IN ROSTER', 40, 52);
+      doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+      doc.text('Event: ' + event, 40, 74);
+      doc.text('Session: ' + sessionName, 40, 90);
+      doc.text('Start: ' + new Date(startTime).toLocaleString('zh-CN'), 40, 106);
+      doc.text('Exported: ' + new Date().toLocaleString('zh-CN'), 40, 122);
+      const cols = [40, 70, 200, 260, 330, 380, 440, 520];
+      const headers = ['No', 'ISU ID', 'Name', 'Country', 'L(°)', 'R(°)', 'Wear', 'Status'];
+      let y = 162;
+      doc.setFont('helvetica', 'bold');
+      headers.forEach((h, i) => doc.text(h, cols[i], y));
+      doc.setFont('helvetica', 'normal'); y += 14;
+      picked.forEach((c, i) => {
+        const ds = c.dataset;
+        const cells = [String(i+1), ds.isu, ds.name, ds.country, ds.l, ds.r, ds.wear, ds.status];
+        cells.forEach((t, idx) => doc.text(t, cols[idx], y));
+        y += 14; if (y > 780) { doc.addPage(); y = 60; }
+      });
+      doc.setFontSize(9); doc.setTextColor(100);
+      doc.text('Checker Signature: _______________', 40, 820);
+      doc.text('Coach   Signature: _______________', 320, 820);
+      doc.save(`ISU-Roster-${new Date().toISOString().slice(0,10)}.pdf`);
+    });
+  })();
+  </script>
+</BaseLayout>

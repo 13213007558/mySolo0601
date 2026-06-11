@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ISU 导出 · 冰刀刃角采集台</title><link rel="stylesheet" href="/_astro/_id_.DVuPJzSv.css">
+<link rel="stylesheet" href="/_astro/_id_.kYLQvQP5.css"></head> <body class="min-h-screen"> <header class="px-6 py-3 flex items-center gap-6 border-b border-ice-700/60 backdrop-blur-sm bg-ice-950/50 sticky top-0 z-30"> <a href="/dashboard" class="flex items-center gap-3"> <span class="grid place-items-center w-9 h-9 rounded-sm bg-ice-500/25 border border-ice-400/40 text-ice-200 text-xl">⛸️</span> <span class="font-display text-lg text-frost tracking-widest">BLADE · EDGE · STATION</span> </a> <nav class="flex items-center gap-1 text-sm"> <a href="/dashboard" class="ice-btn ice-btn--ghost">检录台</a> <a href="/athletes" class="ice-btn ice-btn--ghost">冰刀档案</a> <a href="/export" class="ice-btn ice-btn--ghost">ISU 导出</a> <a href="/calibrate" class="ice-btn ice-btn--ghost">镜头校零</a> </nav> <div class="ml-auto flex items-center gap-4"> <div id="user-chip" class="text-xs text-ice-200"></div> <button id="logout-btn" class="ice-btn ice-btn--ghost">退出登录</button> </div> </header> <main class="min-h-[calc(100vh-64px)]">  <div class="p-6 max-w-6xl mx-auto space-y-5"> <div class="ice-card rounded-sm p-5 flex items-center gap-5"> <div> <h1 class="font-display text-frost text-xl tracking-[0.3em]">ISU · ROSTER · EXPORT</h1> <p class="text-sm text-ice-200 mt-1">批量勾选已检录运动员，导出 ISU 标准 PDF 检录表</p> </div> <div class="ml-auto text-right"> <div class="text-xs uppercase tracking-widest text-ice-300 mb-1">检录进度</div> <div class="font-mono text-2xl font-bold text-ice-100">4 <span class="text-ice-400 text-base">/ 12</span></div> </div> </div> <div class="ice-card rounded-sm p-4 flex items-center gap-3"> <label class="flex items-center gap-2 text-sm"> <input id="sel-all" type="checkbox" class="accent-sky-400"> 全选已检录
+</label> <div class="ml-auto flex items-center gap-2"> <span id="sel-count" class="text-sm text-ice-200 font-mono">已选 0 人</span> <button id="btn-pdf" class="ice-btn">📄 导出选中为 ISU PDF</button> </div> </div> <div class="ice-card rounded-sm overflow-hidden"> <table class="check-table"> <thead> <tr> <th style="width:36px"><input id="sel-top" type="checkbox" class="accent-sky-400"></th> <th>#</th> <th>运动员</th> <th>ISU ID</th> <th>冰刀 QR</th> <th>左刃</th> <th>右刃</th> <th>磨损</th> <th>状态</th> </tr> </thead> <tbody id="export-body"> <tr data-id="ath-001" class=""> <td> <input type="checkbox" class="row-chk accent-sky-400" data-name="林小雪" data-isu="ISU-CHN-0021" data-country="中国" data-l="87.2" data-r="87.2" data-wear="正常" data-status="通过"> </td> <td class="text-xs text-ice-300">01</td> <td><span class="mr-2">🇨🇳</span><span class="text-frost text-sm">林小雪</span></td> <td class="font-mono text-ice-200">ISU-CHN-0021</td> <td class="font-mono text-ice-200">BLD-CHN-001-08</td> <td class="font-mono">87.2°</td> <td class="font-mono">87.2°</td> <td><span class="status-chip border bg-emerald-500/20 border-emerald-400/40 text-emerald-300">正常</span></td> <td> <span class="status-chip bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">✅ 通过</span> </td> </tr><tr data-id="ath-002" class="opacity-50"> <td> <input type="checkbox" class="row-chk accent-sky-400" disabled data-name="张雨婷" data-isu="ISU-CHN-0033" data-country="中国" data-l="" data-r="" data-wear="" data-status="未检录"> </td> <td class="text-xs text-ice-300">02</td> <td><span class="mr-2">🇨🇳</span><span class="text-frost text-sm">张雨婷</span></td> <td class="font-mono text-ice-200">ISU-CHN-0033</td> <td class="font-mono text-ice-200">BLD-CHN-002-08</td> <td class="font-mono">—</td> <td class="font-mono">—</td> <td></td> <td> <span class="status-chip bg-ice-500/10 text-ice-300 border border-ice-400/30">待检录</span> </td> </tr><tr data-id="ath-003" class="opacity-50"> <td> <input type="checkbox" class="row-chk accent-sky-400" disabled data-name="曲春雨" data-isu="ISU-CHN-0045" data-country="中国" data-l="" data-r="" data-wear="" data-status="未检录"> </td> <td class="text-xs text-ice-300">03</td> <td><span class="mr-2">🇨🇳</span><span class="text-frost text-sm">曲春雨</span></td> <td class="font-mono text-ice-200">ISU-CHN-0045</td> <td class="font-mono text-ice-200">BLD-CHN-003-08</td> <td class="font-mono">—</td> <td class="font-mono">—</td> <td></td> <td> <span class="status-chip bg-ice-500/10 text-ice-300 border border-ice-400/30">待检录</span> </td> </tr><tr data-id="ath-004" class=""> <td> <input type="checkbox" class="row-chk accent-sky-400" data-name="范可新" data-isu="ISU-CHN-0057" data-country="中国" data-l="88.3" data-r="88.0" data-wear="重度" data-status="通过"> </td> <td class="text-xs text-ice-300">04</td> <td><span class="mr-2">🇨🇳</span><span class="text-frost text-sm">范可新</span></td> <td class="font-mono text-ice-200">ISU-CHN-0057</td> <td class="font-mono text-ice-200">BLD-CHN-004-08</td> <td class="font-mono">88.3°</td> <td class="font-mono">88.0°</td> <td><span class="status-chip border bg-rose-500/25 border-rose-400/60 text-rose-300">重度</span></td> <td> <span class="status-chip bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">✅ 通过</span> </td> </tr><tr data-id="ath-005" class="opacity-50"> <td> <input type="checkbox" class="row-chk accent-sky-400" disabled data-name="Suzanne Schulting" data-isu="ISU-NED-0112" data-country="荷兰" data-l="" data-r="" data-wear="" data-status="未检录"> </td> <td class="text-xs text-ice-300">05</td> <td><span class="mr-2">🇳🇱</span><span class="text-frost text-sm">Suzanne Schulting</span></td> <td class="font-mono text-ice-200">ISU-NED-0112</td> <td class="font-mono text-ice-200">BLD-NED-011-08</td> <td class="font-mono">—</td> <td class="font-mono">—</td> <td></td> <td> <span class="status-chip bg-ice-500/10 text-ice-300 border border-ice-400/30">待检录</span> </td> </tr><tr data-id="ath-006" class="opacity-50"> <td> <input type="checkbox" class="row-chk accent-sky-400" disabled data-name="Xandra Velzeboer" data-isu="ISU-NED-0128" data-country="荷兰" data-l="" data-r="" data-wear="" data-status="未检录"> </td> <td class="text-xs text-ice-300">06</td> <td><span class="mr-2">🇳🇱</span><span class="text-frost text-sm">Xandra Velzeboer</span></td> <td class="font-mono text-ice-200">ISU-NED-0128</td> <td class="font-mono text-ice-200">BLD-NED-012-08</td> <td class="font-mono">—</td> <td class="font-mono">—</td> <td></td> <td> <span class="status-chip bg-ice-500/10 text-ice-300 border border-ice-400/30">待检录</span> </td> </tr><tr data-id="ath-007" class=""> <td> <input type="checkbox" class="row-chk accent-sky-400" data-name="崔敏静 (Choi Min-jeong)" data-isu="ISU-KOR-0203" data-country="韩国" data-l="89.2" data-r="88.9" data-wear="中度" data-status="通过"> </td> <td class="text-xs text-ice-300">07</td> <td><span class="mr-2">🇰🇷</span><span class="text-frost text-sm">崔敏静 (Choi Min-jeong)</span></td> <td class="font-mono text-ice-200">ISU-KOR-0203</td> <td class="font-mono text-ice-200">BLD-KOR-020-08</td> <td class="font-mono">89.2°</td> <td class="font-mono">88.9°</td> <td><span class="status-chip border bg-amber-500/20 border-amber-400/50 text-amber-300">中度</span></td> <td> <span class="status-chip bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">✅ 通过</span> </td> </tr><tr data-id="ath-008" class="opacity-50"> <td> <input type="checkbox" class="row-chk accent-sky-400" disabled data-name="金雅朗 (Kim A-lang)" data-isu="ISU-KOR-0215" data-country="韩国" data-l="" data-r="" data-wear="" data-status="未检录"> </td> <td class="text-xs text-ice-300">08</td> <td><span class="mr-2">🇰🇷</span><span class="text-frost text-sm">金雅朗 (Kim A-lang)</span></td> <td class="font-mono text-ice-200">ISU-KOR-0215</td> <td class="font-mono text-ice-200">BLD-KOR-021-08</td> <td class="font-mono">—</td> <td class="font-mono">—</td> <td></td> <td> <span class="status-chip bg-ice-500/10 text-ice-300 border border-ice-400/30">待检录</span> </td> </tr><tr data-id="ath-009" class="opacity-50"> <td> <input type="checkbox" class="row-chk accent-sky-400" disabled data-name="Sofia Prosvirnova" data-isu="ISU-RUS-0301" data-country="俄罗斯" data-l="" data-r="" data-wear="" data-status="未检录"> </td> <td class="text-xs text-ice-300">09</td> <td><span class="mr-2">🇷🇺</span><span class="text-frost text-sm">Sofia Prosvirnova</span></td> <td class="font-mono text-ice-200">ISU-RUS-0301</td> <td class="font-mono text-ice-200">BLD-RUS-030-08</td> <td class="font-mono">—</td> <td class="font-mono">—</td> <td></td> <td> <span class="status-chip bg-ice-500/10 text-ice-300 border border-ice-400/30">待检录</span> </td> </tr><tr data-id="ath-010" class=""> <td> <input type="checkbox" class="row-chk accent-sky-400" data-name="Emma Kim Boutin" data-isu="ISU-CAN-0402" data-country="加拿大" data-l="89.7" data-r="89.0" data-wear="轻度" data-status="通过"> </td> <td class="text-xs text-ice-300">10</td> <td><span class="mr-2">🇨🇦</span><span class="text-frost text-sm">Emma Kim Boutin</span></td> <td class="font-mono text-ice-200">ISU-CAN-0402</td> <td class="font-mono text-ice-200">BLD-CAN-040-08</td> <td class="font-mono">89.7°</td> <td class="font-mono">89.0°</td> <td><span class="status-chip border bg-sky-500/20 border-sky-400/40 text-sky-300">轻度</span></td> <td> <span class="status-chip bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">✅ 通过</span> </td> </tr><tr data-id="ath-011" class="opacity-50"> <td> <input type="checkbox" class="row-chk accent-sky-400" disabled data-name="Florence Brunelle" data-isu="ISU-CAN-0418" data-country="加拿大" data-l="" data-r="" data-wear="" data-status="未检录"> </td> <td class="text-xs text-ice-300">11</td> <td><span class="mr-2">🇨🇦</span><span class="text-frost text-sm">Florence Brunelle</span></td> <td class="font-mono text-ice-200">ISU-CAN-0418</td> <td class="font-mono text-ice-200">BLD-CAN-041-08</td> <td class="font-mono">—</td> <td class="font-mono">—</td> <td></td> <td> <span class="status-chip bg-ice-500/10 text-ice-300 border border-ice-400/30">待检录</span> </td> </tr><tr data-id="ath-012" class="opacity-50"> <td> <input type="checkbox" class="row-chk accent-sky-400" disabled data-name="武大靖" data-isu="ISU-CHN-0069" data-country="中国" data-l="" data-r="" data-wear="" data-status="未检录"> </td> <td class="text-xs text-ice-300">12</td> <td><span class="mr-2">🇨🇳</span><span class="text-frost text-sm">武大靖</span></td> <td class="font-mono text-ice-200">ISU-CHN-0069</td> <td class="font-mono text-ice-200">BLD-CHN-005-08</td> <td class="font-mono">—</td> <td class="font-mono">—</td> <td></td> <td> <span class="status-chip bg-ice-500/10 text-ice-300 border border-ice-400/30">待检录</span> </td> </tr> </tbody> </table> </div> </div> <script>(function(){const event = "2026 全国短道速滑冠军赛";
+const sessionName = "女子 1500m 预赛 · 第 2 组";
+const startTime = "2026-06-11T05:20:19.907Z";
+
+  (function () {
+    const allTop = document.getElementById('sel-top');
+    const allBtn = document.getElementById('sel-all');
+    const countEl = document.getElementById('sel-count');
+    const chks = document.querySelectorAll('.row-chk');
+    function upd() {
+      const n = [...chks].filter(c => c.checked).length;
+      countEl.textContent = `已选 ${n} 人`;
+    }
+    function setChecked(v) { chks.forEach(c => { if (!c.disabled) c.checked = v; }); upd(); }
+    allTop.addEventListener('change', e => setChecked(e.target.checked));
+    allBtn.addEventListener('change', e => setChecked(e.target.checked));
+    chks.forEach(c => c.addEventListener('change', upd));
+    upd();
+
+    document.getElementById('btn-pdf').addEventListener('click', async () => {
+      const picked = [...chks].filter(c => c.checked);
+      if (picked.length === 0) { alert('请先勾选要导出的运动员'); return; }
+      const { default: jsPDF } = await import('jspdf');
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+      doc.text('ISU OFFICIAL BLADE EDGE CHECK-IN ROSTER', 40, 52);
+      doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+      doc.text('Event: ' + event, 40, 74);
+      doc.text('Session: ' + sessionName, 40, 90);
+      doc.text('Start: ' + new Date(startTime).toLocaleString('zh-CN'), 40, 106);
+      doc.text('Exported: ' + new Date().toLocaleString('zh-CN'), 40, 122);
+      const cols = [40, 70, 200, 260, 330, 380, 440, 520];
+      const headers = ['No', 'ISU ID', 'Name', 'Country', 'L(°)', 'R(°)', 'Wear', 'Status'];
+      let y = 162;
+      doc.setFont('helvetica', 'bold');
+      headers.forEach((h, i) => doc.text(h, cols[i], y));
+      doc.setFont('helvetica', 'normal'); y += 14;
+      picked.forEach((c, i) => {
+        const ds = c.dataset;
+        const cells = [String(i+1), ds.isu, ds.name, ds.country, ds.l, ds.r, ds.wear, ds.status];
+        cells.forEach((t, idx) => doc.text(t, cols[idx], y));
+        y += 14; if (y > 780) { doc.addPage(); y = 60; }
+      });
+      doc.setFontSize(9); doc.setTextColor(100);
+      doc.text('Checker Signature: _______________', 40, 820);
+      doc.text('Coach   Signature: _______________', 320, 820);
+      doc.save(`ISU-Roster-${new Date().toISOString().slice(0,10)}.pdf`);
+    });
+  })();
+  })();</script>  </main> <script>(function(){
+    (function () {
+      try {
+        const raw = localStorage.getItem('blade-station.auth');
+        const chip = document.getElementById('user-chip');
+        const logout = document.getElementById('logout-btn');
+        if (raw) {
+          const s = JSON.parse(raw);
+          const roleLabel = s.role === 'checker' ? '检录员' : '教练';
+          chip.textContent = `【${roleLabel}】${s.displayName} · 登录 ${new Date(s.loginAt).toLocaleTimeString('zh-CN')}`;
+        } else {
+          location.replace('/login');
+          return;
+        }
+        logout.addEventListener('click', () => {
+          localStorage.removeItem('blade-station.auth');
+          location.replace('/login');
+        });
+      } catch (e) { location.replace('/login'); }
+    })();
+    })();</script> </body></html>
