@@ -1,0 +1,167 @@
+.container {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-serif);
+  font-size: 14px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.gradeBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 12px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.gradeBadge--AAA {
+  background: rgba(45, 147, 108, 0.12);
+  color: var(--color-success);
+}
+
+.gradeBadge--AA {
+  background: rgba(69, 123, 157, 0.12);
+  color: var(--color-info);
+}
+
+.gradeBadge--A {
+  background: rgba(212, 168, 67, 0.12);
+  color: var(--color-nucleus-gold);
+}
+
+.gradeBadge--B {
+  background: rgba(230, 57, 70, 0.08);
+  color: #C44536;
+}
+
+.gradeBadge--C {
+  background: rgba(230, 57, 70, 0.12);
+  color: var(--color-warning-red);
+}
+
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.progressRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.progressLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+}
+
+.progressBar {
+  height: 6px;
+  background: var(--color-border-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-info);
+  border-radius: 3px;
+  transition: width var(--transition-normal);
+}
+
+.progressFillSuccess {
+  background: var(--color-success);
+}
+
+.blockMessage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--color-warning-red-bg);
+  border: 1px solid var(--color-warning-red-border);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  color: var(--color-warning-red);
+}
+
+.blockIcon {
+  flex-shrink: 0;
+}
+
+.gradeInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--color-success-bg);
+  border: 1px solid rgba(45, 147, 108, 0.2);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  color: var(--color-success);
+}
+
+.gradeInfoIcon {
+  flex-shrink: 0;
+}
+
+.exportBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--color-deep-sea);
+  color: var(--color-pearl);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.exportBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.exportBtnDisabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.exportBtnDisabled:hover {
+  opacity: 1;
+  transform: none;
+}

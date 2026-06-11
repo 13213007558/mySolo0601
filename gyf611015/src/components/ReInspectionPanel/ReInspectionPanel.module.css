@@ -1,0 +1,227 @@
+.container {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.pendingBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--color-warning-red-bg);
+  color: var(--color-warning-red);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.emptyIcon {
+  color: var(--color-success);
+}
+
+.emptyText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.orderCard {
+  border-radius: var(--radius-md);
+  padding: 14px;
+  animation: fadeIn 250ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.orderCardPending {
+  background: var(--color-warning-red-bg);
+  border: 1px solid var(--color-warning-red-border);
+}
+
+.orderCardDone {
+  background: var(--color-success-bg);
+  border: 1px solid rgba(45, 147, 108, 0.15);
+}
+
+.orderHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.orderId {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.pendingTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-warning-red);
+  font-weight: 500;
+}
+
+.doneTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-success);
+  font-weight: 500;
+}
+
+.orderBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.orderReason {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.orderMeta {
+  display: flex;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.startBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 7px 14px;
+  border-radius: var(--radius-md);
+  background: var(--color-warning-red);
+  color: var(--color-surface);
+  font-size: 12px;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+.startBtn:hover {
+  opacity: 0.85;
+}
+
+.completeForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 12px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+}
+
+.formRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formLabel {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.formInput,
+.formSelect {
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.formInput:focus,
+.formSelect:focus {
+  border-color: var(--color-deep-sea-light);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.cancelBtn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-pearl);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  transition: background var(--transition-fast);
+}
+
+.cancelBtn:hover {
+  background: var(--color-shell-pink);
+}
+
+.confirmBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-success);
+  color: var(--color-surface);
+  font-size: 12px;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+.confirmBtn:hover {
+  opacity: 0.85;
+}

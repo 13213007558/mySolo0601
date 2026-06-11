@@ -1,0 +1,185 @@
+.container {
+  position: relative;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-serif);
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.shellSvg {
+  display: block;
+  width: 100%;
+  cursor: crosshair;
+}
+
+.shellFill {
+  fill: url(#shellGradient);
+  stroke: var(--color-text-secondary);
+  stroke-width: 1.5;
+}
+
+.quadrantLine {
+  stroke: var(--color-text-secondary);
+  stroke-width: 0.8;
+  stroke-dasharray: 6 4;
+  opacity: 0.4;
+}
+
+.pointGroup {
+  cursor: pointer;
+}
+
+.pointCircle {
+  transition: r var(--transition-fast), opacity var(--transition-fast);
+  stroke: var(--color-surface);
+  stroke-width: 2;
+}
+
+.pointCircleNormal {
+  fill: var(--color-success);
+}
+
+.pointCircleThin {
+  fill: var(--color-warning-red);
+}
+
+.pointCircleEditing {
+  stroke: var(--color-text-primary);
+  stroke-width: 2.5;
+}
+
+.thinPulse {
+  animation: thinPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes thinPulse {
+  0%,
+  100% {
+    opacity: 1;
+    r: 7;
+  }
+  50% {
+    opacity: 0.5;
+    r: 10;
+  }
+}
+
+.pointLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--color-text-primary);
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.pointLabelBg {
+  fill: var(--color-surface);
+  opacity: 0.85;
+  rx: 3;
+  ry: 3;
+  pointer-events: none;
+}
+
+.dialogOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(26, 26, 46, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 10;
+}
+
+.dialogCard {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dialogTitle {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.dialogInputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialogInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--color-text-secondary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.dialogInput:focus {
+  border-color: var(--color-success);
+}
+
+.dialogUnit {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dialogBtn {
+  padding: 6px 16px;
+  border-radius: var(--radius-md);
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.dialogBtnCancel {
+  background-color: var(--color-pearl);
+  color: var(--color-text-secondary);
+}
+
+.dialogBtnCancel:hover {
+  background-color: var(--color-shell-pink);
+}
+
+.dialogBtnConfirm {
+  background-color: var(--color-success);
+  color: var(--color-surface);
+}
+
+.dialogBtnConfirm:hover {
+  opacity: 0.9;
+}

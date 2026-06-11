@@ -1,0 +1,202 @@
+.container {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.countBadgePulse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  background: var(--color-warning-red-bg);
+  color: var(--color-warning-red);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  animation: pulseBadge 2s ease-in-out infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(230, 57, 70, 0); }
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.emptyIcon {
+  color: var(--color-success);
+}
+
+.emptyText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.card {
+  background: var(--color-warning-red-bg);
+  border: 1px solid var(--color-warning-red-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  animation: slideIn 300ms ease forwards;
+  opacity: 0;
+}
+
+@keyframes slideIn {
+  to { opacity: 1; }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.pointId {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.warnIcon {
+  color: var(--color-warning-red);
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.thicknessRow,
+.quadrantRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.thicknessLabel,
+.quadrantLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.thicknessValue {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-warning-red);
+}
+
+.quadrantValue {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.batchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--color-warning-red-border);
+}
+
+.batchBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-nucleus-gold-bg);
+  color: var(--color-nucleus-gold);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.traceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-info);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.traceLink:hover {
+  color: var(--color-deep-sea-light);
+}
+
+.timestamp {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.recheckInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--color-border-light);
+  font-size: 11px;
+  color: var(--color-success);
+}
+
+.recheckIcon {
+  flex-shrink: 0;
+}
