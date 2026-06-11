@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStoneStore } from '@/store/useStoneStore';
 import { ReportFieldMapping } from '@/types';
+import { isStoneReadOnly } from '@/lib/utils';
 import { Check, FileCheck, AlertTriangle, Copy, ArrowLeftRight, X } from 'lucide-react';
 
 interface ReportMappingPanelProps {
@@ -12,7 +13,7 @@ export const ReportMappingPanel: React.FC<ReportMappingPanelProps> = ({ classNam
   const { getCurrentStone, confirmField } = useStoneStore();
   const stone = getCurrentStone();
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
-  const isReadOnly = stone?.status === 'submitted';
+  const isReadOnly = isStoneReadOnly(stone);
 
   if (!stone) return null;
 

@@ -3,7 +3,8 @@ import { useStoneStore, usePlotStore, getSectorFromCoords } from '@/store/useSto
 import { Inclusion, InclusionType } from '@/types';
 import { InclusionMarker } from './InclusionIcon';
 import { SECTOR_NAMES } from '@/config/inclusionTypes';
-import { Trash2, Move, Info } from 'lucide-react';
+import { isStoneReadOnly, getReadonlyHint } from '@/lib/utils';
+import { Trash2, Move, Info, AlertTriangle } from 'lucide-react';
 
 const VIEW_SIZE = 500;
 const CENTER = VIEW_SIZE / 2;
@@ -33,7 +34,7 @@ export const DiamondPlotBoard: React.FC<DiamondPlotBoardProps> = ({ className = 
   const [tooltipInfo, setTooltipInfo] = useState<{ x: number; y: number; sector: number; type?: Inclusion } | null>(null);
 
   const stone = getCurrentStone();
-  const isReadOnly = stone?.status === 'submitted';
+  const isReadOnly = isStoneReadOnly(stone);
 
   const getSVGCoords = useCallback((e: React.MouseEvent | MouseEvent) => {
     const svg = svgRef.current;
@@ -342,12 +343,23 @@ export const DiamondPlotBoard: React.FC<DiamondPlotBoardProps> = ({ className = 
           </g>
         )}
 
-        {isReadOnly && (
-          <g transform={`translate(${CENTER - 75}, 16)`}>
-            <rect x={0} y={0} width={150} height={32} rx={16} fill="rgba(5,150,105,0.9)" />
-            <text x={75} y={20} textAnchor="middle" fill="white" fontSize={12} fontWeight={600}>
-              已提交 · 只读模式
-            </text>
+        {isReadOnly && stone && (
+          <g transform={`translate(${CENTER - 85}, 16)`}>
+            {stone.status === 'erratum_pending' ? (
+              <>
+                <rect x={0} y={0} width={170} height={34} rx={17} fill="rgba(245,158,11,0.95)" />
+                <text x={85} y={21} textAnchor="middle" fill="white" fontSize={12} fontWeight={700}>
+                  ⚠ 勘误待审 · 锁定中
+                </text>
+              </>
+            ) : (
+              <>
+                <rect x={0} y={0} width={170} height={34} rx={17} fill="rgba(5,150,105,0.95)" />
+                <text x={85} y={21} textAnchor="middle" fill="white" fontSize={12} fontWeight={700}>
+                  ✓ 已提交 · 只读锁定
+                </text>
+              </>
+            )}
           </g>
         )}
 

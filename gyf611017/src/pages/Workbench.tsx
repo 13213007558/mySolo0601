@@ -9,7 +9,13 @@ import { ExportTools } from '@/components/ExportTools';
 import { ErratumModal } from '@/components/ErratumModal';
 import { useStoneStore } from '@/store/useStoneStore';
 import { STATUS_LABELS } from '@/config/inclusionTypes';
-import { Send, FileCheck, Gem, CheckCircle2, AlertTriangle } from 'lucide-react';
+import {
+  isStoneReadOnly,
+  canSubmitStone,
+  canRequestErratum,
+  getReadonlyHint,
+} from '@/lib/utils';
+import { Send, FileCheck, Gem, CheckCircle2, AlertTriangle, Lock, FileWarning } from 'lucide-react';
 
 type RightTab = 'progress' | 'legend' | 'mapping' | 'export';
 
@@ -26,9 +32,11 @@ export default function Workbench() {
 
   const stone = getCurrentStone();
   const isComplete = stone?.progress === 100;
-  const isReadOnly = stone?.status === 'submitted';
+  const isReadOnly = isStoneReadOnly(stone);
   const allMappingsConfirmed = stone?.fieldMappings.every(f => f.confirmed) ?? false;
-  const canSubmit = isComplete && allMappingsConfirmed && !isReadOnly;
+  const canSubmit = canSubmitStone(stone);
+  const showErratumBtn = canRequestErratum(stone);
+  const isErratumPending = stone?.status === 'erratum_pending';
 
   const handleSubmit = () => {
     if (!canSubmit || !stone) return;
@@ -136,8 +144,24 @@ export default function Workbench() {
                         boxShadow: canSubmit ? '0 4px 20px rgba(212,175,55,0.35)' : 'none',
                       }}
                     >
-                      <Send size={15} className={submitFlash ? 'animate-pulse' : ''} />
-                      {isReadOnly ? '已提交' : canSubmit ? '提交对标报告' : isComplete ? '请完成报告对照' : '完成度未满100%'}
+                      {isReadOnly ? (
+                        isErratumPending ? (
+                          <>
+                            <FileWarning size={15} />
+                            勘误待审 · 编辑锁定
+                          </>
+                        ) : (
+                          <>
+                            <Lock size={15} />
+                            已提交 · 只读锁定
+                          </>
+                        )
+                      ) : (
+                        <>
+                          <Send size={15} className={submitFlash ? 'animate-pulse' : ''} />
+                          {canSubmit ? '提交对标报告' : isComplete ? '请完成报告对照' : '完成度未满100%'}
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

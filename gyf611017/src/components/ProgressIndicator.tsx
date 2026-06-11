@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStoneStore } from '@/store/useStoneStore';
-import { CheckCircle2, AlertTriangle, Lock, Sparkles } from 'lucide-react';
+import { isStoneReadOnly } from '@/lib/utils';
+import { CheckCircle2, AlertTriangle, Lock, Sparkles, Clock, FileWarning } from 'lucide-react';
 
 interface ProgressRingProps {
   progress: number;
@@ -87,7 +88,8 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ className 
   const required = stone.requiredInclusionCount;
   const current = stone.inclusions.length;
   const isComplete = progress >= 100;
-  const isSubmitted = stone.status === 'submitted';
+  const isReadOnly = isStoneReadOnly(stone);
+  const isErratumPending = stone.status === 'erratum_pending';
   const confirmedFields = stone.fieldMappings.filter(f => f.confirmed).length;
   const totalFields = stone.fieldMappings.length;
 
@@ -97,11 +99,18 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ className 
         <h3 className="font-display text-lg font-semibold text-diamond-cream">
           完成度监控
         </h3>
-        {isSubmitted ? (
-          <span className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30">
-            <Lock size={10} />
-            已锁定
-          </span>
+        {isReadOnly ? (
+          isErratumPending ? (
+            <span className="flex items-center gap-1 text-xs text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/30">
+              <FileWarning size={10} />
+              勘误待审
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30">
+              <Lock size={10} />
+              已锁定
+            </span>
+          )
         ) : isComplete ? (
           <span className="flex items-center gap-1 text-xs text-diamond-gold bg-diamond-gold/10 px-2.5 py-1 rounded-full border border-diamond-gold/30 animate-pulse-slow">
             <Sparkles size={10} />

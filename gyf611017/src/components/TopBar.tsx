@@ -1,7 +1,8 @@
 import React from 'react';
 import { useStoneStore } from '@/store/useStoneStore';
 import { STATUS_LABELS } from '@/config/inclusionTypes';
-import { Gem, User, FileWarning, Eye, EyeOff, Grid3X3, LayoutGrid } from 'lucide-react';
+import { canRequestErratum, canApproveErratum, isStoneReadOnly } from '@/lib/utils';
+import { Gem, User, FileWarning, Eye, EyeOff, Grid3X3, LayoutGrid, AlertTriangle } from 'lucide-react';
 import { usePlotStore } from '@/store/useStoneStore';
 
 interface TopBarProps {
@@ -14,8 +15,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenErratum }) => {
   const stone = getCurrentStone();
 
   const pendingErratum = stone ? errata.find(e => e.stoneId === stone.id && e.status === 'pending') : null;
-  const isSubmitted = stone?.status === 'submitted';
-  const isErratumPending = stone?.status === 'erratum_pending';
+  const showErratumBtn = canRequestErratum(stone);
+  const showApproveBtn = canApproveErratum(stone) && !!pendingErratum;
+  const readonly = isStoneReadOnly(stone);
 
   return (
     <header
@@ -92,7 +94,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenErratum }) => {
           </button>
         </div>
 
-        {isErratumPending && pendingErratum && (
+        {showApproveBtn && pendingErratum && (
           <button
             onClick={() => approveErratum(pendingErratum.id)}
             className="btn btn-sm d-flex align-items-center gap-1.5"
@@ -107,12 +109,12 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenErratum }) => {
               boxShadow: '0 4px 12px rgba(16,185,129,0.25)',
             }}
           >
-            <FileWarning size={13} />
-            审批勘误
+            <AlertTriangle size={13} />
+            审批勘误 · 解锁编辑
           </button>
         )}
 
-        {isSubmitted && (
+        {showErratumBtn && (
           <button
             onClick={onOpenErratum}
             className="btn btn-sm d-flex align-items-center gap-1.5"
@@ -130,6 +132,13 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenErratum }) => {
             <FileWarning size={13} />
             申请勘误
           </button>
+        )}
+
+        {readonly && !showApproveBtn && !showErratumBtn && (
+          <span className="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/30">
+            <FileWarning size={12} />
+            {stone?.status === 'erratum_pending' ? '勘误审核中 · 保持锁定' : '已提交 · 合规锁定'}
+          </span>
         )}
 
         <div className="w-px h-8 bg-slate-700 mx-1 hidden md:block" />

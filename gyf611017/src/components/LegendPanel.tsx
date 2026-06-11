@@ -2,6 +2,7 @@ import React from 'react';
 import { useStoneStore, usePlotStore } from '@/store/useStoneStore';
 import { INCLUSION_TYPES, getInclusionConfig } from '@/config/inclusionTypes';
 import { InclusionIcon } from './InclusionIcon';
+import { isStoneReadOnly } from '@/lib/utils';
 import { Palette, CheckCircle } from 'lucide-react';
 
 interface LegendPanelProps {
@@ -12,7 +13,7 @@ export const LegendPanel: React.FC<LegendPanelProps> = ({ className = '' }) => {
   const { getCurrentStone } = useStoneStore();
   const { currentInclusionType, setCurrentInclusionType } = usePlotStore();
   const stone = getCurrentStone();
-  const isReadOnly = stone?.status === 'submitted';
+  const isReadOnly = isStoneReadOnly(stone);
 
   const getTypeCount = (type: string) => {
     if (!stone) return 0;
