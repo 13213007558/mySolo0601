@@ -16,6 +16,7 @@ sap.ui.define([
             this._currentRecipe = null;
             this._canvas = null;
             this._ctx = null;
+            this._iLastKnownPhase = 0;
 
             this._initAlarmSound();
 
@@ -396,15 +397,30 @@ sap.ui.define([
 
         onPhaseChange: function (oEvent) {
             var iNewPhase = oEvent.getParameter("value");
-            var iOldPhase = this._oRuntimeModel.getProperty("/currentPhase");
+            var iOldPhase = this._iLastKnownPhase;
 
             if (iNewPhase > iOldPhase) {
                 var aScanned = this._oRuntimeModel.getProperty("/phaseScanned");
                 if (!aScanned[iOldPhase]) {
-                    MessageBox.error(this._oBundle.getText("phaseScanRequired"), {
-                        title: "阶段切换被阻止"
+                    MessageBox.error("阶段 " + (iOldPhase + 1) + " 尚未扫码确认原料批号，禁止前进至下一阶段。", {
+                        title: "扫码门禁 - 阶段切换被阻止"
                     });
                     this.byId("phaseStepInput").setValue(iOldPhase);
+                    this._oRuntimeModel.setProperty("/currentPhase", iOldPhase);
+                    return;
+                }
+                if (!aScanned[iNewPhase]) {
+                    this.byId("phaseStepInput").setValue(iOldPhase);
+                    this._oRuntimeModel.setProperty("/currentPhase", iOldPhase);
+                    MessageBox.warning("新阶段 " + (iNewPhase + 1) + " 必须扫码确认原料批号后方可进入。", {
+                        title: "扫码门禁",
+                        actions: [MessageBox.Action.OK],
+                        onClose: function () {
+                            this._applyPhaseWindow(iNewPhase);
+                            this.byId("scanLotInput").setValue("");
+                            this.byId("scanDialog").open();
+                        }.bind(this)
+                    });
                     return;
                 }
             }
@@ -412,10 +428,12 @@ sap.ui.define([
             if (this._oRuntimeModel.getProperty("/isLocked")) {
                 MessageBox.error("系统已锁定，无法切换阶段");
                 this.byId("phaseStepInput").setValue(iOldPhase);
+                this._oRuntimeModel.setProperty("/currentPhase", iOldPhase);
                 return;
             }
 
             this._applyPhaseWindow(iNewPhase);
+            this._iLastKnownPhase = iNewPhase;
             MessageToast.show("已切换至阶段 " + (iNewPhase + 1));
         },
 
@@ -433,7 +451,15 @@ sap.ui.define([
             var aScanned = this._oRuntimeModel.getProperty("/phaseScanned");
             var iCurrentPhase = this._oRuntimeModel.getProperty("/currentPhase");
             if (!aScanned[iCurrentPhase]) {
-                this._performPhaseScan();
+                MessageBox.warning("当前阶段尚未扫码确认原料批号，请先扫码后方可开始模拟。", {
+                    title: "扫码门禁",
+                    actions: [MessageBox.Action.OK],
+                    onClose: function () {
+                        this.byId("scanLotInput").setValue("");
+                        this.byId("scanDialog").open();
+                    }.bind(this)
+                });
+                return;
             }
 
             this._oRuntimeModel.setProperty("/isSimulating", true);
@@ -508,10 +534,22 @@ sap.ui.define([
                         actions: ["进入下一阶段", "停留在当前阶段"],
                         onClose: function (sAction) {
                             if (sAction === "进入下一阶段") {
-                                this._applyPhaseWindow(iPhase + 1);
                                 var aNewScanned = this._oRuntimeModel.getProperty("/phaseScanned");
                                 if (!aNewScanned[iPhase + 1]) {
-                                    this._performPhaseScan();
+                                    this._applyPhaseWindow(iPhase + 1);
+                                    this._iLastKnownPhase = iPhase + 1;
+                                    MessageBox.warning("阶段 " + (iPhase + 2) + " 必须扫码确认原料批号后方可开始模拟。", {
+                                        title: "扫码门禁",
+                                        actions: [MessageBox.Action.OK],
+                                        onClose: function () {
+                                            this.byId("scanLotInput").setValue("");
+                                            this.byId("scanDialog").open();
+                                        }.bind(this)
+                                    });
+                                } else {
+                                    this._applyPhaseWindow(iPhase + 1);
+                                    this._iLastKnownPhase = iPhase + 1;
+                                    MessageToast.show("已切换至阶段 " + (iPhase + 2));
                                 }
                             }
                         }.bind(this)
@@ -691,6 +729,12 @@ sap.ui.define([
         onSubmitAnomaly: function () {
             var oSelect = this.byId("anomalyReasonSelect");
             var sCode = oSelect.getSelectedKey();
+            if (!sCode) {
+                MessageBox.warning("请选择异常原因码（E001-E010），监管要求异常追溯必须关联原因码。", {
+                    title: "异常留痕校验"
+                });
+                return;
+            }
             var sDescription = "";
             var aReasons = this._oDataModel.getProperty("/reasonCodes");
             var oReason = aReasons.find(function (r) { return r.code === sCode; });
@@ -699,6 +743,12 @@ sap.ui.define([
             var sRemark = this.byId("anomalyRemark").getValue();
 
             var sPhoto = this.byId("anomalyPhoto").getSrc() || "";
+            if (!sPhoto || sPhoto.length < 50) {
+                MessageBox.warning("请拍摄或上传异常现场照片，监管要求拍照留档后异常方可入表。", {
+                    title: "异常留痕校验"
+                });
+                return;
+            }
 
             var oRecord = {
                 time: new Date().toLocaleTimeString(),
