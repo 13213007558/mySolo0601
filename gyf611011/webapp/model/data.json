@@ -1,0 +1,285 @@
+{
+  "recipes": [
+    {
+      "id": "REC-001",
+      "name": "经典黑巧克力 70%",
+      "cocoaContent": "70%",
+      "description": "标准黑巧克力调温工艺",
+      "phases": [
+        {
+          "phase": 0,
+          "name": "预熔",
+          "duration": 300,
+          "tempTarget": 45,
+          "tempMin": 43,
+          "tempMax": 47,
+          "speedTarget": 40,
+          "speedMin": 30,
+          "speedMax": 50
+        },
+        {
+          "phase": 1,
+          "name": "升温",
+          "duration": 180,
+          "tempTarget": 50,
+          "tempMin": 48,
+          "tempMax": 52,
+          "speedTarget": 60,
+          "speedMin": 50,
+          "speedMax": 70
+        },
+        {
+          "phase": 2,
+          "name": "调温",
+          "duration": 600,
+          "tempTarget": 29,
+          "tempMin": 27,
+          "tempMax": 31,
+          "speedTarget": 80,
+          "speedMin": 60,
+          "speedMax": 100
+        },
+        {
+          "phase": 3,
+          "name": "保温",
+          "duration": 240,
+          "tempTarget": 32,
+          "tempMin": 30,
+          "tempMax": 34,
+          "speedTarget": 50,
+          "speedMin": 40,
+          "speedMax": 60
+        },
+        {
+          "phase": 4,
+          "name": "浇模",
+          "duration": 120,
+          "tempTarget": 31,
+          "tempMin": 29,
+          "tempMax": 33,
+          "speedTarget": 30,
+          "speedMin": 20,
+          "speedMax": 40
+        }
+      ],
+      "standardCurve": [
+        {"time": 0, "temp": 25, "speed": 0},
+        {"time": 60, "temp": 32, "speed": 35},
+        {"time": 120, "temp": 38, "speed": 38},
+        {"time": 180, "temp": 43, "speed": 40},
+        {"time": 240, "temp": 45, "speed": 42},
+        {"time": 300, "temp": 45, "speed": 45},
+        {"time": 360, "temp": 47, "speed": 55},
+        {"time": 420, "temp": 49, "speed": 60},
+        {"time": 480, "temp": 50, "speed": 65},
+        {"time": 540, "temp": 45, "speed": 75},
+        {"time": 600, "temp": 38, "speed": 80},
+        {"time": 660, "temp": 32, "speed": 85},
+        {"time": 720, "temp": 29, "speed": 80},
+        {"time": 780, "temp": 28, "speed": 78},
+        {"time": 840, "temp": 29, "speed": 75},
+        {"time": 900, "temp": 29, "speed": 72},
+        {"time": 960, "temp": 30, "speed": 55},
+        {"time": 1020, "temp": 31, "speed": 52},
+        {"time": 1080, "temp": 32, "speed": 50},
+        {"time": 1140, "temp": 32, "speed": 48},
+        {"time": 1200, "temp": 31, "speed": 35},
+        {"time": 1260, "temp": 31, "speed": 32},
+        {"time": 1320, "temp": 31, "speed": 30},
+        {"time": 1380, "temp": 31, "speed": 28},
+        {"time": 1440, "temp": 30, "speed": 25}
+      ]
+    },
+    {
+      "id": "REC-002",
+      "name": "牛奶巧克力 38%",
+      "cocoaContent": "38%",
+      "description": "牛奶巧克力温和调温",
+      "phases": [
+        {
+          "phase": 0,
+          "name": "预熔",
+          "duration": 240,
+          "tempTarget": 42,
+          "tempMin": 40,
+          "tempMax": 44,
+          "speedTarget": 35,
+          "speedMin": 25,
+          "speedMax": 45
+        },
+        {
+          "phase": 1,
+          "name": "升温",
+          "duration": 150,
+          "tempTarget": 47,
+          "tempMin": 45,
+          "tempMax": 49,
+          "speedTarget": 55,
+          "speedMin": 45,
+          "speedMax": 65
+        },
+        {
+          "phase": 2,
+          "name": "调温",
+          "duration": 540,
+          "tempTarget": 28,
+          "tempMin": 26,
+          "tempMax": 30,
+          "speedTarget": 75,
+          "speedMin": 55,
+          "speedMax": 95
+        },
+        {
+          "phase": 3,
+          "name": "保温",
+          "duration": 210,
+          "tempTarget": 30,
+          "tempMin": 28,
+          "tempMax": 32,
+          "speedTarget": 45,
+          "speedMin": 35,
+          "speedMax": 55
+        },
+        {
+          "phase": 4,
+          "name": "浇模",
+          "duration": 120,
+          "tempTarget": 29,
+          "tempMin": 27,
+          "tempMax": 31,
+          "speedTarget": 28,
+          "speedMin": 18,
+          "speedMax": 38
+        }
+      ],
+      "standardCurve": [
+        {"time": 0, "temp": 24, "speed": 0},
+        {"time": 60, "temp": 30, "speed": 30},
+        {"time": 120, "temp": 36, "speed": 33},
+        {"time": 180, "temp": 40, "speed": 35},
+        {"time": 240, "temp": 42, "speed": 40},
+        {"time": 300, "temp": 44, "speed": 50},
+        {"time": 360, "temp": 46, "speed": 55},
+        {"time": 390, "temp": 47, "speed": 58},
+        {"time": 450, "temp": 42, "speed": 70},
+        {"time": 510, "temp": 35, "speed": 75},
+        {"time": 570, "temp": 30, "speed": 78},
+        {"time": 630, "temp": 28, "speed": 75},
+        {"time": 690, "temp": 27, "speed": 72},
+        {"time": 750, "temp": 28, "speed": 70},
+        {"time": 810, "temp": 28, "speed": 68},
+        {"time": 870, "temp": 29, "speed": 50},
+        {"time": 930, "temp": 29, "speed": 47},
+        {"time": 990, "temp": 30, "speed": 45},
+        {"time": 1050, "temp": 30, "speed": 42},
+        {"time": 1110, "temp": 29, "speed": 30},
+        {"time": 1170, "temp": 29, "speed": 28},
+        {"time": 1230, "temp": 29, "speed": 26},
+        {"time": 1260, "temp": 29, "speed": 24}
+      ]
+    },
+    {
+      "id": "REC-003",
+      "name": "白巧克力 28%",
+      "cocoaContent": "28%",
+      "description": "白巧克力精细调温",
+      "phases": [
+        {
+          "phase": 0,
+          "name": "预熔",
+          "duration": 240,
+          "tempTarget": 40,
+          "tempMin": 38,
+          "tempMax": 42,
+          "speedTarget": 30,
+          "speedMin": 20,
+          "speedMax": 40
+        },
+        {
+          "phase": 1,
+          "name": "升温",
+          "duration": 120,
+          "tempTarget": 45,
+          "tempMin": 43,
+          "tempMax": 47,
+          "speedTarget": 50,
+          "speedMin": 40,
+          "speedMax": 60
+        },
+        {
+          "phase": 2,
+          "name": "调温",
+          "duration": 480,
+          "tempTarget": 27,
+          "tempMin": 25,
+          "tempMax": 29,
+          "speedTarget": 70,
+          "speedMin": 50,
+          "speedMax": 90
+        },
+        {
+          "phase": 3,
+          "name": "保温",
+          "duration": 180,
+          "tempTarget": 29,
+          "tempMin": 27,
+          "tempMax": 31,
+          "speedTarget": 40,
+          "speedMin": 30,
+          "speedMax": 50
+        },
+        {
+          "phase": 4,
+          "name": "浇模",
+          "duration": 120,
+          "tempTarget": 28,
+          "tempMin": 26,
+          "tempMax": 30,
+          "speedTarget": 25,
+          "speedMin": 15,
+          "speedMax": 35
+        }
+      ],
+      "standardCurve": [
+        {"time": 0, "temp": 23, "speed": 0},
+        {"time": 60, "temp": 28, "speed": 25},
+        {"time": 120, "temp": 34, "speed": 28},
+        {"time": 180, "temp": 38, "speed": 30},
+        {"time": 240, "temp": 40, "speed": 35},
+        {"time": 300, "temp": 42, "speed": 45},
+        {"time": 360, "temp": 45, "speed": 50},
+        {"time": 420, "temp": 40, "speed": 65},
+        {"time": 480, "temp": 33, "speed": 70},
+        {"time": 540, "temp": 28, "speed": 72},
+        {"time": 600, "temp": 26, "speed": 70},
+        {"time": 660, "temp": 27, "speed": 68},
+        {"time": 720, "temp": 27, "speed": 65},
+        {"time": 780, "temp": 27, "speed": 62},
+        {"time": 840, "temp": 28, "speed": 45},
+        {"time": 900, "temp": 28, "speed": 42},
+        {"time": 960, "temp": 29, "speed": 40},
+        {"time": 1020, "temp": 28, "speed": 28},
+        {"time": 1080, "temp": 28, "speed": 25},
+        {"time": 1140, "temp": 28, "speed": 22}
+      ]
+    }
+  ],
+  "reasonCodes": [
+    {"code": "E001", "description": "温度传感器故障"},
+    {"code": "E002", "description": "搅拌电机过载"},
+    {"code": "E003", "description": "冷却水温度异常"},
+    {"code": "E004", "description": "原料批次偏差"},
+    {"code": "E005", "description": "操作员误操作"},
+    {"code": "E006", "description": "环境温度过高"},
+    {"code": "E007", "description": "加热元件故障"},
+    {"code": "E008", "description": "变频器通讯中断"},
+    {"code": "E009", "description": "结晶核不足"},
+    {"code": "E010", "description": "其他原因"}
+  ],
+  "materialLots": [
+    {"lotNo": "CAC-2024-001234", "material": "可可液块", "supplier": "加纳可可合作社", "expiryDate": "2025-06-30"},
+    {"lotNo": "SUG-2024-005678", "material": "白砂糖", "supplier": "广西糖业集团", "expiryDate": "2026-03-15"},
+    {"lotNo": "BTR-2024-009012", "material": "可可脂", "supplier": "科特迪瓦油脂公司", "expiryDate": "2025-09-20"},
+    {"lotNo": "MLK-2024-003456", "material": "全脂奶粉", "supplier": "恒天然乳业", "expiryDate": "2025-04-10"}
+  ]
+}

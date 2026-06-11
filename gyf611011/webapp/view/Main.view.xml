@@ -1,0 +1,244 @@
+<mvc:View
+    controllerName="com.cocoa.tempering.controller.Main"
+    displayBlock="true"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:html="http://www.w3.org/1999/xhtml">
+    <Page id="mainPage" title="{i18n>mainTitle}" showNavButton="false">
+        <headerContent>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button id="btnNightMode" icon="sap-icon://lightbulb" text="{i18n>toggleNightMode}" press="onToggleNightMode" type="Transparent"/>
+                <Button id="btnExport" icon="sap-icon://download" text="{i18n>exportData}" press="onExportData" type="Transparent" enabled="{path: 'runtime>/isLocked', formatter: '.formatEnabledNotLocked'}"/>
+                <Button id="btnUnlock" icon="sap-icon://key" text="{i18n>supervisorUnlock}" press="onShowUnlockDialog" type="Reject" visible="{runtime>/isLocked}"/>
+            </Toolbar>
+        </headerContent>
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <l:Grid containerQuery="true" defaultSpan="L3 M6 S12">
+                    <l:content>
+                        <VBox class="sapUiSmallMargin">
+                            <Label text="{i18n>recipeSelect}" design="Bold"/>
+                            <Select id="recipeSelect" items="{/recipes}" change="onRecipeChange" enabled="{path: 'runtime>/isLocked', formatter: '.formatEnabledNotLocked'}">
+                                <core:Item key="{id}" text="{name} ({cocoaContent})"/>
+                            </Select>
+                        </VBox>
+                    </l:content>
+                    <l:content>
+                        <VBox class="sapUiSmallMargin">
+                            <Label text="{i18n>currentBatch}" design="Bold"/>
+                            <HBox>
+                                <Input id="batchInput" placeholder="{i18n>batchPlaceholder}" value="{runtime>/currentBatchNo}" enabled="{path: 'runtime>/isLocked', formatter: '.formatEnabledNotLocked'}"/>
+                                <Button icon="sap-icon://bar-code" text="{i18n>scanBatch}" press="onScanBatch" type="Emphasized" enabled="{path: 'runtime>/isLocked', formatter: '.formatEnabledNotLocked'}"/>
+                            </HBox>
+                        </VBox>
+                    </l:content>
+                    <l:content>
+                        <VBox class="sapUiSmallMargin">
+                            <Label text="{i18n>currentPhase}" design="Bold"/>
+                            <Text id="phaseText" text="{parts: [{path: 'runtime>/currentPhase'}, {path: 'runtime>/phaseNames'}], formatter: '.formatPhaseName'}" class="sapMText"/>
+                        </VBox>
+                    </l:content>
+                    <l:content>
+                        <VBox class="sapUiSmallMargin">
+                            <Label design="Bold" text="系统状态"/>
+                            <ObjectStatus id="systemStatus"
+                                text="{parts: [{path: 'runtime>/isLocked'}, {path: 'runtime>/isAlarm'}], formatter: '.formatSystemStatus'}"
+                                state="{parts: [{path: 'runtime>/isLocked'}, {path: 'runtime>/isAlarm'}], formatter: '.formatSystemStatusState'}"/>
+                        </VBox>
+                    </l:content>
+                </l:Grid>
+
+                <l:Grid containerQuery="true" defaultSpan="L3 M6 S12" class="sapUiTinyMarginTop">
+                    <l:content>
+                        <Panel class="sapUiSmallMargin" backgroundDesign="Solid">
+                            <VBox>
+                                <Label class="kpiLabel" text="{i18n>actualTemp}"/>
+                                <HBox alignItems="Baseline">
+                                    <Text id="tempKpiText" text="{parts: [{path: 'runtime>/currentTemperature'}], formatter: '.formatTemperature'}" class="kpiValueTemp"/>
+                                    <Text text=" °C" class="sapUiTinyMarginBegin" style="color:#666;"/>
+                                </HBox>
+                                <ObjectStatus text="{parts: [{path: 'runtime>/currentTemperature'}, {path: 'runtime>/temperatureMin'}, {path: 'runtime>/temperatureMax'}], formatter: '.formatKpiStatusText'}"
+                                    state="{parts: [{path: 'runtime>/currentTemperature'}, {path: 'runtime>/temperatureMin'}, {path: 'runtime>/temperatureMax'}], formatter: '.formatKpiState'}"/>
+                                <Text text="窗口: {runtime>/temperatureMin}°C ~ {runtime>/temperatureMax}°C" class="sapUiTinyMarginTop" style="color:#666;font-size:0.85rem;"/>
+                            </VBox>
+                        </Panel>
+                    </l:content>
+                    <l:content>
+                        <Panel class="sapUiSmallMargin" backgroundDesign="Solid">
+                            <VBox>
+                                <Label class="kpiLabel" text="{i18n>actualSpeed}"/>
+                                <HBox alignItems="Baseline">
+                                    <Text id="speedKpiText" text="{parts: [{path: 'runtime>/currentSpeed'}], formatter: '.formatSpeed'}" class="kpiValueSpeed"/>
+                                    <Text text=" RPM" class="sapUiTinyMarginBegin" style="color:#666;"/>
+                                </HBox>
+                                <ObjectStatus text="{parts: [{path: 'runtime>/currentSpeed'}, {path: 'runtime>/speedMin'}, {path: 'runtime>/speedMax'}], formatter: '.formatKpiStatusText'}"
+                                    state="{parts: [{path: 'runtime>/currentSpeed'}, {path: 'runtime>/speedMin'}, {path: 'runtime>/speedMax'}], formatter: '.formatKpiState'}"/>
+                                <Text text="窗口: {runtime>/speedMin} ~ {runtime>/speedMax} RPM" class="sapUiTinyMarginTop" style="color:#666;font-size:0.85rem;"/>
+                            </VBox>
+                        </Panel>
+                    </l:content>
+                    <l:content>
+                        <VBox class="sapUiSmallMargin" alignItems="Start">
+                            <Label design="Bold" text="控制"/>
+                            <Button id="btnStartSim" icon="sap-icon://play" text="{i18n>startSimulation}" press="onStartSimulation" type="Accept"
+                                enabled="{parts: [{path: 'runtime>/isSimulating'}, {path: 'runtime>/isLocked'}, {path: 'runtime>/currentRecipeId'}], formatter: '.formatStartEnabled'}"/>
+                            <Button id="btnStopSim" icon="sap-icon://stop" text="{i18n>stopSimulation}" press="onStopSimulation" type="Reject" class="sapUiTinyMarginTop"
+                                enabled="{runtime>/isSimulating}"/>
+                        </VBox>
+                    </l:content>
+                    <l:content>
+                        <VBox class="sapUiSmallMargin">
+                            <Label design="Bold" text="阶段扫码确认"/>
+                            <List id="phaseList" items="{path: 'runtime>/phaseNames', templateShareable: false}">
+                                <CustomListItem type="Inactive">
+                                    <HBox alignItems="Center" justifyContent="SpaceBetween" width="100%">
+                                        <Label text="{runtime>}"/>
+                                        <core:Icon src="{parts: [{path: 'runtime>/phaseScanned'}, {path: '$index'}], formatter: '.formatPhaseIconSrc'}"
+                                            color="{parts: [{path: 'runtime>/phaseScanned'}, {path: '$index'}], formatter: '.formatPhaseIconColor'}" size="1.2rem"/>
+                                    </HBox>
+                                </CustomListItem>
+                            </List>
+                        </VBox>
+                    </l:content>
+                </l:Grid>
+
+                <Panel id="chartPanel" class="sapUiTinyMarginTop" headerText="温度与转速双轴监控曲线" expandable="true" expanded="true">
+                    <VBox>
+                        <html:div id="curveChartWrapper" class="curveChartContainer">
+                            <html:canvas id="curveCanvas" width="1000" height="480" style="width:100%;height:100%;"/>
+                        </html:div>
+                        <HBox justifyContent="Center" class="sapUiSmallMargin">
+                            <HBox alignItems="Center" class="sapUiTinyMarginEnd">
+                                <core:Icon src="sap-icon://circle-task-2" color="#e74c3c"/>
+                                <Text text="实际温度" class="sapUiTinyMarginBegin"/>
+                            </HBox>
+                            <HBox alignItems="Center" class="sapUiTinyMarginEnd">
+                                <core:Icon src="sap-icon://circle-task-2" color="#3498db"/>
+                                <Text text="实际转速" class="sapUiTinyMarginBegin"/>
+                            </HBox>
+                            <HBox alignItems="Center" class="sapUiTinyMarginEnd">
+                                <core:Icon src="sap-icon://horizontal-bar-chart" color="#95a5a6"/>
+                                <Text text="温度窗口" class="sapUiTinyMarginBegin"/>
+                            </HBox>
+                            <HBox alignItems="Center" class="sapUiTinyMarginEnd">
+                                <core:Icon src="sap-icon://circle-task-2" color="#f39c12"/>
+                                <Text text="标准温度" class="sapUiTinyMarginBegin"/>
+                            </HBox>
+                        </HBox>
+                    </VBox>
+                </Panel>
+
+                <l:Grid containerQuery="true" defaultSpan="L6 M12 S12" class="sapUiTinyMarginTop">
+                    <l:content>
+                        <Panel headerText="{i18n>anomalyRecord}" class="sapUiSmallMarginEnd">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <ToolbarSpacer/>
+                                    <Button icon="sap-icon://add" text="记录异常" press="onShowAnomalyDialog" type="Emphasized" enabled="{parts: [{path: 'runtime>/isLocked'}, {path: 'runtime>/isAlarm'}], formatter: '.formatAnomalyBtnEnabled'}"/>
+                                </Toolbar>
+                            </headerToolbar>
+                            <Table id="anomalyTable" items="{runtime>/anomalyRecords}">
+                                <columns>
+                                    <Column>
+                                        <Label text="时间"/>
+                                    </Column>
+                                    <Column>
+                                        <Label text="原因码"/>
+                                    </Column>
+                                    <Column>
+                                        <Label text="描述"/>
+                                    </Column>
+                                    <Column>
+                                        <Label text="温度"/>
+                                    </Column>
+                                    <Column>
+                                        <Label text="转速"/>
+                                    </Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem class="anomalyListItem">
+                                        <cells>
+                                            <Text text="{time}"/>
+                                            <Text text="{code}"/>
+                                            <Text text="{description}"/>
+                                            <Text text="{temp}°C"/>
+                                            <Text text="{speed} RPM"/>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </Panel>
+                    </l:content>
+                    <l:content>
+                        <Panel headerText="操作指引" class="sapUiSmallMarginStart">
+                            <VBox class="sapUiSmallMargin">
+                                <Title level="H4" text="调温工艺流程"/>
+                                <StepInput id="phaseStepInput" value="{runtime>/currentPhase}" min="0" max="4" step="1"
+                                    change="onPhaseChange" enabled="{parts: [{path: 'runtime>/isLocked'}, {path: 'runtime>/isSimulating'}], formatter: '.formatPhaseStepEnabled'}"/>
+                                <Text class="sapUiTinyMarginTop" text="{path: 'runtime>/currentPhase', formatter: '.formatPhaseGuidance'}"/>
+                                <Title level="H4" text="扫码确认流程" class="sapUiSmallMarginTop"/>
+                                <Text text="1. 选择配方后点击开始模拟&#10;2. 每阶段开始前必须扫码原料批号&#10;3. 脱离结晶窗口将自动锁定并报警&#10;4. 异常需选择原因码及拍照留档&#10;5. 仅领班密码可解锁系统 (默认 Cocoa@2024)"/>
+                            </VBox>
+                        </Panel>
+                    </l:content>
+                </l:Grid>
+            </VBox>
+        </content>
+    </Page>
+
+    <Dialog id="unlockDialog" title="领班解锁" type="Message" state="Error">
+        <Input id="unlockPassword" type="Password" placeholder="请输入领班密码" liveChange="onUnlockPasswordChange"/>
+        <beginButton>
+            <Button text="确认解锁" press="onUnlock" type="Emphasized" enabled="false" id="btnConfirmUnlock"/>
+        </beginButton>
+        <endButton>
+            <Button text="取消" press="onCloseUnlockDialog"/>
+        </endButton>
+    </Dialog>
+
+    <Dialog id="scanDialog" title="扫码确认原料批号">
+        <VBox class="sapUiSmallMargin">
+            <Label text="请扫描或输入原料批号" design="Bold"/>
+            <Input id="scanLotInput" placeholder="例如：CAC-2024-001234" showSuggestion="true" suggestionItems="{/materialLots}">
+                <core:ListItem key="{lotNo}" text="{lotNo} - {material}"/>
+            </Input>
+            <Text class="sapUiTinyMarginTop" text="扫码后系统将记录批号、时间戳及当前阶段，作为生产追溯依据。"/>
+        </VBox>
+        <beginButton>
+            <Button text="确认扫码" press="onConfirmScan" type="Accept"/>
+        </beginButton>
+        <endButton>
+            <Button text="取消" press="onCloseScanDialog"/>
+        </endButton>
+    </Dialog>
+
+    <Dialog id="anomalyDialog" title="记录异常点">
+        <VBox class="sapUiSmallMargin" width="400px">
+            <Label text="原因码" design="Bold"/>
+            <Select id="anomalyReasonSelect" items="{/reasonCodes}">
+                <core:Item key="{code}" text="{code} - {description}"/>
+            </Select>
+            <Label text="当前温度: {runtime>/currentTemperature}°C" class="sapUiSmallMarginTop"/>
+            <Label text="当前转速: {runtime>/currentSpeed} RPM"/>
+            <Label text="异常说明" class="sapUiSmallMarginTop" design="Bold"/>
+            <TextArea id="anomalyRemark" rows="3" placeholder="请补充异常现场描述..."/>
+            <Label text="现场拍照留档" class="sapUiSmallMarginTop" design="Bold"/>
+            <HBox alignItems="Center">
+                <Button icon="sap-icon://camera" text="拍照/上传" press="onCapturePhoto" type="Transparent"/>
+                <Text id="photoStatus" text="尚未拍照" class="sapUiTinyMarginBegin"/>
+            </HBox>
+            <Image id="anomalyPhoto" height="150px" visible="false"/>
+        </VBox>
+        <beginButton>
+            <Button text="提交异常记录" press="onSubmitAnomaly" type="Emphasized"/>
+        </beginButton>
+        <endButton>
+            <Button text="取消" press="onCloseAnomalyDialog"/>
+        </endButton>
+    </Dialog>
+
+    <html:input id="fileUploader" type="file" accept="image/*" style="display:none;" change="onPhotoUploaded"/>
+</mvc:View>

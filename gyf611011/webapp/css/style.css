@@ -1,0 +1,187 @@
+.appTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.curveChartContainer {
+    width: 100%;
+    height: 500px;
+}
+
+.statusNormal {
+    background-color: #107e3e !important;
+    color: white;
+}
+
+.statusAlarm {
+    background-color: #b00 !important;
+    color: white;
+    animation: blink 1s infinite;
+}
+
+.statusLocked {
+    background-color: #8b0000 !important;
+    color: white;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.kpiValueTemp {
+    font-size: 2rem;
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.kpiValueSpeed {
+    font-size: 2rem;
+    color: #3498db;
+    font-weight: bold;
+}
+
+.kpiLabel {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.phaseStep {
+    margin: 0.5rem 0;
+}
+
+.phaseStep.sapMObjLTitle {
+    font-size: 1rem;
+}
+
+.lockOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(139, 0, 0, 0.95);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lockContent {
+    background-color: #fff;
+    padding: 2rem 3rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+}
+
+.lockTitle {
+    font-size: 1.5rem;
+    color: #b00;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.lockReason {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.nightMode .sapMGlobalBackgroundColor {
+    background-color: #0a0a0a !important;
+}
+
+.nightMode .sapMLabel,
+.nightMode .sapMText {
+    color: #f0f0f0 !important;
+}
+
+.nightMode .sapMBusyIndicator {
+    color: #ff6b6b;
+}
+
+.nightMode .sapUiBlockLayer {
+    background-color: #1a1a1a !important;
+}
+
+.nightMode .sapMTitle,
+.nightMode .sapMPage {
+    background-color: #111 !important;
+}
+
+.nightMode .sapMInputBaseContentWrapper,
+.nightMode .sapMInputBaseInner {
+    background-color: #1a1a1a !important;
+    border-color: #444 !important;
+}
+
+.nightMode .sapMLIB.sapMIBelix {
+    background-color: #222 !important;
+    background: #222 !important;
+    color: #f0f0f0 !important;
+}
+
+.nightMode .sapMBtn {
+    background-color: #2a2a2a !important;
+}
+
+.nightMode .sapMBtnContent {
+    color: #f0f0f0 !important;
+    text-shadow: none !important;
+}
+
+.nightMode .kpiValueTemp {
+    color: #ff6b6b !important;
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.8);
+}
+
+.nightMode .kpiValueSpeed {
+    color: #4ecdc4 !important;
+    text-shadow: 0 0 10px rgba(78, 205, 196, 0.8);
+}
+
+.nightMode .statusAlarm {
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+}
+
+.nightMode .kpiLabel {
+    color: #aaa !important;
+}
+
+.nightMode .sapMObjLItem {
+    background-color: #1a1a1a !important;
+}
+
+.nightMode .sapMBar {
+    background-color: #111 !important;
+    text-shadow: none !important;
+}
+
+.nightMode .sapMBarPH {
+    color: #ff6b6b !important;
+}
+
+.anomalyListItem {
+    border-left: 4px solid #e74c3c;
+}
+
+.scanInputWrapper {
+    border: 2px dashed #0a7e3e;
+    padding: 1rem;
+    border-radius: 4px;
+    text-align: center;
+    background-color: #eaf5ef;
+}
+
+.nightMode .scanInputWrapper {
+    background-color: #1a2a1a;
+    border-color: #4ecdc4;
+}
+
+.tempInRange {
+    color: #107e3e !important;
+}
+
+.tempOutOfRange {
+    color: #e74c3c !important;
+}

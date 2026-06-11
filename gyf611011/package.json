@@ -1,0 +1,20 @@
+{
+  "name": "cocoa-tempering-curve",
+  "version": "1.0.0",
+  "description": "可可调温曲线台 - 手工巧克力调温温度与搅拌转速双轴监控系统（OpenUI5）",
+  "private": true,
+  "scripts": {
+    "start": "npx serve webapp -l 8080",
+    "serve": "python3 -m http.server 8080 --directory webapp"
+  },
+  "keywords": [
+    "openui5",
+    "sapui5",
+    "fiori",
+    "cocoa",
+    "tempering",
+    "chocolate"
+  ],
+  "author": "Cocoa Workshop IT",
+  "license": "UNLICENSED"
+}
