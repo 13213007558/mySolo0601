@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --console-bg: #0A1628;
+  --panel-bg: #0F2744;
+  --cyan: #00E5FF;
+  --amber: #FFB020;
+  --red: #FF3B30;
+  --green: #30D158;
+}
+
+@layer base {
+  html, body { height: 100%; }
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(0, 229, 255, 0.06) 0%, transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(255, 59, 48, 0.05) 0%, transparent 50%),
+      var(--console-bg);
+    font-family: "Noto Sans SC", system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  /* 控制台仪表卡片 */
+  .console-card {
+    @apply relative bg-nautical-800/90 backdrop-blur border border-nautical-600/50 rounded-md;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 4px 18px -4px rgba(0, 0, 0, 0.5);
+  }
+
+  /* 工业按钮 */
+  .btn-industrial {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-sm
+           font-semibold text-sm uppercase tracking-wider
+           border-2 transition-all duration-150 active:translate-y-0.5
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0;
+  }
+  .btn-industrial-primary {
+    @apply btn-industrial border-indicator-cyan text-indicator-cyan bg-indicator-cyan/10
+           hover:bg-indicator-cyan/20 hover:shadow-led-cyan;
+  }
+  .btn-industrial-danger {
+    @apply btn-industrial border-indicator-red text-indicator-red bg-indicator-red/10
+           hover:bg-indicator-red/20 hover:shadow-led-red;
+  }
+  .btn-industrial-success {
+    @apply btn-industrial border-indicator-green text-indicator-green bg-indicator-green/10
+           hover:bg-indicator-green/20 hover:shadow-led-green;
+  }
+  .btn-industrial-muted {
+    @apply btn-industrial border-slate-500/50 text-slate-300 bg-nautical-700/50
+           hover:bg-nautical-700;
+  }
+
+  /* LED 状态指示灯 */
+  .led {
+    @apply inline-flex w-2.5 h-2.5 rounded-full relative;
+  }
+  .led::after {
+    content: "";
+    @apply absolute inset-0 rounded-full;
+  }
+  .led-cyan { @apply led bg-indicator-cyan shadow-led-cyan; }
+  .led-amber { @apply led bg-indicator-amber shadow-led-amber; }
+  .led-red { @apply led bg-indicator-red shadow-led-red; }
+  .led-green { @apply led bg-indicator-green shadow-led-green; }
+  .led-gray { @apply led bg-slate-600; }
+
+  /* 等宽数值读数 */
+  .reading-mono {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 分割线 */
+  .console-divider {
+    @apply h-px bg-gradient-to-r from-transparent via-nautical-600/60 to-transparent;
+  }
+
+  /* 输入框（工业风格） */
+  .console-input {
+    @apply w-full bg-nautical-900/80 border-2 border-nautical-600 rounded-sm px-4 py-3
+           text-lg reading-mono text-slate-100 placeholder:text-slate-600
+           focus:outline-none focus:border-indicator-cyan focus:shadow-led-cyan
+           transition-all;
+  }
+}
+
+/* 声呐背景动效 - 登录页 */
+.sonar-bg::before,
+.sonar-bg::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  transform: translate(-50%, -50%);
+  animation: sonarSweep 6s linear infinite;
+}
+.sonar-bg::after { animation-delay: 3s; }
+@keyframes sonarSweep {
+  0%   { width: 120px; height: 120px; opacity: 0.9; }
+  100% { width: 900px; height: 900px; opacity: 0; }
+}
+
+/* 紧急模式红色覆盖 */
+.emergency-overlay {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 59, 48, 0.18),
+      rgba(255, 59, 48, 0.18) 20px,
+      rgba(139, 0, 0, 0.22) 20px,
+      rgba(139, 0, 0, 0.22) 40px
+    );
+  animation: emergencyPulse 0.9s ease-in-out infinite;
+}
+@keyframes emergencyPulse {
+  0%, 100% { opacity: 0.65; }
+  50%      { opacity: 0.95; }
+}
+
+/* 翻牌器式倒计时 */
+.countdown-flip {
+  perspective: 300px;
+}
+.countdown-flip .digit {
+  display: inline-block;
+  transform-origin: center;
+}
+
+/* 阶梯卡片渐变边框 */
+.ladder-unlocked {
+  border-image: linear-gradient(135deg, rgba(0,229,255,0.7), rgba(0,229,255,0.1)) 1;
+}
+
+/* 滚动条美化 - 控制台样式 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(15, 39, 68, 0.4); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #264D75, #1A3A5C);
+  border-radius: 2px;
+  border: 1px solid rgba(0, 229, 255, 0.15);
+}
+::-webkit-scrollbar-thumb:hover { background: #305f8a; }
