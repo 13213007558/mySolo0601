@@ -1,0 +1,41 @@
+@unocss-all;
+
+:root {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background-color: #F5F0EB;
+  color: #3E2723;
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.hotspot-pending-pulse {
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+@keyframes countdown-urgent {
+  0%, 100% { color: #dc2626; }
+  50% { color: #fbbf24; }
+}
+
+.countdown-urgent {
+  animation: countdown-urgent 0.5s ease-in-out infinite;
+}
