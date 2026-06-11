@@ -27,6 +27,7 @@ export interface CaptureState {
   calibrated: boolean;
   isLive: boolean;
   error: string | null;
+  pendingPostpone: boolean;
 }
 
 interface Store {
@@ -43,9 +44,11 @@ interface Store {
   setCaptureLive: (on: boolean) => void;
   submitCapture: () => { ok: boolean; reason?: string };
   togglePostpone: (athleteId: string) => void;
+  togglePendingPostpone: () => void;
   removeCurrentCheck: (athleteId: string) => void;
   setCalibrated: (ok: boolean) => void;
   isOverLimitFor: (curL: number, curR: number, prev: BladeCheck | null) => boolean;
+  postponeActiveFor: (athleteId: string, pendingOverLimit: boolean) => boolean;
 }
 
 function buildInitialRoster(checks: BladeCheck[]): RosterRow[] {
@@ -62,7 +65,7 @@ function buildInitialRoster(checks: BladeCheck[]): RosterRow[] {
       bladeQr: a.bladeQr,
       lastCheck: prev,
       currentCheck: cur,
-      overLimit: cur && prev ? (diffAngle(cur.angleLeft, prev.angleLeft) > DIFF_THRESHOLD || diffAngle(cur.angleRight, prev.angleRight) > DIFF_THRESHOLD) : false,
+      overLimit: !!(cur && prev && (diffAngle(cur.angleLeft, prev.angleLeft) > DIFF_THRESHOLD || diffAngle(cur.angleRight, prev.angleRight) > DIFF_THRESHOLD)),
       pending: !cur
     };
   });
@@ -82,7 +85,8 @@ export const useStationStore = create<Store>((set, get) => ({
     anchor2: [580, 300],
     calibrated: false,
     isLive: false,
-    error: null
+    error: null,
+    pendingPostpone: false
   },
 
   init() {
@@ -90,8 +94,10 @@ export const useStationStore = create<Store>((set, get) => ({
       const raw = localStorage.getItem('blade-station.checks');
       if (raw) {
         const saved = JSON.parse(raw) as BladeCheck[];
-        const merged = [...INITIAL_CHECKS.filter(c => c.sessionId !== CURRENT_SESSION_ID),
-          ...saved.filter(c => c.sessionId === CURRENT_SESSION_ID)];
+        const merged = [
+          ...INITIAL_CHECKS.filter(c => c.sessionId !== CURRENT_SESSION_ID),
+          ...saved.filter(c => c.sessionId === CURRENT_SESSION_ID)
+        ];
         set({ checks: merged, roster: buildInitialRoster(merged) });
       }
       const cal = localStorage.getItem('blade-station.calibration');
@@ -112,6 +118,7 @@ export const useStationStore = create<Store>((set, get) => ({
           angleLeft: r1(prev ? prev.angleLeft + (Math.random() - 0.5) * 1.2 : 88.5 + Math.random()),
           angleRight: r1(prev ? prev.angleRight + (Math.random() - 0.5) * 1.2 : 88.0 + Math.random()),
           wear: prev?.wear || 'normal',
+          pendingPostpone: row?.currentCheck?.postponeTag || false,
           error: null
         }
       };
@@ -135,15 +142,29 @@ export const useStationStore = create<Store>((set, get) => ({
     return diffAngle(curL, prev.angleLeft) > DIFF_THRESHOLD || diffAngle(curR, prev.angleRight) > DIFF_THRESHOLD;
   },
 
+  postponeActiveFor(athleteId, pendingOverLimit) {
+    const s = get();
+    const row = s.roster.find(r => r.athleteId === athleteId);
+    if (!row) return false;
+    if (row.currentCheck) return !!row.currentCheck.postponeTag;
+    return pendingOverLimit && s.capture.pendingPostpone;
+  },
+
   submitCapture() {
     const s = get();
     const { capture, checks, roster } = s;
     if (!capture.selectedAthleteId) return { ok: false, reason: '未选中运动员' };
     const row = roster.find(r => r.athleteId === capture.selectedAthleteId)!;
     const overLimit = s.isOverLimitFor(capture.angleLeft, capture.angleRight, row.lastCheck);
-    if (overLimit && !row.currentCheck?.postponeTag) {
+
+    const postponeTag = row.currentCheck
+      ? !!row.currentCheck.postponeTag
+      : (overLimit ? capture.pendingPostpone : false);
+
+    if (overLimit && !postponeTag) {
       return { ok: false, reason: '刃角差值超限，请教练先勾选「暂缓参赛」标签' };
     }
+
     const auth = JSON.parse(localStorage.getItem('blade-station.auth') || '{}');
     const newCheck: BladeCheck = {
       id: `c-${row.athleteId}-${Date.now()}`,
@@ -156,7 +177,7 @@ export const useStationStore = create<Store>((set, get) => ({
       wear: capture.wear,
       checkerId: auth.userId || 'u-checker-01',
       checkedAt: new Date().toISOString(),
-      postponeTag: overLimit ? (row.currentCheck?.postponeTag || false) : false,
+      postponeTag,
       difference: row.lastCheck ? {
         left: diffAngle(capture.angleLeft, row.lastCheck.angleLeft),
         right: diffAngle(capture.angleRight, row.lastCheck.angleRight)
@@ -165,7 +186,11 @@ export const useStationStore = create<Store>((set, get) => ({
     const others = checks.filter(c => !(c.athleteId === row.athleteId && c.sessionId === s.sessionId));
     const nextChecks = [...others, newCheck];
     localStorage.setItem('blade-station.checks', JSON.stringify(nextChecks.filter(c => c.sessionId === s.sessionId)));
-    set({ checks: nextChecks, roster: buildInitialRoster(nextChecks), capture: { ...capture, selectedAthleteId: null } });
+    set({
+      checks: nextChecks,
+      roster: buildInitialRoster(nextChecks),
+      capture: { ...capture, selectedAthleteId: null, pendingPostpone: false }
+    });
     return { ok: true };
   },
 
@@ -176,10 +201,17 @@ export const useStationStore = create<Store>((set, get) => ({
       const cc = r.currentCheck ? { ...r.currentCheck, postponeTag: !r.currentCheck.postponeTag } : null;
       return { ...r, currentCheck: cc };
     });
-    const checks = s.checks.map(c => c.athleteId === athleteId && c.sessionId === s.sessionId
-      ? { ...c, postponeTag: !c.postponeTag } : c);
+    const checks = s.checks.map(c =>
+      c.athleteId === athleteId && c.sessionId === s.sessionId
+        ? { ...c, postponeTag: !c.postponeTag }
+        : c
+    );
     localStorage.setItem('blade-station.checks', JSON.stringify(checks.filter(c => c.sessionId === s.sessionId)));
     set({ roster, checks });
+  },
+
+  togglePendingPostpone() {
+    set(state => ({ capture: { ...state.capture, pendingPostpone: !state.capture.pendingPostpone } }));
   },
 
   removeCurrentCheck(athleteId) {
