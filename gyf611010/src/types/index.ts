@@ -189,3 +189,20 @@ export interface AppState {
   /** 是否处于监控模式 */
   isMonitoring: boolean;
 }
+
+export interface SecurityAuditLog {
+  id: string;
+  timestamp: Date;
+  eventType: 'user_locked' | 'user_unlocked' | 'forgery_detected' | 'forgery_reported' | 'sms_sent' | 'sms_failed' | 'login' | 'logout' | 'data_interruption' | 'service_initialized';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  actorUserId: string;
+  actorUserName: string;
+  targetUserId?: string;
+  targetUserName?: string;
+  cheeseWheelId?: string;
+  cheeseWheelNumber?: string;
+  details: string;
+  metadata?: Record<string, unknown>;
+  reported?: boolean;
+  reportedAt?: Date;
+}
