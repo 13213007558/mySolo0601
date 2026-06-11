@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.xe-root {
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.xe-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.xe-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.xe-endpoint {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}

@@ -1,0 +1,132 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.sd-root {
+  background: linear-gradient(180deg, var(--bg-secondary), var(--bg-primary));
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px 28px;
+}
+
+.sd-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.sd-clock {
+  font-size: 28px;
+  color: var(--text-primary);
+  font-weight: 700;
+  padding: 4px 16px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+.sd-scorerow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.sd-side {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.sd-side.flash {
+  border-color: var(--accent-green);
+  box-shadow: var(--glow-green);
+  animation: hitFlash 0.3s ease-out;
+}
+
+.sd-side.right {
+  text-align: center;
+}
+
+.sd-name {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.sd-prio {
+  color: var(--accent-red);
+  font-size: 14px;
+}
+
+.sd-score {
+  font-size: 96px;
+  line-height: 1;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.sd-vs {
+  font-size: 32px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.sd-cards {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sd-cards span {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: transparent;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.card-yellow.on {
+  background: var(--accent-yellow);
+  color: #000;
+  box-shadow: var(--glow-yellow);
+}
+
+.card-red.on {
+  background: var(--accent-red);
+  color: #fff;
+  box-shadow: var(--glow-red);
+}
+
+.card-black.on {
+  background: #000;
+  color: #fff;
+  border-color: var(--text-primary);
+}
+
+@keyframes hitFlash {
+  0% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8), 0 0 80px rgba(0, 255, 136, 0.4); border-color: var(--accent-green); }
+  100% { box-shadow: none; border-color: var(--accent-green-dim); }
+}

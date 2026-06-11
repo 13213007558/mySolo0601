@@ -1,0 +1,1 @@
+import{K as o,d as r}from"./keyboard-mapper2.js";const a=o,p=r;export{a as KeyboardMapper,p as defineCustomElement}

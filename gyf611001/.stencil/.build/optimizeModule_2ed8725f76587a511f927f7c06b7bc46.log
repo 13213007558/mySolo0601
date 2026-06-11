@@ -1,0 +1,1 @@
+import{C as o,d as t}from"./countdown-timer2.js";const r=o,s=t;export{r as CountdownTimer,s as defineCustomElement}

@@ -1,0 +1,59 @@
+:host {
+  display: block;
+}
+
+.oc-root {
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.oc-root.offline {
+  border-color: var(--accent-yellow);
+  background: rgba(255, 204, 0, 0.06);
+}
+
+.oc-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.oc-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.oc-dot.green {
+  background: var(--accent-green);
+  box-shadow: 0 0 8px var(--accent-green);
+}
+
+.oc-dot.red {
+  background: var(--accent-red);
+  box-shadow: 0 0 8px var(--accent-red);
+  animation: pulseWarn 1.2s infinite;
+}
+
+.oc-meta {
+  display: flex;
+  gap: 20px;
+  color: var(--text-secondary);
+}
+
+.oc-warn {
+  margin-top: 8px;
+  color: var(--accent-yellow);
+  font-size: 12px;
+}
+
+.oc-sync {
+  margin-top: 8px;
+}

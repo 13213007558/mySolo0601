@@ -1,0 +1,1 @@
+import{S as s,d as o}from"./score-display2.js";const r=s,a=o;export{r as ScoreDisplay,a as defineCustomElement}

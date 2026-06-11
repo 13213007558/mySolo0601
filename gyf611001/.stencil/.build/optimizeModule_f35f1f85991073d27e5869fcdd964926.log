@@ -1,0 +1,1 @@
+import{O as o,d as s}from"./offline-cache2.js";const a=o,c=s;export{a as OfflineCache,c as defineCustomElement}

@@ -1,0 +1,26 @@
+{
+  "name": "fencing-referee-panel",
+  "version": "1.0.0",
+  "description": "花剑裁判判罚席 - Fencing Referee Panel Web Components",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "collection": "dist/collection/collection-manifest.json",
+  "collection:main": "dist/collection/index.js",
+  "unpkg": "dist/fencing-referee-panel/fencing-referee-panel.esm.js",
+  "files": [
+    "dist/",
+    "loader/"
+  ],
+  "scripts": {
+    "build": "stencil build",
+    "start": "stencil build --dev --watch --serve",
+    "generate": "stencil generate"
+  },
+  "devDependencies": {
+    "@stencil/core": "^4.12.0",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  },
+  "license": "MIT"
+}

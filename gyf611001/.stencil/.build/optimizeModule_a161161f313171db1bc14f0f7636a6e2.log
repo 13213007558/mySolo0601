@@ -1,0 +1,1 @@
+import{C as o,d as r}from"./controversy-mode2.js";const s=o,t=r;export{s as ControversyMode,t as defineCustomElement}

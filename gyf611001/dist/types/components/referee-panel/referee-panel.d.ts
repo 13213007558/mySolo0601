@@ -1,0 +1,34 @@
+import { BoutState, KeyboardAction } from '../../utils/types';
+export declare class RefereePanel {
+    el: HTMLElement;
+    state: BoutState;
+    showBreakFullscreen: boolean;
+    showPinDialog: boolean;
+    pendingEditAction: (() => void) | null;
+    showScoreEdit: boolean;
+    editLeft: number;
+    editRight: number;
+    private clockInterval;
+    componentWillLoad(): void;
+    disconnectedCallback(): void;
+    private syncFromCache;
+    private persistCache;
+    private startClock;
+    private stopClock;
+    private togglePause;
+    private addTouch;
+    private addCard;
+    private undoLast;
+    private triggerFlash;
+    private applyCardUi;
+    onKeyboardAction(ev: CustomEvent<KeyboardAction>): void;
+    private startBreak;
+    private onBreakEnded;
+    private requestScoreEdit;
+    private onPinValidated;
+    private confirmScoreEdit;
+    private onAnnotationAdded;
+    private sealBout;
+    private onExportUpload;
+    render(): any;
+}

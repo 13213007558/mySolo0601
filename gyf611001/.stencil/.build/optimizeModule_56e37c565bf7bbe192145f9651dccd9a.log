@@ -1,0 +1,1 @@
+import{RefereePanel as e,d as o}from"./index.js";const r=e,s=o;export{r as RefereePanel,s as defineCustomElement}
