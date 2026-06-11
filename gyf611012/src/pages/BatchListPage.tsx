@@ -73,7 +73,7 @@ export default function BatchListPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/')}
             className="btn-hard-ghost !px-3 !py-2"
             title="返回总览台"
           >
@@ -242,7 +242,7 @@ export default function BatchListPage() {
                           </button>
                         )}
                         <button
-                          onClick={() => navigate(`/batches/${b.id}`)}
+                          onClick={() => navigate(`/batches/${b.id}/summary`)}
                           className="btn-hard-ghost !px-3 !py-1.5 !text-xs"
                           title="查看汇总"
                         >

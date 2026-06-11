@@ -109,7 +109,7 @@ export default function BatchSummaryPage() {
       totalCount: batch.totalQuantity,
     });
     if (order) {
-      navigate(`/return-orders/${order.id}`);
+      navigate(`/approvals/${order.id}`);
     }
   };
 

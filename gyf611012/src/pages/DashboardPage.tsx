@@ -155,7 +155,7 @@ export default function DashboardPage() {
                   const progress = percentOf(b.inspectedCount, b.totalQuantity);
                   return (
                     <tr key={b.id} className="border-t border-ink-700/60 hover:bg-ink-700/20 cursor-pointer"
-                      onClick={() => navigate(`/batches/${b.id}`)}>
+                      onClick={() => navigate(`/batches/${b.id}/summary`)}>
                       <td className="px-5 py-3 font-mono text-ink-200">{b.batchNo}</td>
                       <td className="px-5 py-3 text-ink-300 max-w-[200px] truncate">{b.supplierName}</td>
                       <td className="px-5 py-3 text-ink-400 font-mono text-xs">

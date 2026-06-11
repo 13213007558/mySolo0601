@@ -14,6 +14,16 @@ import { SaffronGrade as Grade } from '@/types';
 import { COLOR_CARDS, MOCK_BATCHES, MOCK_RETURN_ORDERS, USERS } from '@/data/seedData';
 import { dayjs, genId } from '@/utils/helpers';
 
+const GRADE_ORDER: SaffronGrade[] = [
+  Grade.GRADE_S,
+  Grade.GRADE_A,
+  Grade.GRADE_B,
+  Grade.GRADE_C,
+  Grade.GRADE_D,
+  Grade.GRADE_E,
+  Grade.GRADE_F,
+];
+
 interface AppState {
   users: User[];
   currentUser: User;
@@ -68,6 +78,65 @@ interface AppState {
   ) => { success: boolean; error?: string };
 
   refreshReturnOrderStatuses: () => void;
+}
+
+function tryAutoCreateReturnOrder(
+  state: {
+    returnOrders: ReturnOrder[];
+    colorCards: ColorCard[];
+    batches: BatchInfo[];
+  },
+  batchId: string,
+  applicantId: string,
+  applicantName: string
+): ReturnOrder | null {
+  const batch = state.batches.find((b) => b.id === batchId);
+  if (!batch) return null;
+  if (batch.outOfThresholdCount <= batch.totalQuantity * 0.2) return null;
+  const existingActive = state.returnOrders.some(
+    (r) =>
+      r.batchId === batchId &&
+      ['PENDING_APPROVAL', 'FIRST_APPROVED', 'FINAL_APPROVED', 'LOCKED', 'EFFECTIVE'].includes(
+        r.status
+      )
+  );
+  if (existingActive) return null;
+
+  const expectedCard = state.colorCards.find((c) => c.grade === batch.expectedGrade);
+  const threshold = expectedCard?.maxDeltaE ?? 3;
+  let degradedToGrade: SaffronGrade = Grade.GRADE_C;
+  for (const g of GRADE_ORDER) {
+    const card = state.colorCards.find((c) => c.grade === g);
+    if (card && batch.avgDeltaE <= card.maxDeltaE) {
+      degradedToGrade = g;
+      break;
+    }
+  }
+  const newOrder: ReturnOrder = {
+    id: genId('ro'),
+    returnNo: `RT-${dayjs().format('YYYYMMDD')}-${String(
+      state.returnOrders.length + 1
+    ).padStart(3, '0')}`,
+    batchId: batch.id,
+    batchNo: batch.batchNo,
+    supplierName: batch.supplierName,
+    originalGrade: batch.expectedGrade,
+    degradedToGrade,
+    degradationReason: `系统自动检测：批次 ${batch.batchNo} 共 ${batch.totalQuantity} 条，超阈 ${batch.outOfThresholdCount} 条（占比 ${(
+      (batch.outOfThresholdCount / batch.totalQuantity) *
+      100
+    ).toFixed(1)}%），平均ΔE ${batch.avgDeltaE}，最大ΔE ${batch.maxDeltaE}，超出合同等级 ${batch.expectedGrade} 阈值 ${threshold}，自动触发降级退货申请，待双人确认。`,
+    avgDeltaE: batch.avgDeltaE,
+    maxDeltaE: batch.maxDeltaE,
+    outOfThresholdCount: batch.outOfThresholdCount,
+    totalCount: batch.totalQuantity,
+    applicantId,
+    applicantName,
+    status: 'PENDING_APPROVAL',
+    createdAt: dayjs().toISOString(),
+    irrevocableUntil: dayjs().add(1, 'year').toISOString(),
+  };
+  return newOrder;
 }
 
 function emptyDist(): Record<SaffronGrade, number> {
@@ -181,7 +250,18 @@ export const useAppStore = create<AppState>()(
                   : b
               )
             : s.batches;
-          return { silkRecords: records, batches };
+          const nextState = { ...s, batches };
+          const autoOrder = tryAutoCreateReturnOrder(
+            nextState,
+            rec.batchId,
+            user.id,
+            user.name
+          );
+          return {
+            silkRecords: records,
+            batches,
+            returnOrders: autoOrder ? [...s.returnOrders, autoOrder] : s.returnOrders,
+          };
         });
         return rec;
       },
@@ -198,7 +278,18 @@ export const useAppStore = create<AppState>()(
                   : b
               )
             : s.batches;
-          return { silkRecords: allRecords, batches };
+          const nextState = { ...s, batches };
+          const autoOrder = tryAutoCreateReturnOrder(
+            nextState,
+            batchId,
+            s.currentUser.id,
+            s.currentUser.name
+          );
+          return {
+            silkRecords: allRecords,
+            batches,
+            returnOrders: autoOrder ? [...s.returnOrders, autoOrder] : s.returnOrders,
+          };
         }),
 
       applyReturnOrder: (params) => {

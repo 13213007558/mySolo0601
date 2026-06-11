@@ -209,7 +209,7 @@ export default function ReportExportPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/')}
             className="btn-hard-ghost !px-3 !py-2"
             title={t('common.back')}
           >

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Listbox } from '@headlessui/react';
+import { Listbox, Dialog } from '@headlessui/react';
 import {
   ChevronsUpDown,
   Check,
@@ -8,9 +8,11 @@ import {
   Camera,
   AlertTriangle,
   Eye,
+  FileCheck2,
+  ArrowRight,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/useAppStore';
 import { useSeedBatchRecords } from '@/hooks/useSeedBatchRecords';
