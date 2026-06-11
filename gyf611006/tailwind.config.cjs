@@ -1,0 +1,70 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/pages/**/*.{js,jsx,ts,tsx}",
+    "./src/components/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'warning': {
+          50: '#FFF5F0',
+          100: '#FFE8DC',
+          200: '#FFD0B8',
+          300: '#FFB088',
+          400: '#FF8B5A',
+          500: '#FF6B35',
+          600: '#F55015',
+          700: '#CC3D0A',
+          800: '#A33009',
+          900: '#7A2508',
+        },
+        'safety': {
+          50: '#F0FDF4',
+          100: '#DCFCE7',
+          200: '#BBF7D0',
+          300: '#86EFAC',
+          400: '#4ADE80',
+          500: '#2ECC71',
+          600: '#16A34A',
+          700: '#15803D',
+          800: '#166534',
+          900: '#14532D',
+        },
+        'danger': {
+          50: '#FEF2F2',
+          100: '#FEE2E2',
+          200: '#FECACA',
+          300: '#FCA5A5',
+          400: '#F87171',
+          500: '#E74C3C',
+          600: '#DC2626',
+          700: '#B91C1C',
+          800: '#991B1B',
+          900: '#7F1D1D',
+        },
+        'dark': {
+          50: '#F8F8FC',
+          100: '#F0F0F7',
+          200: '#E0E0EF',
+          300: '#C4C4D9',
+          400: '#9A9ABF',
+          500: '#6B6B9E',
+          600: '#4A4A7A',
+          700: '#35355C',
+          800: '#1A1A2E',
+          900: '#0F0F1A',
+        },
+      },
+      fontFamily: {
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+      },
+      boxShadow: {
+        'glow-warning': '0 0 20px rgba(255, 107, 53, 0.4)',
+        'glow-danger': '0 0 20px rgba(231, 76, 60, 0.4)',
+        'glow-safety': '0 0 20px rgba(46, 204, 113, 0.4)',
+      },
+    },
+  },
+  plugins: [],
+}
