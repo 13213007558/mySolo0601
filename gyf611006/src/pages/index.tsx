@@ -107,6 +107,7 @@ const IndexPage: React.FC = () => {
             <svg
               viewBox="0 0 600 600"
               className="absolute inset-0 w-full h-full"
+              style={{ pointerEvents: 'none' }}
               preserveAspectRatio="xMidYMid meet"
             >
               {showHistoryOverlay && <HistoryOverlay width={600} height={600} />}
