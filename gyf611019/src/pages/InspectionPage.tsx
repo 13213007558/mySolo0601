@@ -7,8 +7,9 @@ import {
   generateId,
   readScaleWeight,
   captureMicroscope,
-  createMockAnalysis,
-  confirmScrap
+  confirmScrap,
+  analyzeWear,
+  saveInspection
 } from '../api';
 
 interface Props {
@@ -42,6 +43,8 @@ export default function InspectionPage({ items, setItems }: Props) {
   const [weight, setWeight] = useState(0);
   const [isCapturing, setIsCapturing] = useState(false);
   const [showReview, setShowReview] = useState(false);
+  const [currentItemId, setCurrentItemId] = useState<string>('');
+  const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -200,23 +203,41 @@ export default function InspectionPage({ items, setItems }: Props) {
   const runAnalysis = async () => {
     if (!image) return;
     setIsAnalyzing(true);
-    setTimeout(() => {
-      const result = createMockAnalysis(image.id);
+    if (!currentItemId) {
+      setCurrentItemId(generateId());
+    }
+    try {
+      const result = await analyzeWear(image.imageData, selectedTemplate);
       setAnalysis(result);
       setIsAnalyzing(false);
       if (result.needsReview) setShowReview(true);
-    }, 1500);
+    } catch (err) {
+      console.error('Rust analyze_wear failed, fallback error:', err);
+      setIsAnalyzing(false);
+      alert('磨损分析服务异常，请检查后端连接');
+    }
   };
 
-  const addToQueue = () => {
+  const addToQueue = async () => {
     if (!recordInfo.recordNo) {
       alert('请填写唱片编号');
       return;
     }
+    setSaving(true);
+    const recordId = generateId();
+    const itemId = currentItemId || generateId();
+    const status = analysis
+      ? analysis.needsReview
+        ? 'pending_review'
+        : 'completed'
+      : 'queue';
+    const imageWithRecord = image
+      ? { ...image, recordId }
+      : null;
     const newItem: InspectionItem = {
-      id: generateId(),
+      id: itemId,
       record: {
-        id: generateId(),
+        id: recordId,
         sellerId: recordInfo.sellerId || '',
         sellerName: recordInfo.sellerName || '',
         recordNo: recordInfo.recordNo || '',
@@ -226,17 +247,23 @@ export default function InspectionPage({ items, setItems }: Props) {
         weight: recordInfo.weight || 0,
         createdAt: new Date().toISOString()
       },
-      image,
+      image: imageWithRecord,
       analysis,
       finalPrice,
-      status: analysis
-        ? analysis.needsReview
-          ? 'pending_review'
-          : 'completed'
-        : 'queue',
+      status,
       position: items.length
     };
     setItems((prev) => [...prev, newItem]);
+
+    try {
+      await saveInspection(newItem);
+    } catch (err) {
+      console.error('saveInspection failed:', err);
+      alert('数据库持久化失败，记录仅保留在内存中');
+    }
+
+    setSaving(false);
+    setCurrentItemId('');
     setImage(null);
     setAnalysis(null);
     setRecordInfo({
@@ -252,15 +279,30 @@ export default function InspectionPage({ items, setItems }: Props) {
 
   const handleConfirmScrap = async () => {
     const reviewer = '复核员01';
-    try {
-      if (items.length > 0) {
-        await confirmScrap(items[0].id, reviewer);
-      }
-    } catch {
-      /* ignore */
+    const targetId = currentItemId || (items.length > 0 ? items[items.length - 1].id : '');
+    if (!targetId) {
+      alert('没有可确认的鉴定记录');
+      return;
     }
+    try {
+      await confirmScrap(targetId, reviewer);
+    } catch (err) {
+      console.error('confirmScrap failed:', err);
+    }
+    setItems((prev) =>
+      prev.map((it) =>
+        it.id === targetId
+          ? {
+              ...it,
+              status: 'completed',
+              reviewedBy: reviewer,
+              reviewedAt: new Date().toISOString()
+            }
+          : it
+      )
+    );
     setShowReview(false);
-    alert('报废建议已由复核员确认');
+    alert(`报废建议已由 ${reviewer} 确认（记录: ${targetId}）`);
   };
 
   const templateImage =
@@ -572,10 +614,10 @@ export default function InspectionPage({ items, setItems }: Props) {
             <button
               className="btn btn-success"
               onClick={addToQueue}
-              disabled={!recordInfo.recordNo}
+              disabled={!recordInfo.recordNo || saving}
               style={{ flex: 1 }}
             >
-              📋 加入鉴定队列 / 保存记录
+              {saving ? '💾 保存中...' : '📋 加入鉴定队列 / 保存记录'}
             </button>
           </div>
         </div>

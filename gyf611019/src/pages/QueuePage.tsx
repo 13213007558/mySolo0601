@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { InspectionItem } from '../types';
-import { formatPrice, calculatePricing } from '../api';
+import { formatPrice, calculatePricing, saveInspection, analyzeWear } from '../api';
 
 interface Props {
   items: InspectionItem[];
@@ -19,33 +19,61 @@ export default function QueuePage({ items, setItems }: Props) {
     completed: '已完成'
   };
 
-  const moveUp = (index: number) => {
+  const moveUp = async (index: number) => {
     if (index === 0) return;
+    let updated: InspectionItem[] = [];
     setItems((prev) => {
       const arr = [...prev];
       [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
-      return arr.map((it, i) => ({ ...it, position: i }));
+      updated = arr.map((it, i) => ({ ...it, position: i }));
+      return updated;
     });
+    try {
+      for (const it of updated.slice(Math.max(0, index - 1), index + 1)) {
+        await saveInspection(it);
+      }
+    } catch (e) {
+      console.error('persist order failed:', e);
+    }
   };
 
-  const moveDown = (index: number) => {
+  const moveDown = async (index: number) => {
     if (index === items.length - 1) return;
+    let updated: InspectionItem[] = [];
     setItems((prev) => {
       const arr = [...prev];
       [arr[index + 1], arr[index]] = [arr[index], arr[index + 1]];
-      return arr.map((it, i) => ({ ...it, position: i }));
+      updated = arr.map((it, i) => ({ ...it, position: i }));
+      return updated;
     });
+    try {
+      for (const it of updated.slice(index, index + 2)) {
+        await saveInspection(it);
+      }
+    } catch (e) {
+      console.error('persist order failed:', e);
+    }
   };
 
   const removeItem = (id: string) => {
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
-  const processNext = () => {
-    setItems((prev) =>
-      prev.map((it, i) => {
-        if (i === 0 && it.status === 'queue') {
-          const analysis = it.analysis || {
+  const [processing, setProcessing] = useState(false);
+
+  const processNext = async () => {
+    if (processing) return;
+    const first = items.find((it) => it.status === 'queue');
+    if (!first) return;
+    setProcessing(true);
+    try {
+      const imageData = first.image?.imageData;
+      let analysis = first.analysis;
+      if (!analysis) {
+        if (imageData) {
+          analysis = await analyzeWear(imageData, 'standard');
+        } else {
+          analysis = {
             score: Math.round(50 + Math.random() * 40),
             grooveDepthLoss: Math.round(20 + Math.random() * 50),
             scratchDensity: Math.round(Math.random() * 100),
@@ -54,16 +82,18 @@ export default function QueuePage({ items, setItems }: Props) {
             needsReview: Math.random() > 0.5,
             confidence: Math.round(75 + Math.random() * 20)
           };
-          return {
-            ...it,
-            status: analysis.needsReview ? 'pending_review' : 'completed',
-            analysis,
-            finalPrice: calculatePricing(it.record.originalPrice, analysis.score)
-          };
         }
-        return it;
-      })
-    );
+      }
+      const finalPrice = calculatePricing(first.record.originalPrice, analysis.score);
+      const status = analysis.needsReview ? 'pending_review' : 'completed';
+      const updated: InspectionItem = { ...first, analysis, finalPrice, status };
+      setItems((prev) => prev.map((it) => (it.id === first.id ? updated : it)));
+      await saveInspection(updated);
+    } catch (err) {
+      console.error('processNext failed:', err);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const pendingCount = items.filter((i) => i.status === 'queue').length;
@@ -89,8 +119,8 @@ export default function QueuePage({ items, setItems }: Props) {
             </select>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn btn-primary" onClick={processNext} disabled={pendingCount === 0}>
-              ▶ 处理下一个
+            <button className="btn btn-primary" onClick={processNext} disabled={pendingCount === 0 || processing}>
+              {processing ? '⏳ 处理中...' : '▶ 处理下一个'}
             </button>
           </div>
           <div style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>
