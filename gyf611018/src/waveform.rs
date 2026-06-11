@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct WaveformAnalysis {
     pub amplitude: f64,
     pub frequency: f64,
@@ -13,7 +13,7 @@ pub struct WaveformAnalysis {
     pub troughs: Vec<usize>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct WaveformData {
     pub samples: Vec<f32>,
     pub sample_rate: f64,

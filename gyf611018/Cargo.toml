@@ -37,7 +37,7 @@ web-sys = { version = "0.3", features = [
     "MediaDevices",
     "HtmlDivElement",
     "HtmlElement",
-    "Console",
+    "console",
 ] }
 gloo-console = "0.2"
 gloo-storage = "0.3"

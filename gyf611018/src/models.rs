@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Local, NaiveDate};
+use chrono::{DateTime, Local, NaiveDate, Timelike};
 use uuid::Uuid;
 use crate::waveform::{WaveformData, WaveformAnalysis};
 
@@ -57,7 +57,7 @@ impl DetectionStatus {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DetectionRecord {
     pub id: Uuid,
     pub movement_id: String,
@@ -108,7 +108,7 @@ impl DetectionRecord {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct RepairRequest {
     pub id: Uuid,
     pub detection_record_id: Uuid,
@@ -163,7 +163,7 @@ impl RepairRequest {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ShiftSummary {
     pub date: NaiveDate,
     pub shift: ShiftType,
