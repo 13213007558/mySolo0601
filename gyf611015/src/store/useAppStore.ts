@@ -1,16 +1,44 @@
 import { create } from 'zustand';
-import type { Mussel, MeasurementPoint, ReInspectionOrder, Operator } from '@/types';
+import type { Mussel, ReInspectionOrder, Operator } from '@/types';
 import { calcStats, computeGrade, isAnomalous, getQuadrant } from '@/utils/statistics';
 import {
   createEmptyMussel,
   createPoint,
   createReInspectionOrder,
   exportCertificate as genCert,
-  NUCLEUS_BATCHES,
   OPERATORS,
   POOL_HISTORY,
-  genId,
 } from '@/mock/data';
+
+const STORAGE_KEY = 'pearl-gauge-store-v1';
+
+interface PersistState {
+  mussels: Mussel[];
+  currentMusselId: string | null;
+  reInspectionOrders: ReInspectionOrder[];
+  currentOperatorId: string;
+}
+
+function loadPersisted(): PersistState | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistState;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function savePersisted(state: PersistState): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // ignore quota errors
+  }
+}
 
 interface AppState {
   mussels: Mussel[];
@@ -38,13 +66,16 @@ interface AppState {
   completeReInspection: (orderId: string, recheckValue: number, operatorId: string) => void;
   setOperator: (id: string) => void;
   exportCertificate: () => string | null;
+  resetAll: () => void;
 }
 
+const persisted = loadPersisted();
+
 export const useAppStore = create<AppState>((set, get) => ({
-  mussels: [],
-  currentMusselId: null,
-  reInspectionOrders: [],
-  currentOperatorId: OPERATORS[0].id,
+  mussels: persisted?.mussels ?? [],
+  currentMusselId: persisted?.currentMusselId ?? null,
+  reInspectionOrders: persisted?.reInspectionOrders ?? [],
+  currentOperatorId: persisted?.currentOperatorId ?? OPERATORS[0].id,
   thinThreshold: 1.2,
   requiredPoints: 8,
   requiredQuadrants: 3,
@@ -78,10 +109,29 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   addMussel: (poolId, batchId) => {
     const mussel = createEmptyMussel(poolId, batchId);
-    set((s) => ({ mussels: [...s.mussels, mussel], currentMusselId: mussel.id }));
+    set((s) => {
+      const next = { mussels: [...s.mussels, mussel], currentMusselId: mussel.id };
+      savePersisted({
+        mussels: next.mussels,
+        currentMusselId: next.currentMusselId,
+        reInspectionOrders: s.reInspectionOrders,
+        currentOperatorId: s.currentOperatorId,
+      });
+      return next;
+    });
   },
 
-  selectMussel: (id) => set({ currentMusselId: id }),
+  selectMussel: (id) =>
+    set((s) => {
+      const next = { currentMusselId: id };
+      savePersisted({
+        mussels: s.mussels,
+        currentMusselId: id,
+        reInspectionOrders: s.reInspectionOrders,
+        currentOperatorId: s.currentOperatorId,
+      });
+      return next;
+    }),
 
   addPoint: (x, y, thickness) => {
     const state = get();
@@ -123,10 +173,17 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
     }
 
-    set((s) => ({
-      mussels: s.mussels.map((m) => (m.id === mussel.id ? updatedMussel : m)),
-      reInspectionOrders: [...s.reInspectionOrders, ...newOrders],
-    }));
+    set((s) => {
+      const nextMussels = s.mussels.map((m) => (m.id === mussel.id ? updatedMussel : m));
+      const nextOrders = [...s.reInspectionOrders, ...newOrders];
+      savePersisted({
+        mussels: nextMussels,
+        currentMusselId: s.currentMusselId,
+        reInspectionOrders: nextOrders,
+        currentOperatorId: s.currentOperatorId,
+      });
+      return { mussels: nextMussels, reInspectionOrders: nextOrders };
+    });
   },
 
   updatePoint: (pointId, thickness) => {
@@ -156,9 +213,16 @@ export const useAppStore = create<AppState>((set, get) => ({
       gradeReason: gradeResult.reason,
     };
 
-    set((s) => ({
-      mussels: s.mussels.map((m) => (m.id === mussel.id ? updatedMussel : m)),
-    }));
+    set((s) => {
+      const nextMussels = s.mussels.map((m) => (m.id === mussel.id ? updatedMussel : m));
+      savePersisted({
+        mussels: nextMussels,
+        currentMusselId: s.currentMusselId,
+        reInspectionOrders: s.reInspectionOrders,
+        currentOperatorId: s.currentOperatorId,
+      });
+      return { mussels: nextMussels };
+    });
   },
 
   removePoint: (pointId) => {
@@ -178,10 +242,17 @@ export const useAppStore = create<AppState>((set, get) => ({
       gradeReason: gradeResult.reason,
     };
 
-    set((s) => ({
-      mussels: s.mussels.map((m) => (m.id === mussel.id ? updatedMussel : m)),
-      reInspectionOrders: s.reInspectionOrders.filter((o) => o.pointId !== pointId),
-    }));
+    set((s) => {
+      const nextMussels = s.mussels.map((m) => (m.id === mussel.id ? updatedMussel : m));
+      const nextOrders = s.reInspectionOrders.filter((o) => o.pointId !== pointId);
+      savePersisted({
+        mussels: nextMussels,
+        currentMusselId: s.currentMusselId,
+        reInspectionOrders: nextOrders,
+        currentOperatorId: s.currentOperatorId,
+      });
+      return { mussels: nextMussels, reInspectionOrders: nextOrders };
+    });
   },
 
   setEditingPoint: (id) => set({ editingPointId: id }),
@@ -228,13 +299,29 @@ export const useAppStore = create<AppState>((set, get) => ({
       );
     }
 
-    set((s) => ({
-      reInspectionOrders: s.reInspectionOrders.map((o) => (o.id === orderId ? updatedOrder : o)),
-      mussels: updatedMussels,
-    }));
+    set((s) => {
+      const nextOrders = s.reInspectionOrders.map((o) => (o.id === orderId ? updatedOrder : o));
+      savePersisted({
+        mussels: updatedMussels,
+        currentMusselId: s.currentMusselId,
+        reInspectionOrders: nextOrders,
+        currentOperatorId: s.currentOperatorId,
+      });
+      return { reInspectionOrders: nextOrders, mussels: updatedMussels };
+    });
   },
 
-  setOperator: (id) => set({ currentOperatorId: id }),
+  setOperator: (id) =>
+    set((s) => {
+      const next = { currentOperatorId: id };
+      savePersisted({
+        mussels: s.mussels,
+        currentMusselId: s.currentMusselId,
+        reInspectionOrders: s.reInspectionOrders,
+        currentOperatorId: id,
+      });
+      return next;
+    }),
 
   exportCertificate: () => {
     const state = get();
@@ -242,13 +329,20 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (!mussel || mussel.points.length === 0) return null;
     return genCert(mussel, state.currentOperator().name);
   },
-}));
 
-declare global {
-  interface Window {
-    __pearlGauge?: typeof useAppStore;
-  }
-}
-if (typeof window !== 'undefined') {
-  window.__pearlGauge = useAppStore;
-}
+  resetAll: () => {
+    set({
+      mussels: [],
+      currentMusselId: null,
+      reInspectionOrders: [],
+      editingPointId: null,
+    });
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // ignore
+      }
+    }
+  },
+}));
