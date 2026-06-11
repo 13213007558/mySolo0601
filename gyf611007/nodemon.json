@@ -1,0 +1,5 @@
+{
+  "watch": ["api", "migrations"],
+  "ext": "ts,html,css",
+  "exec": "tsx --tsconfig ./tsconfig.json ./api/server.ts"
+}
