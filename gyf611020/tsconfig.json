@@ -26,11 +26,14 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ]
-    }
+      ],
+      "react-native": ["./node_modules/react-native-web/dist/index.d.ts"]
+    },
+    "types": ["react-native"]
   },
   "include": [
     "src",
-    "api"
+    "api",
+    "src/types/global.d.ts"
   ]
 }
