@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --screen-brightness: 1;
+  font-family: 'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: #030712;
+  color: #F3F4F6;
+  filter: brightness(var(--screen-brightness));
+  transition: filter 0.8s ease;
+}
+
+.darkbox-mode {
+  --screen-brightness: 0.92;
+}
+
+.darkbox-mode::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%);
+}
+
+.darkbox-led-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 9999;
+  background: linear-gradient(90deg, transparent 0%, #D4AF37 50%, transparent 100%);
+  box-shadow: 0 0 12px 2px rgba(212,175,55,0.55);
+  animation: breathe-led 3s ease-in-out infinite;
+}
+
+@layer components {
+  .btn-hard {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 font-mono font-semibold uppercase tracking-wider text-sm transition-all duration-100 rounded-none shadow-btn active:shadow-btn-pressed active:translate-y-[3px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gold-500 focus-visible:ring-offset-ink-900;
+  }
+  .btn-hard-primary {
+    @apply btn-hard bg-saffron-700 text-white hover:bg-saffron-600;
+  }
+  .btn-hard-gold {
+    @apply btn-hard bg-gold-500 text-ink-900 hover:bg-gold-400;
+  }
+  .btn-hard-ghost {
+    @apply btn-hard bg-ink-800 text-ink-100 border border-ink-700 hover:bg-ink-700;
+  }
+  .btn-hard-danger {
+    @apply btn-hard bg-saffron-500 text-white hover:bg-saffron-400;
+  }
+  .btn-hard-success {
+    @apply btn-hard bg-emerald-700 text-white hover:bg-emerald-600;
+  }
+
+  .panel {
+    @apply bg-ink-800/80 border border-ink-700 backdrop-blur-sm;
+  }
+  .panel-header {
+    @apply flex items-center justify-between px-5 py-3 border-b border-ink-700 bg-ink-900/50;
+  }
+  .panel-title {
+    @apply font-serif text-lg font-bold text-ink-100 tracking-wide;
+  }
+
+  .data-chip {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none font-mono text-xs border;
+  }
+
+  .color-card-strip {
+    @apply relative flex-1 min-w-[84px] cursor-pointer transition-all duration-200 flex flex-col items-center justify-end pb-3 pt-5 border-2 border-ink-600 select-none hover:scale-[1.05] hover:-translate-y-1 focus:outline-none;
+  }
+  .color-card-strip.active {
+    @apply border-gold-500 animate-pulse-gold shadow-gold-glow z-10;
+  }
+
+  .gauge-track {
+    @apply relative h-3 bg-ink-900 border border-ink-600 overflow-hidden;
+  }
+  .gauge-fill {
+    @apply absolute inset-y-0 left-0 transition-all duration-500 ease-out;
+  }
+
+  .led-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.1em;
+  }
+
+  .stamp-seal {
+    @apply inline-flex items-center justify-center rounded-full border-4 font-serif font-black uppercase text-center;
+    animation: stamp 0.35s ease-out forwards;
+  }
+
+  .target-corner {
+    @apply absolute w-6 h-6 border-gold-500 pointer-events-none;
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(212,175,55,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,175,55,0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .progress-track {
+    @apply h-2 bg-ink-900 border border-ink-700 overflow-hidden;
+  }
+  .progress-bar {
+    @apply h-full transition-all duration-500 ease-out;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #4B5563 transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #4B5563;
+    border-radius: 0;
+  }
+
+  .text-shadow-gold {
+    text-shadow: 0 0 8px rgba(212,175,55,0.55);
+  }
+  .text-shadow-red {
+    text-shadow: 0 0 8px rgba(220,20,60,0.65);
+  }
+}
