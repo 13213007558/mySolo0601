@@ -139,7 +139,9 @@ export class Store {
     if (!judge) return false;
     const target = judge.wines.get(blindId);
     if (!target) return false;
-    if (target.status === 'locked') return false;
+
+    const wasActive = target.status === 'active';
+    const willActivate = target.status === 'pending';
 
     this.setState((s) => {
       const j = s.judges.get(judgeId);
@@ -151,7 +153,7 @@ export class Store {
         }
       }
       const tgt = newWines.get(blindId);
-      if (tgt && tgt.status !== 'locked') {
+      if (tgt && tgt.status === 'pending') {
         newWines.set(blindId, { ...tgt, status: 'active' });
       }
       const newJudge: Judge = { ...j, wines: newWines, currentBlindId: blindId };
@@ -160,7 +162,9 @@ export class Store {
       return { ...s, judges: newJudges };
     });
 
-    this.writeAudit('WINE_ACTIVATED', { judgeId, blindId, detail: `激活酒款 ${blindId}` });
+    if (willActivate && !wasActive) {
+      this.writeAudit('WINE_ACTIVATED', { judgeId, blindId, detail: `激活酒款 ${blindId}` });
+    }
     return true;
   }
 
@@ -238,13 +242,29 @@ export class Store {
         detail: `达到 ${sipLimit} 口上限，系统自动锁定评分`,
       });
     }
+  }
 
-    if (willLock) {
-      const remaining = this.getNextUnlockedWine(judgeId);
-      if (remaining) {
-        setTimeout(() => this.activateWine(judgeId, remaining), 600);
-      }
-    }
+  reportSipExceeded(judgeId: string, blindId: string): void {
+    const judge = this.state.judges.get(judgeId);
+    if (!judge) return;
+    const ws = judge.wines.get(blindId);
+    if (!ws || ws.status !== 'locked') return;
+
+    const sipLimit = this.state.config.sipLimitPerWine;
+    const attemptSip = ws.sipCount + 1;
+
+    this.writeAudit('SIP_LIMIT_EXCEEDED', {
+      judgeId,
+      blindId,
+      detail: `评委尝试第 ${attemptSip} 口，超出赛规上限 ${sipLimit} 口，触发监审 PIN`,
+    });
+
+    this.requestUnlock(
+      judgeId,
+      blindId,
+      `异常口数告警：第 ${attemptSip} 口超出赛规上限 ${sipLimit} 口`,
+      () => {},
+    );
   }
 
   private getNextUnlockedWine(judgeId: string): string | null {
@@ -290,6 +310,11 @@ export class Store {
       blindId,
       detail: `提交评分：外观${score.appearance}/香气${score.aroma}/口感${score.taste}/余韵${score.finish}，总分 ${total}`,
     });
+
+    const nextWine = this.getNextUnlockedWine(judgeId);
+    if (nextWine) {
+      setTimeout(() => this.activateWine(judgeId, nextWine), 500);
+    }
     return true;
   }
 
