@@ -1,7 +1,7 @@
-import { Component, Prop, State, h, Method, Event, EventEmitter, Watch } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, h, Method, Watch } from '@stencil/core';
 import { buildFIEXml } from '../../utils/helpers';
 
-const ENDPOINT_CACHE_KEY = 'fencing_assoc_endpoint_v1';
+export const SHARED_ENDPOINT_KEY = 'fencing_assoc_endpoint_v1';
 
 @Component({
   tag: 'xml-exporter',
@@ -10,7 +10,6 @@ const ENDPOINT_CACHE_KEY = 'fencing_assoc_endpoint_v1';
 })
 export class XmlExporter {
   @Prop() boutState: any = null;
-  @Prop() associationEndpoint: string = '';
   @Prop() autoUpload: boolean = false;
   @Event() exportComplete: EventEmitter<{ xml: string; uploaded: boolean }>;
   @Event() uploadFailed: EventEmitter<{ error: string }>;
@@ -22,37 +21,34 @@ export class XmlExporter {
   @State() showConfig: boolean = false;
 
   componentWillLoad() {
+    this.loadEndpointFromStorage();
+  }
+
+  @Watch('localEndpoint')
+  onLocalEndpointChange(val: string) {
+    if (typeof localStorage !== 'undefined' && val) {
+      localStorage.setItem(SHARED_ENDPOINT_KEY, val);
+    }
+  }
+
+  private loadEndpointFromStorage() {
     if (typeof localStorage !== 'undefined') {
-      const saved = localStorage.getItem(ENDPOINT_CACHE_KEY);
+      const saved = localStorage.getItem(SHARED_ENDPOINT_KEY) || '';
       if (saved) {
         this.localEndpoint = saved;
-        if (!this.associationEndpoint) {
-          this.associationEndpoint = saved;
-        }
       }
     }
-    if (this.associationEndpoint) {
-      this.localEndpoint = this.associationEndpoint;
-    }
-  }
-
-  @Watch('associationEndpoint')
-  onEndpointPropChange(val: string) {
-    if (val && val !== this.localEndpoint) {
-      this.localEndpoint = val;
-    }
-  }
-
-  private get effectiveEndpoint(): string {
-    return this.associationEndpoint || this.localEndpoint || '';
   }
 
   private saveEndpoint() {
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(ENDPOINT_CACHE_KEY, this.localEndpoint);
+      localStorage.setItem(SHARED_ENDPOINT_KEY, this.localEndpoint);
     }
-    this.associationEndpoint = this.localEndpoint;
     this.showConfig = false;
+  }
+
+  private get effectiveEndpoint(): string {
+    return this.localEndpoint || '';
   }
 
   @Method()
@@ -82,7 +78,7 @@ export class XmlExporter {
     const xml = await this.buildXml();
     const endpoint = this.effectiveEndpoint;
     if (!endpoint) {
-      this.lastError = '未配置协会系统上传地址';
+      this.lastError = '未配置协会系统上传地址，请先在「配置」中填写';
       this.lastUploadOk = false;
       this.uploadFailed.emit({ error: this.lastError });
       return false;
@@ -113,6 +109,10 @@ export class XmlExporter {
   @Method()
   async exportAndUpload(): Promise<{ xml: string; uploaded: boolean }> {
     const xml = await this.download();
+    const endpoint = this.effectiveEndpoint;
+    if (!endpoint) {
+      return { xml, uploaded: false };
+    }
     let uploaded = false;
     try {
       uploaded = await this.uploadToAssociation();
@@ -125,6 +125,14 @@ export class XmlExporter {
   @Method()
   async getEffectiveEndpoint(): Promise<string> {
     return this.effectiveEndpoint;
+  }
+
+  @Method()
+  async setEndpoint(url: string): Promise<void> {
+    this.localEndpoint = url;
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(SHARED_ENDPOINT_KEY, url);
+    }
   }
 
   render() {
@@ -150,7 +158,7 @@ export class XmlExporter {
               />
             </label>
             <button class="btn-flat btn-primary xe-save" onClick={() => this.saveEndpoint()}>保存</button>
-            <p class="xe-hint">地址会保存在本地浏览器。留空时仅下载，不上传。</p>
+            <p class="xe-hint">地址保存后，xml-exporter 与 offline-cache 共用同一端点。留空时仅下载，不上传。</p>
           </div>
         )}
 
@@ -178,12 +186,15 @@ export class XmlExporter {
             <span class="xe-ep-value">{endpoint}</span>
           </div>
         )}
+        {!endpoint && (
+          <div class="xe-endpoint xe-endpoint-missing">未配置上传端点 — 请点击「配置」设置协会系统地址</div>
+        )}
 
         {this.lastUploadOk === true && (
-          <div class="xe-status xe-status-ok">✓ 上次上传成功</div>
+          <div class="xe-status xe-status-ok">✓ 上传成功</div>
         )}
         {this.lastUploadOk === false && this.lastError && (
-          <div class="xe-status xe-status-err">✕ 上传失败：{this.lastError}</div>
+          <div class="xe-status xe-status-err">✕ {this.lastError}</div>
         )}
       </div>
     );
