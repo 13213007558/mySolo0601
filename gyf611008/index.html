@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>精品咖啡杯测滑分台 | SCA Cupping Score</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-left">
+      <h1>精品咖啡合作社 · 杯测滑分台</h1>
+      <span class="subtitle">SCA 标准四轴滑分 · 实时偏差对标</span>
+    </div>
+    <div class="header-right">
+      <label class="blind-toggle">
+        <input type="checkbox" id="blindModeToggle">
+        <span class="toggle-slider"></span>
+        <span class="toggle-label">盲测模式</span>
+      </label>
+      <button id="exportBtn" class="btn btn-secondary">导出 CSV</button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <section class="cupping-station">
+      <div class="station-header">
+        <div class="sample-info">
+          <span class="label">杯号：</span>
+          <span id="currentCupNum" class="cup-num">#1</span>
+          <span class="divider">|</span>
+          <span class="label">烘焙曲线编号：</span>
+          <input type="text" id="roastProfileId" class="roast-input" placeholder="如 RP-2024-001">
+        </div>
+        <div class="origin-info" id="originInfo">
+          <span class="label">产地：</span>
+          <span id="originName">埃塞俄比亚 · 耶加雪菲</span>
+          <span class="divider">|</span>
+          <span class="label">处理法：</span>
+          <span id="processMethod">水洗</span>
+        </div>
+      </div>
+
+      <div class="slider-panel">
+        <div class="slider-column">
+          <h3>四轴滑分</h3>
+          <div class="slider-group" id="sliderGroup">
+            <div class="slider-item" data-axis="acidity">
+              <div class="slider-label-row">
+                <span class="axis-name">酸质 Acidity</span>
+                <span class="axis-value" id="value-acidity">7.50</span>
+              </div>
+              <div class="slider-track">
+                <div class="slider-standard-band" id="band-acidity"></div>
+                <input type="range" min="0" max="10" step="0.01" value="7.50" class="axis-slider" id="slider-acidity">
+                <div class="slider-marker standard-marker" id="marker-acidity"></div>
+              </div>
+              <div class="slider-scale">
+                <span>0</span><span>5</span><span>10</span>
+              </div>
+            </div>
+
+            <div class="slider-item" data-axis="sweetness">
+              <div class="slider-label-row">
+                <span class="axis-name">甜感 Sweetness</span>
+                <span class="axis-value" id="value-sweetness">7.50</span>
+              </div>
+              <div class="slider-track">
+                <div class="slider-standard-band" id="band-sweetness"></div>
+                <input type="range" min="0" max="10" step="0.01" value="7.50" class="axis-slider" id="slider-sweetness">
+                <div class="slider-marker standard-marker" id="marker-sweetness"></div>
+              </div>
+              <div class="slider-scale">
+                <span>0</span><span>5</span><span>10</span>
+              </div>
+            </div>
+
+            <div class="slider-item" data-axis="body">
+              <div class="slider-label-row">
+                <span class="axis-name">醇厚度 Body</span>
+                <span class="axis-value" id="value-body">7.50</span>
+              </div>
+              <div class="slider-track">
+                <div class="slider-standard-band" id="band-body"></div>
+                <input type="range" min="0" max="10" step="0.01" value="7.50" class="axis-slider" id="slider-body">
+                <div class="slider-marker standard-marker" id="marker-body"></div>
+              </div>
+              <div class="slider-scale">
+                <span>0</span><span>5</span><span>10</span>
+              </div>
+            </div>
+
+            <div class="slider-item" data-axis="aftertaste">
+              <div class="slider-label-row">
+                <span class="axis-name">余韵 Aftertaste</span>
+                <span class="axis-value" id="value-aftertaste">7.50</span>
+              </div>
+              <div class="slider-track">
+                <div class="slider-standard-band" id="band-aftertaste"></div>
+                <input type="range" min="0" max="10" step="0.01" value="7.50" class="axis-slider" id="slider-aftertaste">
+                <div class="slider-marker standard-marker" id="marker-aftertaste"></div>
+              </div>
+              <div class="slider-scale">
+                <span>0</span><span>5</span><span>10</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="deviation-summary">
+            <span class="label">总偏差：</span>
+            <span id="totalDeviation" class="deviation-value neutral">±0.00</span>
+            <span class="label">综合分：</span>
+            <span id="overallScore" class="score-value">7.50</span>
+          </div>
+        </div>
+
+        <div class="standard-column">
+          <h3>标样参考</h3>
+          <div class="standard-info">
+            <div class="standard-item">
+              <span class="label">标样名称</span>
+              <span id="standardName" class="value">金标 · 耶加雪菲</span>
+            </div>
+            <div class="standard-item">
+              <span class="label">允许偏差带</span>
+              <span class="value">±0.50</span>
+            </div>
+            <div class="standard-scores">
+              <div class="std-score-row"><span>酸质</span><span id="std-acidity">7.80</span></div>
+              <div class="std-score-row"><span>甜感</span><span id="std-sweetness">8.00</span></div>
+              <div class="std-score-row"><span>醇厚度</span><span id="std-body">7.20</span></div>
+              <div class="std-score-row"><span>余韵</span><span id="std-aftertaste">7.50</span></div>
+              <div class="std-score-row total"><span>综合分</span><span id="std-overall">7.63</span></div>
+            </div>
+          </div>
+
+          <div class="defect-section">
+            <h4>缺陷标记</h4>
+            <div class="defect-select-row">
+              <select id="defectSelect" class="defect-select">
+                <option value="">无缺陷</option>
+                <option value="sour_ferment">酸发酵味 -2分</option>
+                <option value="moldy">发霉味 -3分</option>
+                <option value="astringent">涩感 -1.5分</option>
+                <option value="flat">平淡 -1分</option>
+                <option value="bitter">苦感过重 -2分</option>
+                <option value="chemical">化学味 -4分</option>
+              </select>
+              <span class="defect-deduction" id="defectDeduction">-0.00</span>
+            </div>
+            <p class="defect-desc" id="defectDesc">杯测样本无缺陷标记</p>
+          </div>
+
+          <div class="final-score-section">
+            <div class="final-score-row">
+              <span class="label">最终得分</span>
+              <span id="finalScore" class="final-score">7.50</span>
+            </div>
+            <p class="score-grade" id="scoreGrade">精品级</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="station-footer">
+        <div class="validation-hint" id="validationHint">
+          <span class="hint-icon">ⓘ</span>
+          <span id="hintText">请拖动四轴滑块完成打分（每轴至少移动 0.3 分距离）</span>
+        </div>
+        <div class="action-buttons">
+          <button id="resetBtn" class="btn btn-outline">重置</button>
+          <button id="submitBtn" class="btn btn-primary" disabled>提交杯测</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="matrix-section">
+      <div class="matrix-header">
+        <h2>批量杯测矩阵</h2>
+        <div class="matrix-actions">
+          <button id="addCupBtn" class="btn btn-sm btn-secondary">+ 新增杯样</button>
+        </div>
+      </div>
+      <div class="matrix-table-container">
+        <table class="matrix-table" id="matrixTable">
+          <thead>
+            <tr>
+              <th>杯号</th>
+              <th>烘焙曲线</th>
+              <th class="origin-col">产地</th>
+              <th>酸质</th>
+              <th>甜感</th>
+              <th>醇厚</th>
+              <th>余韵</th>
+              <th>缺陷</th>
+              <th>偏差</th>
+              <th>最终分</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="matrixBody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div class="blind-overlay" id="blindOverlay">
+    <div class="blind-dialog">
+      <h3>盲测解锁</h3>
+      <p>请输入解锁密码查看产地信息</p>
+      <input type="password" id="blindPassword" placeholder="解锁密码">
+      <div class="blind-actions">
+        <button id="blindCancelBtn" class="btn btn-outline">取消</button>
+        <button id="blindUnlockBtn" class="btn btn-primary">解锁</button>
+      </div>
+      <p class="blind-hint">默认密码：cupping2024</p>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
